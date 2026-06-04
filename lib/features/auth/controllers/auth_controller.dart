@@ -2,41 +2,62 @@ import 'package:get/get.dart';
 import '../../../services/auth_service.dart';
 
 class AuthController extends GetxController {
+  AuthController({AuthService? authService})
+      : authService = authService ?? AuthService();
+
   final AuthService authService;
 
-  AuthController({required this.authService});
+  final RxBool isLoading = false.obs;
+  final RxBool isCheckingSession = true.obs;
+  final RxBool isAuthenticated = false.obs;
+  final RxnString error = RxnString();
 
-  final RxBool _isLoading = false.obs;
-  bool get isLoading => _isLoading.value;
+  @override
+  void onInit() {
+    super.onInit();
+    checkSession();
+  }
 
-  final RxnString _error = RxnString();
-  String? get error => _error.value;
-
-  final RxBool _isAuthenticated = false.obs;
-  bool get isAuthenticated => _isAuthenticated.value;
-
-  final RxnString _userEmail = RxnString();
-  String? get userEmail => _userEmail.value;
-
-  Future<void> login(String email, String password) async {
-    _isLoading.value = true;
-    _error.value = null;
-
+  Future<void> checkSession() async {
+    isCheckingSession.value = true;
     try {
-      final user = await authService.login(email, password);
-      _userEmail.value = user.email;
-      _isAuthenticated.value = true;
-    } catch (e) {
-      _error.value = 'Login failed: $e';
-      _isAuthenticated.value = false;
+      isAuthenticated.value = await authService.restoreSession();
+    } catch (_) {
+      isAuthenticated.value = false;
     } finally {
-      _isLoading.value = false;
+      isCheckingSession.value = false;
     }
   }
 
-  void logout() {
-    _isAuthenticated.value = false;
-    _userEmail.value = null;
-    _error.value = null;
+  Future<void> login(String email, String password) async {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      await authService.login(email, password);
+      isAuthenticated.value = true;
+    } catch (e) {
+      error.value = _formatError(e);
+      isAuthenticated.value = false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> logout() async {
+    await authService.logout();
+    isAuthenticated.value = false;
+  }
+
+  String _formatError(Object e) {
+    final msg = e.toString();
+    if (msg.contains('SocketException') ||
+        msg.contains('Failed host lookup') ||
+        msg.contains('Connection refused')) {
+      return 'Impossible de joindre le serveur. Vérifiez que le backend tourne sur le port 5200.';
+    }
+    if (msg.contains('401') || msg.contains('403')) {
+      return 'Email ou mot de passe incorrect';
+    }
+    return 'Connexion impossible : $msg';
   }
 }
