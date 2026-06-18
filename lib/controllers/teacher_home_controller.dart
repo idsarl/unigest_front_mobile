@@ -32,6 +32,9 @@ class TeacherHomeController extends GetxController {
     try {
       teacherName.value = _session.teacherName;
 
+      // 0. Générer les séances du jour
+      await _repo.genererSeancesDuJour();
+
       // 1. Récupération des séances du jour
       final fetchedSeances = await _repo.getSeancesDuJour();
       if (fetchedSeances is List) {
@@ -66,7 +69,9 @@ class TeacherHomeController extends GetxController {
 
       // 4. Moyennes matière en cours
       final moyenneData = await _repo.getMoyenneMatiere();
-      if (moyenneData != null && moyenneData['message'] == null) {
+      print('=== DEBUG Moyenne Matiere ===');
+      print('moyenneData: $moyenneData');
+      if (moyenneData != null) {
         moyenneMatiere.value = moyenneData;
       } else {
         moyenneMatiere.clear();
@@ -76,6 +81,41 @@ class TeacherHomeController extends GetxController {
       error.value = 'Erreur lors du chargement des données : $e';
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Démarrer une séance
+  Future<void> demarrerSeance(int index) async {
+    final seance = seances[index];
+    final affectationId = seance['affectationId'] as int;
+    final matiere = seance['matiere'] as String;
+
+    try {
+      final result = await _repo.demarrerSeance(affectationId, matiere);
+      // Mettre à jour la séance dans la liste
+      seances[index] = result;
+      Get.snackbar('Succès', 'Séance démarrée avec succès !',
+          snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      Get.snackbar('Erreur', 'Impossible de démarrer la séance : $e',
+          snackPosition: SnackPosition.BOTTOM);
+    }
+  }
+
+  /// Terminer une séance
+  Future<void> terminerSeance(int index) async {
+    final seance = seances[index];
+    final seanceId = seance['id'] as int;
+
+    try {
+      final result = await _repo.terminerSeance(seanceId);
+      // Mettre à jour la séance dans la liste
+      seances[index] = result;
+      Get.snackbar('Succès', 'Séance terminée avec succès !',
+          snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      Get.snackbar('Erreur', 'Impossible de terminer la séance : $e',
+          snackPosition: SnackPosition.BOTTOM);
     }
   }
 }

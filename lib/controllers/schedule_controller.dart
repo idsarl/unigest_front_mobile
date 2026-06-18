@@ -18,23 +18,37 @@ class ScheduleController extends GetxController {
   }
 
   Future<void> loadData() async {
-    await loadAffectationsAndClassCounts();
     await loadSeances();
     await loadWeekSeances();
+    await loadClassCountsFromSeances();
   }
 
-  Future<void> loadAffectationsAndClassCounts() async {
-    try {
-      final affectations = await _repo.getAffectations();
-      for (final aff in affectations) {
-        final map = Map<String, dynamic>.from(aff as Map);
-        final classeId = int.tryParse(map['classe']?['id']?.toString() ?? '');
-        if (classeId != null) {
+  Future<void> loadClassCountsFromSeances() async {
+    final classesToFetch = <int>{};
+    for (final s in seances) {
+      final cId = s['classeId'] as int?;
+      if (cId != null) classesToFetch.add(cId);
+    }
+    for (final s in weekSeances) {
+      final cId = s['classeId'] as int?;
+      if (cId != null) classesToFetch.add(cId);
+    }
+
+    bool added = false;
+    for (final classeId in classesToFetch) {
+      if (!classStudentCounts.containsKey(classeId)) {
+        try {
           final students = await _repo.getEtudiantsClasse(classeId);
           classStudentCounts[classeId] = students.length;
-        }
+          added = true;
+        } catch (_) {}
       }
-    } catch (_) {}
+    }
+    
+    // Forcer la mise à jour des observateurs si de nouvelles classes ont été chargées
+    if (added) {
+      classStudentCounts.refresh();
+    }
   }
 
   Future<void> loadSeances() async {
@@ -42,21 +56,26 @@ class ScheduleController extends GetxController {
     error.value = '';
     try {
       final date = selectedDate.value;
-      final raw = await _repo.getSeancesParDate(date);
+      final raw = await _repo.getEmploisDuTempsParDate(date);
 
       seances.assignAll(raw.map((s) {
         final map = Map<String, dynamic>.from(s as Map);
-        final classeId = int.tryParse(map['classeId']?.toString() ?? '');
+        final classeMap = map['classe'] as Map?;
+        final matiereMap = map['matiere'] as Map?;
+        final classeId = classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null;
+        
+        final statutLocal = _calculateStatus(date, map['heureDebut']?.toString(), map['heureFin']?.toString());
+
         return {
           'id': map['id'],
-          'matiere': map['matiere']?.toString() ?? 'Cours',
-          'classe': map['classe']?.toString() ?? '',
+          'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
+          'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
           'classeId': classeId,
           'heureDebut': map['heureDebut']?.toString() ?? '',
           'heureFin': map['heureFin']?.toString() ?? '',
-          'statut': _statutLabel(map['statut']?.toString()),
-          'statutRaw': map['statut']?.toString(),
-          'color': _statutColor(map['statut']?.toString()),
+          'statut': _statutLabel(statutLocal),
+          'statutRaw': statutLocal,
+          'color': _statutColor(statutLocal),
         };
       }).toList()
         ..sort((a, b) =>
@@ -74,25 +93,69 @@ class ScheduleController extends GetxController {
       final List<Map<String, dynamic>> allWeek = [];
       for (int i = 0; i < 7; i++) {
         final day = start.add(Duration(days: i));
-        final raw = await _repo.getSeancesParDate(day);
+        final raw = await _repo.getEmploisDuTempsParDate(day);
         for (final s in raw) {
           final map = Map<String, dynamic>.from(s as Map);
-          final classeId = int.tryParse(map['classeId']?.toString() ?? '');
+          final classeMap = map['classe'] as Map?;
+          final matiereMap = map['matiere'] as Map?;
+          final classeId = classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null;
+          
+          final statutLocal = _calculateStatus(day, map['heureDebut']?.toString(), map['heureFin']?.toString());
+
           allWeek.add({
             'id': map['id'],
-            'matiere': map['matiere']?.toString() ?? 'Cours',
-            'classe': map['classe']?.toString() ?? '',
+            'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
+            'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
             'classeId': classeId,
             'heureDebut': map['heureDebut']?.toString() ?? '',
             'heureFin': map['heureFin']?.toString() ?? '',
-            'statut': _statutLabel(map['statut']?.toString()),
-            'statutRaw': map['statut']?.toString(),
-            'color': _statutColor(map['statut']?.toString()),
+            'statut': _statutLabel(statutLocal),
+            'statutRaw': statutLocal,
+            'color': _statutColor(statutLocal),
           });
         }
       }
       weekSeances.assignAll(allWeek);
     } catch (_) {}
+  }
+
+  String _calculateStatus(DateTime date, String? startStr, String? endStr) {
+    if (startStr == null || endStr == null) return 'PLANIFIEE';
+    
+    final now = DateTime.now();
+    
+    // Si le jour est passé
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final todayStartOfDay = DateTime(now.year, now.month, now.day);
+    
+    if (startOfDay.isBefore(todayStartOfDay)) {
+      return 'TERMINEE';
+    }
+    
+    // Si le jour est à venir
+    if (startOfDay.isAfter(todayStartOfDay)) {
+      return 'PLANIFIEE';
+    }
+    
+    // C'est aujourd'hui, on vérifie l'heure
+    try {
+      final p1 = startStr.split(':');
+      final p2 = endStr.split(':');
+      final h1 = int.parse(p1[0]);
+      final m1 = int.parse(p1[1]);
+      final h2 = int.parse(p2[0]);
+      final m2 = int.parse(p2[1]);
+      
+      final currentMins = now.hour * 60 + now.minute;
+      final startMins = h1 * 60 + m1;
+      final endMins = h2 * 60 + m2;
+      
+      if (currentMins > endMins) return 'TERMINEE';
+      if (currentMins >= startMins && currentMins <= endMins) return 'EN_COURS';
+      return 'PLANIFIEE';
+    } catch (_) {
+      return 'PLANIFIEE';
+    }
   }
 
   void selectDate(DateTime date) {

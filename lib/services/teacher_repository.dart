@@ -48,6 +48,14 @@ class TeacherRepository {
   }
 
   // --- Séances ---
+  Future<void> genererSeancesDuJour() async {
+    try {
+      await _api.post('/api/seances/generer-jour');
+    } catch (e) {
+      print('Erreur génération séances: $e');
+    }
+  }
+
   Future<List<dynamic>> getSeancesDuJour() async {
     final data = await _api.get('/api/seances/enseignant/$teacherId/jour');
     return data is List ? data : [];
@@ -58,6 +66,16 @@ class TeacherRepository {
         '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     final data = await _api.get(
       '/api/seances/enseignant/$teacherId/date',
+      query: {'date': dateStr},
+    );
+    return data is List ? data : [];
+  }
+
+  Future<List<dynamic>> getEmploisDuTempsParDate(DateTime date) async {
+    final dateStr =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    final data = await _api.get(
+      '/api/emplois-du-temps/enseignant/$teacherId/date',
       query: {'date': dateStr},
     );
     return data is List ? data : [];
@@ -87,6 +105,11 @@ class TeacherRepository {
         'matiere': matiere,
       },
     );
+    return Map<String, dynamic>.from(data as Map);
+  }
+
+  Future<Map<String, dynamic>> terminerSeance(int seanceId) async {
+    final data = await _api.put('/api/seances/$seanceId/terminer');
     return Map<String, dynamic>.from(data as Map);
   }
 
@@ -196,5 +219,26 @@ class TeacherRepository {
       if (data is Map) return Map<String, dynamic>.from(data);
     } catch (_) {}
     return null;
+  }
+
+  Future<void> updateProfile({
+    required String nom,
+    required String prenom,
+    required String email,
+    String? password,
+  }) async {
+    final queryParams = {
+      'nom': nom,
+      'prenom': prenom,
+      'email': email,
+    };
+    if (password != null && password.isNotEmpty) {
+      queryParams['password'] = password;
+    }
+    
+    await _api.put(
+      '/api/utilisateurs/$teacherId',
+      query: queryParams,
+    );
   }
 }

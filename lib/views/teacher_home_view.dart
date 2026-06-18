@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/teacher_home_controller.dart';
 import '../core/session/app_session.dart';
 import '../features/auth/controllers/auth_controller.dart';
+import 'teacher_profile_view.dart';
 
 class TeacherHomeView extends StatelessWidget {
   const TeacherHomeView({super.key});
@@ -63,9 +64,21 @@ class TeacherHomeView extends StatelessWidget {
                     onSelected: (value) {
                       if (value == 'logout') {
                         Get.find<AuthController>().logout();
+                      } else if (value == 'profil') {
+                        Get.to(() => const TeacherProfileView());
                       }
                     },
                     itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'profil',
+                        child: Row(
+                          children: [
+                            Icon(Icons.person, size: 18, color: Colors.blue),
+                            SizedBox(width: 8),
+                            Text('Mon Profil'),
+                          ],
+                        ),
+                      ),
                       const PopupMenuItem(
                         value: 'logout',
                         child: Row(
@@ -254,7 +267,7 @@ class TeacherHomeView extends StatelessWidget {
     );
   }
 
-  // --- COMPOSANT GRILLE DES STATISTIQUES ---
+  // --- COMPOSANT STATISTIQUES ---
   Widget _buildStatsGrid(TeacherHomeController controller) {
     final moyenneData = controller.moyenneMatiere;
     if (moyenneData.isEmpty || moyenneData['message'] != null) {
@@ -266,36 +279,51 @@ class TeacherHomeView extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: Colors.grey.shade200),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
-            'Aucune statistique de note disponible aujourd\'hui.',
-            style: TextStyle(color: Colors.black54, fontSize: 13),
+            moyenneData['message'] ?? 'Aucune statistique de note disponible aujourd\'hui.',
+            style: const TextStyle(color: Colors.black54, fontSize: 13),
             textAlign: TextAlign.center,
           ),
         ),
       );
     }
 
-    final List<dynamic> classes = moyenneData['moyenneParClasse'] ?? [];
-    final double moyenneGenerale = double.tryParse(moyenneData['moyenneGenerale']?.toString() ?? '0') ?? 0.0;
-    
-    // Calcul du total des étudiants
-    int totalEtudiants = 0;
-    for (var cl in classes) {
-      totalEtudiants += int.tryParse(cl['nombreEtudiants']?.toString() ?? '0') ?? 0;
-    }
-
-    // Couleurs prédéfinies pour les cartes
-    final List<Color> cardColors = [
-      const Color(0xFF536DFE),
-      Colors.green,
-      Colors.orange,
+    final List<Map<String, dynamic>> allCards = [
+      {
+        'titre': 'Taux de réussite',
+        'note': moyenneData['tauxReussite'] ?? '0%',
+        'sousTitre': '',
+        'color': Colors.green,
+        'icon': Icons.check_circle_outline,
+      },
+      {
+        'titre': 'Meilleure note',
+        'note': moyenneData['meilleureNote'] ?? '0',
+        'sousTitre': 'sur 20',
+        'color': Colors.blue,
+        'icon': Icons.star_border,
+      },
+      {
+        'titre': 'Plus faible note',
+        'note': moyenneData['plusFaibleNote'] ?? '0',
+        'sousTitre': 'sur 20',
+        'color': Colors.red,
+        'icon': Icons.trending_down,
+      },
+      {
+        'titre': 'Notes ≥ 10',
+        'note': moyenneData['notesSuperieuresOuEgalesA10']?.toString() ?? '0',
+        'sousTitre': 'étudiants',
+        'color': Colors.purple,
+        'icon': Icons.pie_chart_outline,
+      },
     ];
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: classes.length + 1, // +1 pour la carte générale
+      itemCount: allCards.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 15,
@@ -303,32 +331,57 @@ class TeacherHomeView extends StatelessWidget {
         childAspectRatio: 1.4,
       ),
       itemBuilder: (context, index) {
-        if (index < classes.length) {
-          final cl = classes[index];
-          final String nomClasse = cl['classeNom'] ?? 'Classe';
-          final double moy = double.tryParse(cl['moyenne']?.toString() ?? '0') ?? 0.0;
-          final int etudiants = cl['nombreEtudiants'] ?? 0;
-          final Color color = cardColors[index % cardColors.length];
-          final String noteStr = moy.toStringAsFixed(moy % 1 == 0 ? 0 : 1);
-
-          return _buildClassStatCard(
-            nomClasse,
-            noteStr,
-            '$etudiants etudiants',
-            color,
-            Icons.bar_chart_outlined,
-          );
-        } else {
-          final String noteStr = moyenneGenerale.toStringAsFixed(moyenneGenerale % 1 == 0 ? 0 : 1);
-          return _buildClassStatCard(
-            'General',
-            noteStr,
-            '$totalEtudiants etudiants',
-            Colors.red,
-            Icons.show_chart,
-          );
-        }
+        final card = allCards[index];
+        return _buildClassStatCard(
+          card['titre'],
+          card['note'],
+          card['sousTitre'],
+          card['color'],
+          card['icon'],
+        );
       },
+    );
+  }
+
+  Widget _buildClassStatCard(String title, String value, String subtitle, Color color, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.w500),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(icon, color: color, size: 22),
+            ],
+          ),
+          Text(
+            value,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
+          ),
+          if (subtitle.isNotEmpty)
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 11, color: Colors.black54),
+            )
+          else
+            const SizedBox(height: 11), // Pour garder le même alignement même sans sous-titre
+        ],
+      ),
     );
   }
 
@@ -377,8 +430,9 @@ class TeacherHomeView extends StatelessWidget {
           final String matiere = s['matiere'] ?? 'Cours';
           final String classe = s['classe'] ?? 'Classe';
           final Color color = agendaColors[index % agendaColors.length];
+          final String statut = s['statut'] ?? 'PLANIFIEE';
 
-          return _buildAgendaRow(hDebut, hFin, matiere, classe, color);
+          return _buildAgendaRow(hDebut, hFin, matiere, classe, color, statut, controller, index);
         },
       ),
     );
@@ -421,26 +475,93 @@ class TeacherHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildAgendaRow(String t1, String t2, String subject, String sub, Color color) {
+  Widget _buildAgendaRow(String t1, String t2, String subject, String sub, Color color, String statut, TeacherHomeController controller, int index) {
     return Padding(
       padding: const EdgeInsets.all(15),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: 4, height: 40, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(t1, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-              Text(t2, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-            ],
-          ),
-          const SizedBox(width: 30),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              Text(sub, style: const TextStyle(color: Colors.black54, fontSize: 13)),
+              Container(width: 4, height: 40, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
+              const SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t1, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text(t2, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                ],
+              ),
+              const SizedBox(width: 30),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(sub, style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                  ],
+                ),
+              ),
+              // Statut badge ou boutons
+              const SizedBox(width: 10),
+              if (statut == 'EN_COURS')
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8E6FF),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        'En cours',
+                        style: TextStyle(
+                          color: Color(0xFF6C5CE7),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => controller.terminerSeance(index),
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(Colors.red),
+                        foregroundColor: WidgetStateProperty.all(Colors.white),
+                        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+                      ),
+                      child: const Text('Arrêter', style: TextStyle(fontSize: 12)),
+                    ),
+                  ],
+                )
+              else if (statut == 'TERMINEE')
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Terminé',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                )
+              else if (statut == 'PLANIFIEE')
+                ElevatedButton(
+                  onPressed: () => controller.demarrerSeance(index),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(Colors.green),
+                    foregroundColor: WidgetStateProperty.all(Colors.white),
+                    padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                    shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+                  ),
+                  child: const Text('Démarrer', style: TextStyle(fontSize: 12)),
+                ),
             ],
           ),
         ],
@@ -448,38 +569,5 @@ class TeacherHomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildClassStatCard(String className, String note, String studentCount, Color color, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                className,
-                style: const TextStyle(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.w500),
-              ),
-              Icon(icon, color: color, size: 22),
-            ],
-          ),
-          Text(
-            note,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
-          ),
-          Text(
-            'sur 20 . $studentCount',
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
-          ),
-        ],
-      ),
-    );
-  }
+
 }

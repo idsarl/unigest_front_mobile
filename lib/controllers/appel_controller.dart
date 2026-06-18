@@ -70,34 +70,62 @@ class AppelController extends GetxController {
         affs.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList(),
       );
       
-      // Essayer de trouver la séance actuelle/prochaine et sélectionner la classe correspondante
+      // Essayer de trouver la séance actuelle/prochaine via l'emploi du temps
       if (affectations.isNotEmpty) {
-        final prochaineSeance = await _repo.getProchaineSeance();
-        if (prochaineSeance != null) {
-          // Trouver l'affectation correspondante à cette séance
-          final affSeance = prochaineSeance['affectation'];
-          if (affSeance is Map) {
-            final affId = int.tryParse(affSeance['id']?.toString() ?? '');
-            if (affId != null) {
-              final index = affectations.indexWhere((a) => 
-                int.tryParse(a['id']?.toString() ?? '') == affId
-              );
-              if (index != -1) {
-                selectedAffectationIndex.value = index;
+        final emploisDuJour = await _repo.getEmploisDuTempsParDate(DateTime.now());
+        final now = DateTime.now();
+        final currentMins = now.hour * 60 + now.minute;
+        
+        Map<String, dynamic>? currentEmploi;
+        
+        for (final e in emploisDuJour) {
+          final map = Map<String, dynamic>.from(e as Map);
+          final startStr = map['heureDebut']?.toString();
+          final endStr = map['heureFin']?.toString();
+          if (startStr != null && endStr != null) {
+            try {
+              final p1 = startStr.split(':');
+              final p2 = endStr.split(':');
+              final startMins = int.parse(p1[0]) * 60 + int.parse(p1[1]);
+              final endMins = int.parse(p2[0]) * 60 + int.parse(p2[1]);
+              if (currentMins >= startMins && currentMins <= endMins) {
+                currentEmploi = map;
+                break;
+              } else if (currentMins < startMins) {
+                // Keep the next closest one if we don't have a current one
+                if (currentEmploi == null) {
+                  currentEmploi = map;
+                }
               }
-            }
+            } catch (_) {}
           }
+        }
+        
+        if (currentEmploi != null) {
+          final classeMap = currentEmploi['classe'] as Map?;
+          final matiereMap = currentEmploi['matiere'] as Map?;
+          final cId = classeMap?['id']?.toString();
+          final matNom = matiereMap?['nom']?.toString();
           
-          // Trouver la matière correspondante
-          final matiereSeance = prochaineSeance['matiere'];
-          if (matiereSeance is String) {
-            final mats = currentMatieres;
-            final matIndex = mats.indexWhere((m) => 
-              m['nom']?.toString() == matiereSeance
-            );
-            if (matIndex != -1) {
-              selectedMatiereIndex.value = matIndex;
-            }
+          if (cId != null) {
+             final index = affectations.indexWhere((a) {
+                final aC = a['classe'];
+                if (aC is Map) {
+                  return aC['id']?.toString() == cId;
+                }
+                return false;
+             });
+             if (index != -1) {
+               selectedAffectationIndex.value = index;
+               // Selectionner la matiere si possible
+               if (matNom != null) {
+                 final mats = currentMatieres;
+                 final matIndex = mats.indexWhere((m) => m['nom']?.toString() == matNom);
+                 if (matIndex != -1) {
+                   selectedMatiereIndex.value = matIndex;
+                 }
+               }
+             }
           }
         }
         

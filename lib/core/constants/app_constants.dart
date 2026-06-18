@@ -9,9 +9,9 @@ class AppConstants {
   /// URL du backend Spring (port 5200).
   /// Android émulateur : 10.0.2.2 | Windows/Web/iOS simulateur : localhost
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:5200';
-    if (Platform.isAndroid) return 'http://10.0.2.2:5200';
-    return 'http://localhost:5200';
+    if (kIsWeb) return 'http://localhost:5400';
+    if (Platform.isAndroid) return 'http://10.0.2.2:5400';
+    return 'http://localhost:5400';
   }
   
   /// Storage keys

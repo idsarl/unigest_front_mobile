@@ -106,7 +106,13 @@ class NoteController extends GetxController {
         }
 
         final type = n['type']?.toString() ?? 'DEVOIR';
-        final date = n['dateEvaluation']?.toString() ?? '';
+        var date = n['dateEvaluation']?.toString() ?? '';
+        if (n['dateEvaluation'] is List) {
+          final l = n['dateEvaluation'] as List;
+          if (l.length >= 3) {
+            date = '${l[0]}-${l[1].toString().padLeft(2, '0')}-${l[2].toString().padLeft(2, '0')}';
+          }
+        }
         final key = '$type|$date';
         grouped.putIfAbsent(
           key,
