@@ -11,7 +11,7 @@ import '../core/utils/presence_utils.dart';
 import '../services/teacher_repository.dart';
 
 class ParentController extends GetxController {
-  final TeacherRepository _repo = TeacherRepository();
+  final TeacherRepository _repo = TeacherRepository.instance;
   final AppSession _session = AppSession.instance;
 
   StompClient? _stompClient;

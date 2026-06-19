@@ -1,10 +1,13 @@
 import 'package:get/get.dart';
 import '../core/session/app_session.dart';
+import '../core/storage/hive_service.dart';
 import '../services/teacher_repository.dart';
+import '../services/api_service.dart';
 
 class TeacherHomeController extends GetxController {
-  final TeacherRepository _repo = TeacherRepository();
+  final TeacherRepository _repo = TeacherRepository.instance;
   final AppSession _session = AppSession.instance;
+  final HiveService _hive = HiveService.instance;
 
   int get teacherId => _session.teacherId;
 
@@ -22,7 +25,41 @@ class TeacherHomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchDashboardData();
+    _init();
+  }
+
+  Future<void> _init() async {
+    // D'abord essaye de charger les données locales
+    await _loadLocalData();
+    // Puis essaye de charger les données depuis l'API et synchroniser
+    await fetchDashboardData();
+    // Synchronise les requêtes en attente
+    await ApiService.instance.syncQueuedRequests();
+  }
+
+  Future<void> _loadLocalData() async {
+    // Charge l'emploi du temps depuis le cache
+    final localEmplois = _hive.getEmploiDuTemps();
+    if (localEmplois != null) {
+      final date = DateTime.now();
+      final transformed = localEmplois.map((s) {
+        final map = Map<String, dynamic>.from(s as Map);
+        final classeMap = map['classe'] as Map?;
+        final matiereMap = map['matiere'] as Map?;
+        final statutLocal = _calculateStatus(date, map['heureDebut']?.toString(), map['heureFin']?.toString());
+        return {
+          'id': map['id'],
+          'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
+          'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
+          'classeId': classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null,
+          'heureDebut': map['heureDebut']?.toString() ?? '',
+          'heureFin': map['heureFin']?.toString() ?? '',
+          'statut': statutLocal,
+        };
+      }).toList()
+        ..sort((a, b) => (a['heureDebut'] as String).compareTo(b['heureDebut'] as String));
+      seances.assignAll(transformed);
+    }
   }
 
   String _calculateStatus(DateTime date, String? startStr, String? endStr) {

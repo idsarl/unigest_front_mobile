@@ -1,26 +1,59 @@
 import 'package:file_picker/file_picker.dart';
 import '../core/session/app_session.dart';
 import '../core/utils/presence_utils.dart';
+import '../core/storage/hive_service.dart';
 import 'api_service.dart';
 
-/// Appels API métier enseignant (séances, appels, notes, classes).
+/// Appels API métier enseignant avec support hors ligne.
 class TeacherRepository {
-  TeacherRepository({ApiService? api}) : _api = api ?? ApiService.instance;
+  TeacherRepository._({ApiService? api}) : _api = api ?? ApiService.instance;
+
+  static final TeacherRepository instance = TeacherRepository._();
 
   final ApiService _api;
   final AppSession _session = AppSession.instance;
+  final HiveService _hive = HiveService.instance;
 
   int get teacherId => _session.teacherId;
 
   // --- Messages ---
   Future<List<dynamic>> getConversations() async {
-    final data = await _api.get('/api/messages/conversations');
-    return data is List ? data : [];
+    try {
+      final data = await _api.get('/api/messages/conversations');
+      if (data is List) {
+        // Sauvegarde dans le stockage local
+        await _hive.saveConversations(data);
+        return data;
+      }
+    } catch (e) {
+      // Si erreur, essaye le stockage local
+      final localConversations = _hive.getConversations();
+      if (localConversations.isNotEmpty) {
+        return localConversations;
+      }
+      rethrow;
+    }
+    return [];
   }
 
   Future<List<dynamic>> getMessages(int contactId) async {
-    final response = await _api.get('/api/messages/conversation/$contactId');
-    return response is List ? List<Map<String, dynamic>>.from(response) : [];
+    try {
+      final response = await _api.get('/api/messages/conversation/$contactId');
+      if (response is List) {
+        final messages = List<Map<String, dynamic>>.from(response);
+        // Sauvegarde dans le stockage local
+        await _hive.saveMessages(contactId, messages);
+        return messages;
+      }
+    } catch (e) {
+      // Si erreur, essaye le stockage local
+      final localMessages = _hive.getMessages(contactId);
+      if (localMessages.isNotEmpty) {
+        return localMessages;
+      }
+      rethrow;
+    }
+    return [];
   }
 
   Future<void> markMessagesAsRead(int contactId) async {
@@ -74,11 +107,25 @@ class TeacherRepository {
   Future<List<dynamic>> getEmploisDuTempsParDate(DateTime date) async {
     final dateStr =
         '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-    final data = await _api.get(
-      '/api/emplois-du-temps/enseignant/$teacherId/date',
-      query: {'date': dateStr},
-    );
-    return data is List ? data : [];
+    try {
+      final data = await _api.get(
+        '/api/emplois-du-temps/enseignant/$teacherId/date',
+        query: {'date': dateStr},
+      );
+      if (data is List) {
+        // Sauvegarde dans le cache
+        await _hive.saveEmploiDuTemps(data);
+        return data;
+      }
+    } catch (e) {
+      // Si erreur, essaye le cache
+      final localData = _hive.getEmploiDuTemps();
+      if (localData != null) {
+        return localData;
+      }
+      rethrow;
+    }
+    return [];
   }
 
   Future<List<dynamic>> getSeancesAffectationDate(

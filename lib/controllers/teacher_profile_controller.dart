@@ -4,7 +4,7 @@ import '../core/session/app_session.dart';
 import '../services/teacher_repository.dart';
 
 class TeacherProfileController extends GetxController {
-  final TeacherRepository _repo = TeacherRepository();
+  final TeacherRepository _repo = TeacherRepository.instance;
   final AppSession _session = AppSession.instance;
 
   int get teacherId => _session.teacherId;

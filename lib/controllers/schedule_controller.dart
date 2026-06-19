@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import '../services/teacher_repository.dart';
 
 class ScheduleController extends GetxController {
-  final TeacherRepository _repo = TeacherRepository();
+  final TeacherRepository _repo = TeacherRepository.instance;
 
   final RxBool isLoading = true.obs;
   final RxString error = ''.obs;
