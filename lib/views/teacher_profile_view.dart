@@ -288,43 +288,7 @@ class TeacherProfileView extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 10),
 
-                          // Bouton Déconnexion
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                Get.dialog(
-                                  AlertDialog(
-                                    title: const Text('Déconnexion'),
-                                    content: const Text('Êtes-vous sûr de vouloir vous déconnecter ?'),
-                                    actions: [
-                                      TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
-                                      TextButton(
-                                        onPressed: () {
-                                          Get.back();
-                                          controller.logout();
-                                        },
-                                        child: const Text('Déconnexion', style: TextStyle(color: Colors.red)),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.logout, color: Colors.red),
-                              label: const Text(
-                                'Se déconnecter',
-                                style: TextStyle(color: Colors.red, fontSize: 15),
-                              ),
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Colors.red.shade50),
-                                alignment: Alignment.centerLeft,
-                                padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 16)),
-                                shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     )),

@@ -43,20 +43,6 @@ class TeacherHomeView extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Stack(
-                    children: [
-                      const Icon(Icons.notifications_none_outlined, size: 30, color: Colors.black87),
-                      Positioned(
-                        right: 3,
-                        top: 3,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                        ),
-                      ),
-                    ],
-                  ),
                   const SizedBox(width: 15),
                   PopupMenuButton<String>(
                     offset: const Offset(0, 40),
@@ -69,27 +55,27 @@ class TeacherHomeView extends StatelessWidget {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'profil',
-                        child: Row(
-                          children: [
-                            Icon(Icons.person, size: 18, color: Colors.blue),
-                            SizedBox(width: 8),
-                            Text('Mon Profil'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'logout',
-                        child: Row(
-                          children: [
-                            Icon(Icons.logout, size: 18, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text('Déconnexion'),
-                          ],
-                        ),
-                      ),
-                    ],
+                          const PopupMenuItem(
+                            value: 'profil',
+                            child: Row(
+                              children: [
+                                Icon(Icons.person, size: 18, color: Colors.blue),
+                                SizedBox(width: 8),
+                                Text('Mon Profil'),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'logout',
+                            child: Row(
+                              children: [
+                                Icon(Icons.logout, size: 18, color: Colors.red),
+                                SizedBox(width: 8),
+                                Text('Déconnexion'),
+                              ],
+                            ),
+                          ),
+                        ],
                     child: CircleAvatar(
                       radius: 18,
                       backgroundColor: const Color(0xFF6C5CE7),
