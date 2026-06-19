@@ -502,38 +502,23 @@ class TeacherHomeView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Statut badge ou boutons
+              // Statut badge seulement
               const SizedBox(width: 10),
               if (statut == 'EN_COURS')
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8E6FF),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'En cours',
-                        style: TextStyle(
-                          color: Color(0xFF6C5CE7),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8E6FF),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'En cours',
+                    style: TextStyle(
+                      color: Color(0xFF6C5CE7),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () => controller.terminerSeance(index),
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(Colors.red),
-                        foregroundColor: WidgetStateProperty.all(Colors.white),
-                        padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
-                      ),
-                      child: const Text('Arrêter', style: TextStyle(fontSize: 12)),
-                    ),
-                  ],
+                  ),
                 )
               else if (statut == 'TERMINEE')
                 Container(
@@ -552,15 +537,20 @@ class TeacherHomeView extends StatelessWidget {
                   ),
                 )
               else if (statut == 'PLANIFIEE')
-                ElevatedButton(
-                  onPressed: () => controller.demarrerSeance(index),
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.green),
-                    foregroundColor: WidgetStateProperty.all(Colors.white),
-                    padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-                    shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text('Démarrer', style: TextStyle(fontSize: 12)),
+                  child: const Text(
+                    'À venir',
+                    style: TextStyle(
+                      color: Colors.orange,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
             ],
           ),
