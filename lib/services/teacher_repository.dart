@@ -247,24 +247,60 @@ class TeacherRepository {
   }
 
   Future<Map<String, dynamic>> getDashboardAbsences() async {
-    final data = await _api.get('/api/seances/enseignant/$teacherId/absences/jour');
-    return data is Map ? Map<String, dynamic>.from(data) : {};
+    final cacheKey = 'dashboard_absences_$teacherId';
+    try {
+      final data = await _api.get('/api/seances/enseignant/$teacherId/absences/jour');
+      if (data is Map) {
+        final result = Map<String, dynamic>.from(data);
+        await _hive.saveCache(cacheKey, result);
+        return result;
+      }
+    } catch (_) {
+      // Essaie de récupérer depuis le cache
+      final cached = _hive.getCache(cacheKey);
+      if (cached is Map) {
+        return Map<String, dynamic>.from(cached);
+      }
+    }
+    return {};
   }
 
   Future<Map<String, dynamic>?> getProchaineSeance() async {
+    final cacheKey = 'prochaine_seance_$teacherId';
     try {
       final data = await _api.get('/api/seances/enseignant/$teacherId/prochaine');
-      if (data is Map) return Map<String, dynamic>.from(data);
-    } catch (_) {}
+      if (data is Map) {
+        final result = Map<String, dynamic>.from(data);
+        await _hive.saveCache(cacheKey, result);
+        return result;
+      }
+    } catch (_) {
+      // Essaie de récupérer depuis le cache
+      final cached = _hive.getCache(cacheKey);
+      if (cached is Map) {
+        return Map<String, dynamic>.from(cached);
+      }
+    }
     return null;
   }
 
   Future<Map<String, dynamic>?> getMoyenneMatiere() async {
+    final cacheKey = 'moyenne_matiere_$teacherId';
     try {
       final data =
           await _api.get('/api/seances/enseignant/$teacherId/moyenne-matiere/encours');
-      if (data is Map) return Map<String, dynamic>.from(data);
-    } catch (_) {}
+      if (data is Map) {
+        final result = Map<String, dynamic>.from(data);
+        await _hive.saveCache(cacheKey, result);
+        return result;
+      }
+    } catch (_) {
+      // Essaie de récupérer depuis le cache
+      final cached = _hive.getCache(cacheKey);
+      if (cached is Map) {
+        return Map<String, dynamic>.from(cached);
+      }
+    }
     return null;
   }
 

@@ -222,7 +222,7 @@ class ApiService {
   }
 
   dynamic _handleResponse(http.Response response) {
-    if (response.statusCode == 204) return null;
+    if (response.statusCode == 204) return {};
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.body.isEmpty) return {};
       return json.decode(utf8.decode(response.bodyBytes));

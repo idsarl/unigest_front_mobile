@@ -60,6 +60,25 @@ class TeacherHomeController extends GetxController {
         ..sort((a, b) => (a['heureDebut'] as String).compareTo(b['heureDebut'] as String));
       seances.assignAll(transformed);
     }
+
+    // Charge les stats depuis le cache
+    final cacheKeyAbsences = 'dashboard_absences_${_session.teacherId}';
+    final cachedAbsences = _hive.getCache(cacheKeyAbsences);
+    if (cachedAbsences != null && cachedAbsences['absences'] != null) {
+      absencesCount.value = int.tryParse(cachedAbsences['absences'].toString()) ?? 0;
+    }
+
+    final cacheKeyProchaine = 'prochaine_seance_${_session.teacherId}';
+    final cachedProchaine = _hive.getCache(cacheKeyProchaine);
+    if (cachedProchaine != null) {
+      prochaineSeance.value = Map<String, dynamic>.from(cachedProchaine);
+    }
+
+    final cacheKeyMoyenne = 'moyenne_matiere_${_session.teacherId}';
+    final cachedMoyenne = _hive.getCache(cacheKeyMoyenne);
+    if (cachedMoyenne != null) {
+      moyenneMatiere.value = Map<String, dynamic>.from(cachedMoyenne);
+    }
   }
 
   String _calculateStatus(DateTime date, String? startStr, String? endStr) {

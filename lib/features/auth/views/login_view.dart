@@ -11,8 +11,8 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'parent7@unigest.com');
-  final _passwordController = TextEditingController(text: 'password');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _auth = Get.find<AuthController>();
   bool _obscurePassword = true;
 
@@ -155,21 +155,6 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         )),
                     const SizedBox(height: 24),
-                    Column(
-                      children: [
-                        Text(
-                          'Enseignant : enseignant3@unigest.com / password',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Parent : parent7@unigest.com / password',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),

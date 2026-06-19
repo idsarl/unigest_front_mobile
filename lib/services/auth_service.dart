@@ -11,7 +11,7 @@ class AuthService {
     final data = await _api.post('/api/auth/login', body: {
       'login': email.trim(),
       'password': password,
-    });
+    }, queueIfOffline: false);
 
     final token = data['token']?.toString();
     if (token == null || token.isEmpty) {
