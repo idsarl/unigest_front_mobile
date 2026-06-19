@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'api_service.dart';
 import '../utils/error_handler.dart';
 import '../../../models/absence_model.dart';
@@ -8,7 +7,7 @@ class AbsencesService {
   static Future<List<AbsenceModel>> getAbsencesByStudentId(int studentId) async {
     try {
       final response = await ApiService.get('/appels/etudiant/$studentId');
-      final List<dynamic> data = jsonDecode(response.body);
+      final List<dynamic> data = ApiService.decodeJson(response);
       
       // On ne garde que les absences et les retards
       List<AbsenceModel> absences = [];

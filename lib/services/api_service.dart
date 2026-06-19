@@ -4,17 +4,18 @@ import '../models/child_model.dart';
 import '../models/note_model.dart';
 import '../models/absence_model.dart';
 import '../models/emploi_model.dart';
+import '../core/config/app_config.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://api.unigest.com';
-  
+  static String get baseUrl => AppConfig.baseUrl;
+
   static Future<List<ChildModel>> getChildren(String parentId) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/parents/$parentId/children'),
         headers: {'Content-Type': 'application/json'},
       );
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => ChildModel.fromJson(json)).toList();
@@ -25,14 +26,14 @@ class ApiService {
       throw Exception('Error fetching children: $e');
     }
   }
-  
+
   static Future<List<NoteModel>> getNotes(String childId) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/children/$childId/notes'),
         headers: {'Content-Type': 'application/json'},
       );
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => NoteModel.fromJson(json)).toList();
@@ -43,14 +44,14 @@ class ApiService {
       throw Exception('Error fetching notes: $e');
     }
   }
-  
+
   static Future<List<AbsenceModel>> getAbsences(String childId) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/children/$childId/absences'),
         headers: {'Content-Type': 'application/json'},
       );
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => AbsenceModel.fromJson(json)).toList();
@@ -61,14 +62,14 @@ class ApiService {
       throw Exception('Error fetching absences: $e');
     }
   }
-  
+
   static Future<List<EmploiModel>> getEmploiDuTemps(String childId) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/children/$childId/emploi'),
         headers: {'Content-Type': 'application/json'},
       );
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => EmploiModel.fromJson(json)).toList();

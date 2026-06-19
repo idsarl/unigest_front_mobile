@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/state_management/getx_helpers.dart';
@@ -15,7 +14,8 @@ import '../../../models/message_model.dart';
 import '../../../models/teacher_model.dart';
 import '../../auth/controllers/auth_controller.dart';
 
-class ChildDetailsController extends BaseController with GetTickerProviderStateMixin {
+class ChildDetailsController extends BaseController
+    with GetTickerProviderStateMixin {
   final Rx<ChildModel?> child = Rx<ChildModel?>(null);
   final RxInt selectedTab = 0.obs;
   final RxList<NoteModel> notes = <NoteModel>[].obs;
@@ -43,13 +43,18 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
     try {
       final childIdVal = int.tryParse(child.value?.id ?? '') ?? 0;
       final className = child.value?.className ?? '';
-      
+      final classId = int.tryParse(child.value?.classId ?? '');
+
       if (childIdVal != 0 && className.isNotEmpty) {
         // Charger les données en parallèle
         final results = await Future.wait([
           NotesService.getNotesByStudentId(childIdVal),
           AbsencesService.getAbsencesByStudentId(childIdVal),
-          EmploiService.getEmploiDuTemps(className, childIdVal),
+          EmploiService.getEmploiDuTemps(
+            className,
+            childIdVal,
+            classId: classId,
+          ),
         ]);
 
         notes.value = results[0] as List<NoteModel>;
@@ -65,17 +70,17 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
             total += note.value * coeff;
             totalCoeff += coeff;
           }
-          generalAverage.value = totalCoeff > 0 
-              ? double.parse((total / totalCoeff).toStringAsFixed(2)) 
+          generalAverage.value = totalCoeff > 0
+              ? double.parse((total / totalCoeff).toStringAsFixed(2))
               : 0.0;
         } else {
           generalAverage.value = 0.0;
         }
       }
-      
+
       // Charger les enseignants séparément
       loadTeachers();
-      
+
       clearError();
     } catch (e) {
       setError(e.toString());
@@ -107,8 +112,8 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
             total += note.value * coeff;
             totalCoeff += coeff;
           }
-          generalAverage.value = totalCoeff > 0 
-              ? double.parse((total / totalCoeff).toStringAsFixed(2)) 
+          generalAverage.value = totalCoeff > 0
+              ? double.parse((total / totalCoeff).toStringAsFixed(2))
               : 0.0;
         } else {
           generalAverage.value = 0.0;
@@ -124,20 +129,21 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
 
   Map<String, double> getSubjectAverages() {
     final Map<String, List<double>> subjectNotes = {};
-    
+
     for (var note in notes) {
       if (!subjectNotes.containsKey(note.subject)) {
         subjectNotes[note.subject] = [];
       }
       subjectNotes[note.subject]!.add(note.value);
     }
-    
+
     final Map<String, double> averages = {};
     subjectNotes.forEach((subject, values) {
       final sum = values.reduce((a, b) => a + b);
-      averages[subject] = double.parse((sum / values.length).toStringAsFixed(2));
+      averages[subject] =
+          double.parse((sum / values.length).toStringAsFixed(2));
     });
-    
+
     return averages;
   }
 
@@ -146,7 +152,8 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
     try {
       final childIdVal = int.tryParse(child.value?.id ?? '') ?? 0;
       if (childIdVal != 0) {
-        absences.value = await AbsencesService.getAbsencesByStudentId(childIdVal);
+        absences.value =
+            await AbsencesService.getAbsencesByStudentId(childIdVal);
       }
       clearError();
     } catch (e) {
@@ -161,8 +168,13 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
     try {
       final childIdVal = int.tryParse(child.value?.id ?? '') ?? 0;
       final className = child.value?.className ?? '';
+      final classId = int.tryParse(child.value?.classId ?? '');
       if (childIdVal != 0 && className.isNotEmpty) {
-        emploiDuTemps.value = await EmploiService.getEmploiDuTemps(className, childIdVal);
+        emploiDuTemps.value = await EmploiService.getEmploiDuTemps(
+          className,
+          childIdVal,
+          classId: classId,
+        );
       }
       clearError();
     } catch (e) {
@@ -177,14 +189,16 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
     try {
       final response = await ApiService.get('/enseignants');
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        teachers.value = data.map((json) => TeacherModel(
-          id: json['id']?.toString() ?? '',
-          firstName: json['prenom'] ?? '',
-          lastName: json['nom'] ?? '',
-          subject: json['specialite'] ?? 'Matière',
-          email: json['email'] ?? '',
-        )).toList();
+        final List<dynamic> data = ApiService.decodeJson(response);
+        teachers.value = data
+            .map((json) => TeacherModel(
+                  id: json['id']?.toString() ?? '',
+                  firstName: json['prenom'] ?? '',
+                  lastName: json['nom'] ?? '',
+                  subject: json['specialite'] ?? 'Matière',
+                  email: json['email'] ?? '',
+                ))
+            .toList();
       }
       clearError();
     } catch (e) {
@@ -202,7 +216,8 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
       final teacherIdVal = int.tryParse(selectedTeacher.value?.id ?? '') ?? 0;
 
       if (parentId != 0 && teacherIdVal != 0) {
-        messages.value = await MessagesService.getMessages(parentId, teacherIdVal);
+        messages.value =
+            await MessagesService.getMessages(parentId, teacherIdVal);
       }
       clearError();
     } catch (e) {
@@ -220,8 +235,10 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
   }
 
   Future<void> sendMessage() async {
-    if (messageText.value.trim().isEmpty || selectedTeacher.value == null) return;
-    
+    if (messageText.value.trim().isEmpty || selectedTeacher.value == null) {
+      return;
+    }
+
     try {
       final authController = Get.find<AuthController>();
       final parentId = authController.userId.value;
@@ -229,7 +246,8 @@ class ChildDetailsController extends BaseController with GetTickerProviderStateM
       final content = messageText.value.trim();
 
       if (parentId != 0 && teacherIdVal != 0) {
-        final sentMessage = await MessagesService.sendMessage(parentId, teacherIdVal, content);
+        final sentMessage =
+            await MessagesService.sendMessage(parentId, teacherIdVal, content);
         messages.add(sentMessage);
         messageText.value = '';
       }

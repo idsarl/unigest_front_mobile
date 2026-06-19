@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../../../core/state_management/getx_helpers.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/utils/error_handler.dart';
@@ -20,12 +18,12 @@ class AuthController extends BaseController {
     // Validation des champs
     final identifierError = Validators.validateIdentifier(email.value);
     final passwordError = Validators.validatePassword(password.value);
-    
+
     if (identifierError != null) {
       authError.value = identifierError;
       return;
     }
-    
+
     if (passwordError != null) {
       authError.value = passwordError;
       return;
@@ -41,17 +39,19 @@ class AuthController extends BaseController {
       });
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = ApiService.decodeJson(response);
         final token = data['token'];
         final role = data['role'];
         final nom = data['nom'] ?? '';
         final prenom = data['prenom'] ?? '';
-        
+        final id = data['id'] ?? data['idUser'];
+
         // Stocker le token et les infos utilisateur
         ApiService.setToken(token);
         userRole.value = role;
         userName.value = nom;
         userPrenom.value = prenom;
+        userId.value = _toInt(id);
 
         // Récupérer les infos utilisateur complètes pour obtenir l'ID
         await _fetchUserInfo();
@@ -79,13 +79,18 @@ class AuthController extends BaseController {
     try {
       final response = await ApiService.get('/auth/me');
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        userId.value = data['id'] ?? 0;
+        final data = ApiService.decodeJson(response);
+        userId.value = _toInt(data['id'] ?? data['idUser']);
       }
     } catch (e) {
       // Silencer l'erreur pour ne pas bloquer la connexion
-      print('Erreur lors de la récupération des infos utilisateur: $e');
     }
+  }
+
+  int _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   void togglePasswordVisibility() {

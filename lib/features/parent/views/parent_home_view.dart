@@ -240,20 +240,6 @@ class ParentHomeView extends GetView<ParentHomeController> {
               value: '${controller.childrenCount}',
               color: AppColors.primary,
             ),
-            _buildMetricTile(
-              icon: Icons.trending_up_rounded,
-              label: 'Moyenne',
-              value: controller.globalAverage > 0
-                  ? controller.globalAverage.toStringAsFixed(1)
-                  : '--',
-              color: AppColors.success,
-            ),
-            _buildMetricTile(
-              icon: Icons.event_busy_rounded,
-              label: 'Absences',
-              value: '${controller.totalAbsences}',
-              color: AppColors.warning,
-            ),
           ],
         );
       },

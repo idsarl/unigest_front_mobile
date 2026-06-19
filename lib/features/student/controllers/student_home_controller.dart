@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:get/get.dart';
 import '../../../core/state_management/getx_helpers.dart';
 import '../../../core/services/notes_service.dart';
@@ -10,6 +9,7 @@ import '../../../models/notification_model.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../../core/services/emploi_service.dart';
 import '../../../core/services/absences_service.dart';
+import '../../../core/services/notifications_service.dart';
 import '../../../services/storage_service.dart';
 
 class StudentHomeController extends BaseController {
@@ -32,6 +32,7 @@ class StudentHomeController extends BaseController {
   final RxString studentPhone = ''.obs;
   final RxString studentBirthDate = ''.obs;
   final RxString studentClassName = ''.obs;
+  final RxInt studentClassId = 0.obs;
   final RxString studentSchoolYear = ''.obs;
   final RxString studentParentName = ''.obs;
   final RxString studentParentAddress = ''.obs;
@@ -66,7 +67,11 @@ class StudentHomeController extends BaseController {
       // Charger les données en parallèle pour optimiser les performances
       final results = await Future.wait([
         NotesService.getNotesByStudentId(studentId),
-        EmploiService.getEmploiDuTemps('Classe 1', studentId),
+        EmploiService.getEmploiDuTemps(
+          studentClassName.value,
+          studentId,
+          classId: studentClassId.value,
+        ),
         AbsencesService.getAbsencesByStudentId(studentId),
       ]);
 
@@ -74,8 +79,10 @@ class StudentHomeController extends BaseController {
       emploiDuTemps.value = results[1] as List<EmploiModel>;
       absences.value = results[2] as List<AbsenceModel>;
 
-      // Charger les notifications (mock pour l'instant)
-      _loadMockSecondaryData();
+      notifications.value = await NotificationsService.getStudentNotifications(
+        studentId,
+        childName: studentFullName.value,
+      );
       unreadCount.value = notifications.where((n) => !n.isRead).length;
 
       // Calculer les moyennes
@@ -127,8 +134,10 @@ class StudentHomeController extends BaseController {
         ApiService.get('/inscriptions/etudiant/$studentId'),
       ]);
 
-      final studentJson = jsonDecode(results[0].body) as Map<String, dynamic>;
-      final inscriptionsJson = jsonDecode(results[1].body) as List<dynamic>;
+      final studentJson =
+          ApiService.decodeJson(results[0]) as Map<String, dynamic>;
+      final inscriptionsJson =
+          ApiService.decodeJson(results[1]) as List<dynamic>;
 
       final firstName = studentJson['prenom']?.toString() ?? '';
       final lastName = studentJson['nom']?.toString() ?? '';
@@ -157,6 +166,8 @@ class StudentHomeController extends BaseController {
 
         if (classe is Map<String, dynamic>) {
           studentClassName.value = classe['nom']?.toString() ?? '';
+          studentClassId.value =
+              int.tryParse(classe['id']?.toString() ?? '') ?? 0;
         }
 
         if (anneeScolaire is Map<String, dynamic>) {

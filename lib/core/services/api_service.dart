@@ -20,7 +20,8 @@ class ApiService {
   // Headers par défaut avec authentification
   static Map<String, String> get headers {
     final Map<String, String> defaultHeaders = {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
     };
     
     if (_token != null) {
@@ -28,6 +29,14 @@ class ApiService {
     }
     
     return defaultHeaders;
+  }
+
+  static String decodeBody(http.Response response) {
+    return utf8.decode(response.bodyBytes);
+  }
+
+  static dynamic decodeJson(http.Response response) {
+    return jsonDecode(decodeBody(response));
   }
   
   // Méthode GET avec timeout et gestion d'erreurs
@@ -125,7 +134,7 @@ class ApiService {
     } else if (response.statusCode >= 500) {
       throw ErrorHandler.createServerException();
     } else {
-      throw ErrorHandler.createHttpException(response.statusCode, response.body);
+      throw ErrorHandler.createHttpException(response.statusCode, decodeBody(response));
     }
   }
 }

@@ -4,6 +4,7 @@ class ChildModel {
   final String lastName;
   final String birthDate;
   final String className;
+  final String classId;
   final String photoUrl;
   final List<String> parentIds;
 
@@ -13,6 +14,7 @@ class ChildModel {
     required this.lastName,
     required this.birthDate,
     required this.className,
+    this.classId = '',
     this.photoUrl = '',
     required this.parentIds,
   });
@@ -24,6 +26,7 @@ class ChildModel {
       lastName: json['lastName'] ?? '',
       birthDate: json['birthDate'] ?? '',
       className: json['className'] ?? '',
+      classId: json['classId']?.toString() ?? '',
       photoUrl: json['photoUrl'] ?? '',
       parentIds: List<String>.from(json['parentIds'] ?? []),
     );
@@ -36,6 +39,7 @@ class ChildModel {
       'lastName': lastName,
       'birthDate': birthDate,
       'className': className,
+      'classId': classId,
       'photoUrl': photoUrl,
       'parentIds': parentIds,
     };
