@@ -537,6 +537,22 @@ class TeacherHomeView extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                )
+              else if (statut == 'Non effectuée')
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Non effectuée',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
             ],
           ),

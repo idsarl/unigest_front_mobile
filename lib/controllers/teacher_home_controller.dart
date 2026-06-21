@@ -55,6 +55,8 @@ class TeacherHomeController extends GetxController {
             statutLocal = 'En cours';
           } else if (seance['statut'] == 'TERMINEE') {
             statutLocal = 'Terminé';
+          } else if (seance['statut'] == 'NON_EFFECTUEE') {
+            statutLocal = 'Non effectuée';
           } else {
             statutLocal = 'À venir';
           }
@@ -64,6 +66,8 @@ class TeacherHomeController extends GetxController {
             statutLocal = 'En cours';
           } else if (calculated == 'TERMINEE') {
             statutLocal = 'Terminé';
+          } else if (calculated == 'NON_EFFECTUEE') {
+            statutLocal = 'Non effectuée';
           } else {
             statutLocal = 'À venir';
           }
@@ -116,7 +120,7 @@ class TeacherHomeController extends GetxController {
     final todayStartOfDay = DateTime(now.year, now.month, now.day);
     
     if (startOfDay.isBefore(todayStartOfDay)) {
-      return 'TERMINEE';
+      return 'NON_EFFECTUEE';
     }
     
     // Si le jour est à venir
@@ -137,7 +141,7 @@ class TeacherHomeController extends GetxController {
       final startMins = h1 * 60 + m1;
       final endMins = h2 * 60 + m2;
       
-      if (currentMins > endMins) return 'TERMINEE';
+      if (currentMins > endMins) return 'NON_EFFECTUEE';
       if (currentMins >= startMins && currentMins <= endMins) return 'EN_COURS';
       return 'PLANIFIEE';
     } catch (_) {
@@ -171,6 +175,8 @@ class TeacherHomeController extends GetxController {
               statut = 'En cours';
             } else if (seance['statut'] == 'TERMINEE') {
               statut = 'Terminé';
+            } else if (seance['statut'] == 'NON_EFFECTUEE') {
+              statut = 'Non effectuée';
             } else {
               statut = 'À venir';
             }
@@ -180,6 +186,8 @@ class TeacherHomeController extends GetxController {
               statut = 'En cours';
             } else if (calculated == 'TERMINEE') {
               statut = 'Terminé';
+            } else if (calculated == 'NON_EFFECTUEE') {
+              statut = 'Non effectuée';
             } else {
               statut = 'À venir';
             }

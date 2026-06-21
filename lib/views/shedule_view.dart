@@ -122,9 +122,6 @@ class ScheduleView extends StatelessWidget {
                         subject: s['matiere'] as String,
                         className: s['classe'] as String,
                         duration: _durationLabel(s['heureDebut'] as String, s['heureFin'] as String),
-                        status: s['statut'] as String,
-                        color: color,
-                        isSelected: s['statutRaw'] == 'EN_COURS',
                       );
                     }),
                 ],
@@ -263,21 +260,18 @@ class ScheduleView extends StatelessWidget {
     required String subject,
     required String className,
     required String duration,
-    required String status,
-    required Color color,
-    required bool isSelected,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFEDEEFC) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isSelected ? const Color(0xFF6C5CE7).withOpacity(0.3) : Colors.grey.shade200),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: IntrinsicHeight(
         child: Row(
           children: [
-            Container(width: 5, decoration: BoxDecoration(color: color, borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)))),
+            Container(width: 5, decoration: const BoxDecoration(color: Color(0xFF6C5CE7), borderRadius: BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)))),
             const SizedBox(width: 12),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -310,17 +304,9 @@ class ScheduleView extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(status, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 11)),
-                  ),
-                  const Spacer(),
-                  Text(duration, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  Text(duration, style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 14)),
                 ],
               ),
             ),
