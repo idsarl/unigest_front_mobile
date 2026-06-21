@@ -109,7 +109,7 @@ class TeacherRepository {
         '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     try {
       final data = await _api.get(
-        '/api/emplois-du-temps/enseignant/$teacherId/date',
+        '/api/emplois-du-temps/enseignant/$teacherId/date/avec-seances',
         query: {'date': dateStr},
       );
       if (data is List) {

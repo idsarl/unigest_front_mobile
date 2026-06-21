@@ -462,6 +462,10 @@ class TeacherHomeView extends StatelessWidget {
   }
 
   Widget _buildAgendaRow(String t1, String t2, String subject, String sub, Color color, String statut, TeacherHomeController controller, int index) {
+    final s = controller.seances[index];
+    final seance = s['seance'] as Map?;
+    final affectationId = s['affectationId'] as int?;
+
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -488,25 +492,37 @@ class TeacherHomeView extends StatelessWidget {
                   ],
                 ),
               ),
-              // Statut badge seulement
               const SizedBox(width: 10),
-              if (statut == 'EN_COURS')
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8E6FF),
-                    borderRadius: BorderRadius.circular(12),
+              // Boutons ou badge selon le statut
+              if (statut == 'En cours' && seance != null)
+                ElevatedButton(
+                  onPressed: () => controller.terminerSeance(index),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text(
-                    'En cours',
-                    style: TextStyle(
-                      color: Color(0xFF6C5CE7),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    'Terminer',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 )
-              else if (statut == 'TERMINEE')
+              else if (statut == 'À venir' && affectationId != null)
+                ElevatedButton(
+                  onPressed: () => controller.demarrerSeance(index),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C5CE7),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text(
+                    'Démarrer',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                )
+              else if (statut == 'Terminé')
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
@@ -517,22 +533,6 @@ class TeacherHomeView extends StatelessWidget {
                     'Terminé',
                     style: TextStyle(
                       color: Colors.green,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                )
-              else if (statut == 'PLANIFIEE')
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'À venir',
-                    style: TextStyle(
-                      color: Colors.orange,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),

@@ -60,19 +60,20 @@ class ScheduleController extends GetxController {
 
       seances.assignAll(raw.map((s) {
         final map = Map<String, dynamic>.from(s as Map);
-        final classeMap = map['classe'] as Map?;
-        final matiereMap = map['matiere'] as Map?;
+        final emploiMap = map['emploiDuTemps'] as Map? ?? map;
+        final classeMap = emploiMap['classe'] as Map?;
+        final matiereMap = emploiMap['matiere'] as Map?;
         final classeId = classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null;
         
-        final statutLocal = _calculateStatus(date, map['heureDebut']?.toString(), map['heureFin']?.toString());
+        final statutLocal = _calculateStatus(date, emploiMap['heureDebut']?.toString(), emploiMap['heureFin']?.toString());
 
         return {
-          'id': map['id'],
+          'id': emploiMap['id'],
           'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
           'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
           'classeId': classeId,
-          'heureDebut': map['heureDebut']?.toString() ?? '',
-          'heureFin': map['heureFin']?.toString() ?? '',
+          'heureDebut': emploiMap['heureDebut']?.toString() ?? '',
+          'heureFin': emploiMap['heureFin']?.toString() ?? '',
           'statut': _statutLabel(statutLocal),
           'statutRaw': statutLocal,
           'color': _statutColor(statutLocal),
@@ -96,19 +97,20 @@ class ScheduleController extends GetxController {
         final raw = await _repo.getEmploisDuTempsParDate(day);
         for (final s in raw) {
           final map = Map<String, dynamic>.from(s as Map);
-          final classeMap = map['classe'] as Map?;
-          final matiereMap = map['matiere'] as Map?;
+          final emploiMap = map['emploiDuTemps'] as Map? ?? map;
+          final classeMap = emploiMap['classe'] as Map?;
+          final matiereMap = emploiMap['matiere'] as Map?;
           final classeId = classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null;
           
-          final statutLocal = _calculateStatus(day, map['heureDebut']?.toString(), map['heureFin']?.toString());
+          final statutLocal = _calculateStatus(day, emploiMap['heureDebut']?.toString(), emploiMap['heureFin']?.toString());
 
           allWeek.add({
-            'id': map['id'],
+            'id': emploiMap['id'],
             'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
             'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
             'classeId': classeId,
-            'heureDebut': map['heureDebut']?.toString() ?? '',
-            'heureFin': map['heureFin']?.toString() ?? '',
+            'heureDebut': emploiMap['heureDebut']?.toString() ?? '',
+            'heureFin': emploiMap['heureFin']?.toString() ?? '',
             'statut': _statutLabel(statutLocal),
             'statutRaw': statutLocal,
             'color': _statutColor(statutLocal),

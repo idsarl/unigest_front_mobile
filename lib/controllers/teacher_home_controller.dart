@@ -44,16 +44,41 @@ class TeacherHomeController extends GetxController {
       final date = DateTime.now();
       final transformed = localEmplois.map((s) {
         final map = Map<String, dynamic>.from(s as Map);
-        final classeMap = map['classe'] as Map?;
-        final matiereMap = map['matiere'] as Map?;
-        final statutLocal = _calculateStatus(date, map['heureDebut']?.toString(), map['heureFin']?.toString());
+        final emploi = map['emploiDuTemps'] as Map? ?? map; // Fallback pour l'ancien format
+        final seance = map['seance'] as Map?;
+        final classeMap = emploi['classe'] as Map?;
+        final matiereMap = emploi['matiere'] as Map?;
+        
+        String statutLocal;
+        if (seance != null && seance['statut'] != null) {
+          if (seance['statut'] == 'EN_COURS') {
+            statutLocal = 'En cours';
+          } else if (seance['statut'] == 'TERMINEE') {
+            statutLocal = 'Terminé';
+          } else {
+            statutLocal = 'À venir';
+          }
+        } else {
+          final calculated = _calculateStatus(date, emploi['heureDebut']?.toString(), emploi['heureFin']?.toString());
+          if (calculated == 'EN_COURS') {
+            statutLocal = 'En cours';
+          } else if (calculated == 'TERMINEE') {
+            statutLocal = 'Terminé';
+          } else {
+            statutLocal = 'À venir';
+          }
+        }
+
         return {
-          'id': map['id'],
+          'id': emploi['id'],
+          'emploiDuTemps': emploi,
+          'seance': seance,
+          'affectationId': map['affectationId'],
           'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
           'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
           'classeId': classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null,
-          'heureDebut': map['heureDebut']?.toString() ?? '',
-          'heureFin': map['heureFin']?.toString() ?? '',
+          'heureDebut': emploi['heureDebut']?.toString() ?? '',
+          'heureFin': emploi['heureFin']?.toString() ?? '',
           'statut': statutLocal,
         };
       }).toList()
@@ -127,28 +152,50 @@ class TeacherHomeController extends GetxController {
     try {
       teacherName.value = _session.teacherName;
 
-      // 1. Récupération des emplois du temps du jour (pas les séances !)
+      // 1. Récupération des emplois du temps du jour avec les séances associées
       final date = DateTime.now();
-      final fetchedEmplois = await _repo.getEmploisDuTempsParDate(date);
-      if (fetchedEmplois is List) {
+      final fetchedEmploisAvecSeances = await _repo.getEmploisDuTempsParDate(date);
+      if (fetchedEmploisAvecSeances is List) {
         // Transforme les emplois du temps en format compatible avec l'agenda
-        final transformedSeances = fetchedEmplois.map((s) {
-          final map = Map<String, dynamic>.from(s as Map);
-          final classeMap = map['classe'] as Map?;
-          final matiereMap = map['matiere'] as Map?;
+        final transformedSeances = fetchedEmploisAvecSeances.map((item) {
+          final map = Map<String, dynamic>.from(item as Map);
+          final emploi = map['emploiDuTemps'] as Map;
+          final seance = map['seance'] as Map?;
+          final classeMap = emploi['classe'] as Map?;
+          final matiereMap = emploi['matiere'] as Map?;
           final classeId = classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null;
           
-          final statutLocal = _calculateStatus(date, map['heureDebut']?.toString(), map['heureFin']?.toString());
+          String statut;
+          if (seance != null && seance['statut'] != null) {
+            if (seance['statut'] == 'EN_COURS') {
+              statut = 'En cours';
+            } else if (seance['statut'] == 'TERMINEE') {
+              statut = 'Terminé';
+            } else {
+              statut = 'À venir';
+            }
+          } else {
+            final calculated = _calculateStatus(date, emploi['heureDebut']?.toString(), emploi['heureFin']?.toString());
+            if (calculated == 'EN_COURS') {
+              statut = 'En cours';
+            } else if (calculated == 'TERMINEE') {
+              statut = 'Terminé';
+            } else {
+              statut = 'À venir';
+            }
+          }
 
           return {
-            'id': map['id'],
+            'id': emploi['id'],
+            'emploiDuTemps': emploi,
+            'seance': seance,
+            'affectationId': map['affectationId'],
             'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
             'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
             'classeId': classeId,
-            'heureDebut': map['heureDebut']?.toString() ?? '',
-            'heureFin': map['heureFin']?.toString() ?? '',
-            'statut': statutLocal,
-            // Note: affectationId is not available from emploi_du_temps, but maybe we don't need it for now?
+            'heureDebut': emploi['heureDebut']?.toString() ?? '',
+            'heureFin': emploi['heureFin']?.toString() ?? '',
+            'statut': statut,
           };
         }).toList()
           ..sort((a, b) => (a['heureDebut'] as String).compareTo(b['heureDebut'] as String));
@@ -193,15 +240,53 @@ class TeacherHomeController extends GetxController {
 
   /// Démarrer une séance
   Future<void> demarrerSeance(int index) async {
-    // Pour l'instant, on désactive cette fonctionnalité car on n'a plus affectationId
-    Get.snackbar('Info', 'Fonctionnalité en cours de maintenance',
-        snackPosition: SnackPosition.BOTTOM);
+    final seanceData = seances[index];
+    final affectationId = seanceData['affectationId'] as int?;
+    final matiere = seanceData['matiere'] as String;
+    if (affectationId == null) {
+      Get.snackbar('Erreur', 'Impossible de démarrer la séance : affectation introuvable',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+    try {
+      final result = await _repo.demarrerSeance(affectationId, matiere);
+      if (result != null) {
+        // Mettre à jour la séance dans la liste
+        seances[index]['seance'] = result;
+        seances[index]['statut'] = 'En cours';
+        seances.refresh();
+        Get.snackbar('Succès', 'Séance démarrée !',
+            snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      Get.snackbar('Erreur', 'Impossible de démarrer la séance : $e',
+          snackPosition: SnackPosition.BOTTOM);
+    }
   }
 
   /// Terminer une séance
   Future<void> terminerSeance(int index) async {
-    // Pour l'instant, on désactive cette fonctionnalité car on n'a plus seanceId
-    Get.snackbar('Info', 'Fonctionnalité en cours de maintenance',
-        snackPosition: SnackPosition.BOTTOM);
+    final seanceData = seances[index];
+    final seance = seanceData['seance'] as Map?;
+    final seanceId = seance?['id'] as int?;
+    if (seanceId == null) {
+      Get.snackbar('Erreur', 'Impossible de terminer la séance : séance introuvable',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+    try {
+      final result = await _repo.terminerSeance(seanceId);
+      if (result != null) {
+        // Mettre à jour la séance dans la liste
+        seances[index]['seance'] = result;
+        seances[index]['statut'] = 'Terminé';
+        seances.refresh();
+        Get.snackbar('Succès', 'Séance terminée !',
+            snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      Get.snackbar('Erreur', 'Impossible de terminer la séance : $e',
+          snackPosition: SnackPosition.BOTTOM);
+    }
   }
 }
