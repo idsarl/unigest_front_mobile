@@ -243,7 +243,7 @@ class TeacherRepository {
   }
 
   Future<void> saveNotesBatch(List<Map<String, dynamic>> notes) async {
-    await _api.post('/api/notes/batch', body: notes);
+    await _api.post('/api/notes/batch', body: notes, queueIfOffline: false);
   }
 
   Future<Map<String, dynamic>> getDashboardAbsences() async {

@@ -52,7 +52,10 @@ class ParentController extends GetxController {
     if (aff == null) return [];
     final mats = aff['matieres'] as List?;
     if (mats == null) return [];
-    return mats.map((m) => m['nom']?.toString() ?? '').where((n) => n.isNotEmpty).toList();
+    return mats.map((m) => m['nom']?.toString() ?? '')
+        .where((n) => n.isNotEmpty)
+        .toSet()
+        .toList();
   }
 
   List<Map<String, dynamic>> get filteredStudents {

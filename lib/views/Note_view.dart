@@ -25,10 +25,8 @@ class _NoteViewState extends State<NoteView> {
 
   final List<String> _typeEvaluationList = [
     'DEVOIR',
-    'COMPOSITION',
     'EXAMEN',
     'INTERROGATION',
-    'TP',
     'PARTICIPATION'
   ];
 
@@ -505,6 +503,7 @@ class _NoteViewState extends State<NoteView> {
                             }).toList();
                             final d = _selectedDateObj ?? DateTime.now();
                             await _controller.saveEvaluationNotes(
+                              title: _titreController.text.trim(),
                               type: _selectedType,
                               dateIso: d.toIso8601String().split('T').first,
                               noteMax: double.tryParse(_noteMaxController.text) ?? 20,

@@ -495,18 +495,35 @@ class TeacherHomeView extends StatelessWidget {
               const SizedBox(width: 10),
               // Boutons ou badge selon le statut
               if (statut == 'En cours' && seance != null)
-                ElevatedButton(
-                  onPressed: () => controller.terminerSeance(index),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text(
-                    'Terminer',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade100,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'En cours',
+                        style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => controller.terminerSeance(index),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade400,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text(
+                        'Arrêter',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
                 )
               else if (statut == 'À venir' && affectationId != null)
                 ElevatedButton(

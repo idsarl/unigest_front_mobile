@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/utils/presence_utils.dart';
 import '../services/teacher_repository.dart';
+import '../core/storage/hive_service.dart';
 
 class NoteController extends GetxController {
   final TeacherRepository _repo = TeacherRepository.instance;
@@ -120,7 +122,7 @@ class NoteController extends GetxController {
             'type': type,
             'date': date,
             'dateLabel': _formatDateLabel(date),
-            'title': _typeLabel(type),
+            'title': HiveService.instance.getCache('titre_eval_${affId}_${type}_$date') ?? _typeLabel(type),
             'noteMax': '20',
             'notes': <Map<String, dynamic>>[],
           },
@@ -130,6 +132,7 @@ class NoteController extends GetxController {
 
       evaluations.assignAll(grouped.values.toList()
         ..sort((a, b) => (b['date'] as String).compareTo(a['date'] as String)));
+      evaluations.refresh();
 
       final etudiants = await _repo.getEtudiantsClasse(cId);
       students.assignAll(etudiants.map((e) {
@@ -150,6 +153,7 @@ class NoteController extends GetxController {
   }
 
   Future<void> saveEvaluationNotes({
+    required String title,
     required String type,
     required String dateIso,
     required double noteMax,
@@ -181,12 +185,39 @@ class NoteController extends GetxController {
             snackPosition: SnackPosition.BOTTOM);
         return;
       }
+      
       await _repo.saveNotesBatch(batch);
+
+      // Sauvegarde du titre localement SEULEMENT en cas de succès
+      if (title.isNotEmpty) {
+        final key = 'titre_eval_${affId}_${type}_$dateIso';
+        HiveService.instance.saveCache(key, title);
+      }
+
       await loadNotes();
-      Get.snackbar('Succès', 'Notes publiées',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Succès', 'Notes publiées avec succès',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white);
     } catch (e) {
-      Get.snackbar('Erreur', '$e', snackPosition: SnackPosition.BOTTOM);
+      String errorMsg = e.toString();
+      if (errorMsg.contains('Duplicate entry') || errorMsg.contains('uk_note_unique') || errorMsg.contains('DataIntegrityViolationException')) {
+        errorMsg = "Une évaluation de ce type (ex: Devoir) existe déjà à cette date pour cette classe. Veuillez choisir une autre date ou un autre type.";
+      } else {
+        // Nettoyage de l'erreur brute pour la rendre plus lisible
+        if (errorMsg.contains('"message":')) {
+           final RegExp regex = RegExp(r'"message":"(.*?)"');
+           final match = regex.firstMatch(errorMsg);
+           if (match != null) {
+              errorMsg = match.group(1) ?? errorMsg;
+           }
+        }
+      }
+      Get.snackbar('Attention', errorMsg, 
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange.shade800,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5));
     } finally {
       isSaving.value = false;
     }
@@ -231,14 +262,10 @@ class NoteController extends GetxController {
     switch (type) {
       case 'DEVOIR':
         return 'Devoir';
-      case 'COMPOSITION':
-        return 'Composition';
       case 'EXAMEN':
         return 'Examen';
       case 'INTERROGATION':
         return 'Interrogation';
-      case 'TP':
-        return 'TP';
       case 'PARTICIPATION':
         return 'Participation';
       default:
