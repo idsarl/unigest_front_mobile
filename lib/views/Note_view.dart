@@ -726,27 +726,30 @@ class _NoteViewState extends State<NoteView> {
 
   Widget _buildEvaluationList() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ElevatedButton.icon(
-          onPressed: () {
-            setState(() {
-              _titreController.clear();
-              _dateController.clear();
-              _selectedDateObj = null;
-              _noteMaxController.text = '20';
-              _noteControllers.clear();
-              _currentEvaluation = null;
-              _isAdding = true;
-            });
-          },
-          icon: const Icon(Icons.add, color: Colors.white, size: 18),
-          label: const Text('Nouvelle évaluation', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6C5CE7),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            elevation: 0,
+        Align(
+          alignment: Alignment.centerLeft,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                _titreController.clear();
+                _dateController.clear();
+                _selectedDateObj = null;
+                _noteMaxController.text = '20';
+                _noteControllers.clear();
+                _currentEvaluation = null;
+                _isAdding = true;
+              });
+            },
+            icon: const Icon(Icons.add, color: Colors.white, size: 18),
+            label: const Text('Nouvelle évaluation', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6C5CE7),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
+            ),
           ),
         ),
         const SizedBox(height: 24),

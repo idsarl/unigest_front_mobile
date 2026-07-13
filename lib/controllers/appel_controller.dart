@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../core/utils/presence_utils.dart';
 import '../services/teacher_repository.dart';
+import 'teacher_home_controller.dart';
 
 class AppelController extends GetxController {
   final TeacherRepository _repo = TeacherRepository.instance;
@@ -259,6 +260,11 @@ class AppelController extends GetxController {
       isAppelSaved.value = true; // Marque l'appel comme enregistré
       Get.snackbar('Succès', 'Appel enregistré',
           snackPosition: SnackPosition.BOTTOM);
+      try {
+        if (Get.isRegistered<TeacherHomeController>()) {
+          Get.find<TeacherHomeController>().fetchDashboardData();
+        }
+      } catch (_) {}
     } catch (e) {
       Get.snackbar('Erreur', '$e', snackPosition: SnackPosition.BOTTOM);
     } finally {

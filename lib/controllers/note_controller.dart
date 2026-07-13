@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../core/utils/presence_utils.dart';
 import '../services/teacher_repository.dart';
 import '../core/storage/hive_service.dart';
+import 'teacher_home_controller.dart';
 
 class NoteController extends GetxController {
   final TeacherRepository _repo = TeacherRepository.instance;
@@ -199,6 +200,11 @@ class NoteController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
           colorText: Colors.white);
+      try {
+        if (Get.isRegistered<TeacherHomeController>()) {
+          Get.find<TeacherHomeController>().fetchDashboardData();
+        }
+      } catch (_) {}
     } catch (e) {
       String errorMsg = e.toString();
       if (errorMsg.contains('Duplicate entry') || errorMsg.contains('uk_note_unique') || errorMsg.contains('DataIntegrityViolationException')) {

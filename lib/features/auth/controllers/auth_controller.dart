@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import '../../../services/auth_service.dart';
+import '../../../core/constants/app_constants.dart';
 
 class AuthController extends GetxController {
   AuthController({AuthService? authService})
@@ -53,7 +54,7 @@ class AuthController extends GetxController {
     if (msg.contains('SocketException') ||
         msg.contains('Failed host lookup') ||
         msg.contains('Connection refused')) {
-      return 'Impossible de joindre le serveur. Vérifiez que le backend tourne sur le port 5200.';
+      return 'Impossible de joindre le serveur (${AppConstants.baseUrl}).';
     }
     if (msg.contains('401') || msg.contains('403')) {
       return 'Email ou mot de passe incorrect';

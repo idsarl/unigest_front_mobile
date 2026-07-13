@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:unigest_app/views/parent_view.dart';
 import 'package:unigest_app/views/shedule_view.dart';
 import 'Note_view.dart';
 import 'teacher_home_view.dart';
 import 'appel_view.dart';
 import '../core/session/app_session.dart';
+import '../controllers/teacher_home_controller.dart';
+import '../controllers/appel_controller.dart';
+import '../controllers/note_controller.dart';
+import '../controllers/schedule_controller.dart';
+import '../controllers/parent_controller.dart';
 import 'parent_home_view.dart';
 
 class MainLayout extends StatefulWidget {
@@ -63,6 +69,39 @@ class _MainLayoutState extends State<MainLayout> {
             setState(() {
               _currentIndex = index;
             });
+            if (isTeacher) {
+              if (index == 0) {
+                try {
+                  if (Get.isRegistered<TeacherHomeController>()) {
+                    Get.find<TeacherHomeController>().fetchDashboardData();
+                  }
+                } catch (_) {}
+              } else if (index == 1) {
+                try {
+                  if (Get.isRegistered<AppelController>()) {
+                    Get.find<AppelController>().loadData();
+                  }
+                } catch (_) {}
+              } else if (index == 2) {
+                try {
+                  if (Get.isRegistered<NoteController>()) {
+                    Get.find<NoteController>().loadData();
+                  }
+                } catch (_) {}
+              } else if (index == 3) {
+                try {
+                  if (Get.isRegistered<ScheduleController>()) {
+                    Get.find<ScheduleController>().loadSeances();
+                  }
+                } catch (_) {}
+              } else if (index == 4) {
+                try {
+                  if (Get.isRegistered<ParentController>()) {
+                    Get.find<ParentController>().loadData();
+                  }
+                } catch (_) {}
+              }
+            }
           },
           items: isTeacher
               ? const [

@@ -1,4 +1,3 @@
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 
 /// Application-level constants
@@ -6,12 +5,15 @@ class AppConstants {
   /// Application name
   static const String appName = 'unigest_app';
 
-  /// URL du backend Spring (port 5200).
-  /// Android émulateur : 10.0.2.2 | Windows/Web/iOS simulateur : localhost
+  /// URL du backend Spring local
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:5400';
-    if (Platform.isAndroid) return 'http://10.0.2.2:5400';
-    return 'http://localhost:5400';
+    if (kIsWeb) {
+      return 'http://localhost:5400';
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://10.0.2.2:5400'; // IP spéciale pour accéder à l'hôte local depuis l'émulateur Android
+    } else {
+      return 'http://localhost:5400';
+    }
   }
   
   /// Storage keys

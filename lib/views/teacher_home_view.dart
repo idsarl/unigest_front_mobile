@@ -206,18 +206,24 @@ class TeacherHomeView extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF6C5CE7),
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6C5CE7).withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
         ),
         child: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Prochain cours', style: TextStyle(color: Colors.black54, fontSize: 13)),
+            Text('Prochain cours', style: TextStyle(color: Colors.white70, fontSize: 13)),
             SizedBox(height: 6),
-            Text('Aucun cours restant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black54)),
+            Text('Aucun cours restant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
             SizedBox(height: 6),
-            Text("Bonne fin de journée !", style: TextStyle(color: Colors.black87, fontSize: 14)),
+            Text("Bonne fin de journée !", style: TextStyle(color: Colors.white, fontSize: 14)),
           ],
         ),
       );
@@ -236,18 +242,24 @@ class TeacherHomeView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF6C5CE7),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6C5CE7).withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Prochain cours dans', style: TextStyle(color: Colors.black54, fontSize: 13)),
+          const Text('Prochain cours dans', style: TextStyle(color: Colors.white70, fontSize: 13)),
           const SizedBox(height: 6),
-          Text(timeString, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          Text(timeString, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
           const SizedBox(height: 6),
-          Text('$matiere$label', style: const TextStyle(color: Colors.black87, fontSize: 14)),
+          Text('$matiere$label', style: const TextStyle(color: Colors.white, fontSize: 14)),
         ],
       ),
     );
@@ -494,83 +506,105 @@ class TeacherHomeView extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               // Boutons ou badge selon le statut
-              if (statut == 'En cours' && seance != null)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade100,
-                        borderRadius: BorderRadius.circular(6),
+              if (seance != null)
+                if (statut == 'En cours')
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade100,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'En cours',
+                          style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      child: const Text(
-                        'En cours',
-                        style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => controller.terminerSeance(index),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade400,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text(
+                          'Arrêter',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () => controller.terminerSeance(index),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade400,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: const Text(
-                        'Arrêter',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                )
-              else if (statut == 'À venir' && affectationId != null)
-                ElevatedButton(
-                  onPressed: () => controller.demarrerSeance(index),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6C5CE7),
-                    foregroundColor: Colors.white,
+                    ],
+                  )
+                else if (statut == 'Terminé')
+                  Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text(
-                    'Démarrer',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
-                )
-              else if (statut == 'Terminé')
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Terminé',
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-                )
-              else if (statut == 'Non effectuée')
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Non effectuée',
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                    child: const Text(
+                      'Terminé',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ),
+                  )
+                else if (statut == 'Non effectuée')
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'Non effectuée',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox.shrink()
+              else // seance == null (pas encore démarrée)
+                if (statut == 'Non effectuée')
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'Non effectuée',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  )
+                else if (affectationId != null)
+                  ElevatedButton(
+                    onPressed: () => controller.demarrerSeance(index),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C5CE7),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text(
+                      'Démarrer',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
+                  )
+                else
+                  const SizedBox.shrink(),
             ],
           ),
         ],

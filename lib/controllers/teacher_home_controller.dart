@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import '../core/session/app_session.dart';
 import '../core/storage/hive_service.dart';
@@ -21,11 +22,22 @@ class TeacherHomeController extends GetxController {
   final RxMap<String, dynamic> moyenneMatiere = <String, dynamic>{}.obs;
 
   final RxString teacherName = AppSession.instance.teacherName.obs;
+  Timer? _refreshTimer;
 
   @override
   void onInit() {
     super.onInit();
     _init();
+    // Lance un timer de rafraîchissement toutes les 30 secondes
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      fetchDashboardData();
+    });
+  }
+
+  @override
+  void onClose() {
+    _refreshTimer?.cancel();
+    super.onClose();
   }
 
   Future<void> _init() async {
@@ -259,10 +271,7 @@ class TeacherHomeController extends GetxController {
     try {
       final result = await _repo.demarrerSeance(affectationId, matiere);
       if (result != null) {
-        // Mettre à jour la séance dans la liste
-        seances[index]['seance'] = result;
-        seances[index]['statut'] = 'En cours';
-        seances.refresh();
+        await fetchDashboardData();
         Get.snackbar('Succès', 'Séance démarrée !',
             snackPosition: SnackPosition.BOTTOM);
       }
@@ -285,10 +294,7 @@ class TeacherHomeController extends GetxController {
     try {
       final result = await _repo.terminerSeance(seanceId);
       if (result != null) {
-        // Mettre à jour la séance dans la liste
-        seances[index]['seance'] = result;
-        seances[index]['statut'] = 'Terminé';
-        seances.refresh();
+        await fetchDashboardData();
         Get.snackbar('Succès', 'Séance terminée !',
             snackPosition: SnackPosition.BOTTOM);
       }

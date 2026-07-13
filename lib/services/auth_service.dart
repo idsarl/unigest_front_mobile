@@ -24,7 +24,8 @@ class AuthService {
     final displayName =
         '$prenom $nom'.trim().isEmpty ? 'Utilisateur' : '$prenom $nom';
 
-    final userId = int.tryParse(data['id']?.toString() ?? '');
+    final userId = int.tryParse(data['id']?.toString() ?? '') ??
+        int.tryParse(data['enseignantId']?.toString() ?? '');
     _session.setFromLogin(
       authToken: token,
       id: userId != null && userId > 0 ? userId : _session.teacherId,

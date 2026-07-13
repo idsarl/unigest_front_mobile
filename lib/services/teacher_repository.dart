@@ -268,7 +268,13 @@ class TeacherRepository {
   Future<Map<String, dynamic>?> getProchaineSeance() async {
     final cacheKey = 'prochaine_seance_$teacherId';
     try {
-      final data = await _api.get('/api/seances/enseignant/$teacherId/prochaine');
+      final now = DateTime.now();
+      final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+      final data = await _api.get(
+        '/api/seances/enseignant/$teacherId/prochaine',
+        query: {'date': dateStr, 'time': timeStr},
+      );
       if (data is Map) {
         final result = Map<String, dynamic>.from(data);
         await _hive.saveCache(cacheKey, result);
