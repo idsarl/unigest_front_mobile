@@ -3,8 +3,12 @@ import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import 'login_view.dart';
 import '../../../views/MainLayout.dart';
+import '../../../core/session/app_session.dart';
+import '../../parent/views/parent_main_view.dart';
+import '../../student/views/student_home_view.dart';
+import '../../student/controllers/student_home_controller.dart';
 
-/// Affiche login ou app selon l'état d'authentification.
+/// Affiche login ou l'interface adaptée au rôle selon l'état d'authentification.
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 
@@ -32,6 +36,16 @@ class AuthWrapper extends StatelessWidget {
       }
 
       if (auth.isAuthenticated.value) {
+        final role = AppSession.instance.role.toUpperCase();
+        if (role == 'PARENT') {
+          return const ParentMainView();
+        }
+        if (role == 'ETUDIANT' || role == 'ELEVE' || role == 'STUDENT') {
+          if (!Get.isRegistered<StudentHomeController>()) {
+            Get.lazyPut(() => StudentHomeController());
+          }
+          return const StudentHomeView();
+        }
         return const MainLayout();
       }
 

@@ -10,6 +10,7 @@ class AppSession {
   static const String _keyTeacherId = 'teacher_id';
   static const String _keyTeacherName = 'teacher_name';
   static const String _keyTeacherEmail = 'teacher_email';
+  static const String _keyRole = 'user_role';
 
   String? token;
   int teacherId = 0;
@@ -49,6 +50,7 @@ class AppSession {
     await prefs.setInt(_keyTeacherId, teacherId);
     await prefs.setString(_keyTeacherName, teacherName);
     await prefs.setString(_keyTeacherEmail, teacherEmail);
+    await prefs.setString(_keyRole, role);
   }
 
   Future<bool> restore() async {
@@ -57,6 +59,7 @@ class AppSession {
     teacherId = prefs.getInt(_keyTeacherId) ?? 0;
     teacherName = prefs.getString(_keyTeacherName) ?? '';
     teacherEmail = prefs.getString(_keyTeacherEmail) ?? '';
+    role = prefs.getString(_keyRole) ?? 'ENSEIGNANT';
     return isAuthenticated;
   }
 
@@ -66,6 +69,7 @@ class AppSession {
     await prefs.remove(_keyTeacherId);
     await prefs.remove(_keyTeacherName);
     await prefs.remove(_keyTeacherEmail);
+    await prefs.remove(_keyRole);
     clear();
   }
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class Helpers {
   /// Formats date to readable string
   static String formatDate(DateTime date) {
-      return '${date.day}/${date.month}/${date.year}';
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   /// Capitalizes the first letter of a string
@@ -13,7 +13,7 @@ class Helpers {
     return text[0].toUpperCase() + text.substring(1);
   }
 
-  /// Shows a snackbar message 
+  /// Shows a snackbar message
   static void showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -22,7 +22,7 @@ class Helpers {
 
   /// Validates email format
   static bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[w-.]+@([w-]+.)+[w-]{2,4}$');
+    final emailRegex = RegExp(r'^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
   }
 }

@@ -1,3 +1,4 @@
+import '../core/services/api_service.dart' as core_api;
 import '../core/session/app_session.dart';
 import '../models/user.dart';
 import 'api_service.dart';
@@ -40,6 +41,7 @@ class AuthService {
       // /me optionnel si le profil est déjà dans la réponse login
     }
 
+    core_api.ApiService.setToken(token);
     await _session.persist();
 
     return User(
@@ -49,9 +51,15 @@ class AuthService {
     );
   }
 
+  Future<User> register(String email, String password, String name) async {
+    throw UnsupportedError('Inscription non exposée par l’API mobile actuelle');
+  }
+
   Future<bool> restoreSession() async {
     final restored = await _session.restore();
     if (!restored) return false;
+
+    core_api.ApiService.setToken(_session.token);
 
     try {
       await _loadCurrentUser();
@@ -80,6 +88,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
+    core_api.ApiService.clearToken();
     await _session.clearStorage();
   }
 }
