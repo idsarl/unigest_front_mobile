@@ -44,7 +44,10 @@ class EmploiService {
                   ? matiere['nom']?.toString() ?? 'Cours'
                   : matiere?.toString() ?? 'Cours',
               teacher: teacherName,
-              classroom: 'Salle 102', // Valeur par défaut
+              // Le backend ne possede pas encore de champ "salle" dedie.
+              // Ne pas inventer une valeur : utiliser celle de l'API si elle
+              // existe, sinon laisser le champ vide.
+              classroom: json['salle']?.toString() ?? '',
               type: json['type']?.toString().toLowerCase() ?? 'cours',
             ));
           }

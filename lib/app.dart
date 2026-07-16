@@ -9,6 +9,8 @@ import 'features/student/views/student_home_view.dart';
 import 'features/student/controllers/student_home_controller.dart';
 import 'features/auth/views/login_view.dart';
 import 'core/theme/app_theme.dart';
+import 'views/MainLayout.dart';
+import 'core/session/app_session.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -53,6 +55,10 @@ class MyApp extends StatelessWidget {
           binding: BindingsBuilder(() {
             Get.lazyPut(() => StudentHomeController());
           }),
+        ),
+        GetPage(
+          name: '/teacher-home',
+          page: () => const MainLayout(),
         ),
       ],
     );

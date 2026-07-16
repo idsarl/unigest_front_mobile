@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:unigest_app/views/parent_view.dart';
-import 'package:unigest_app/views/shedule_view.dart';
+import 'parent_view.dart';
+import 'shedule_view.dart';
 import 'Note_view.dart';
 import 'teacher_home_view.dart';
 import 'appel_view.dart';
@@ -47,7 +47,6 @@ class _MainLayoutState extends State<MainLayout> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: pages[_currentIndex],
-
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -105,15 +104,27 @@ class _MainLayoutState extends State<MainLayout> {
           },
           items: isTeacher
               ? const [
-                  BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Accueil'),
-                  BottomNavigationBarItem(icon: Icon(Icons.check_box_outlined), label: 'Appel'),
-                  BottomNavigationBarItem(icon: Icon(Icons.insert_chart_outlined), label: 'Notes'),
-                  BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: 'Emploi'),
-                  BottomNavigationBarItem(icon: Icon(Icons.people_outline), label: 'Parents'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.home_outlined),
+                      activeIcon: Icon(Icons.home),
+                      label: 'Accueil'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.check_box_outlined), label: 'Appel'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.insert_chart_outlined), label: 'Notes'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.calendar_today_outlined),
+                      label: 'Emploi'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.people_outline), label: 'Parents'),
                 ]
               : const [
-                  BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Accueil'),
-                  BottomNavigationBarItem(icon: Icon(Icons.chat_outlined), label: 'Messages'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.home_outlined),
+                      activeIcon: Icon(Icons.home),
+                      label: 'Accueil'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.chat_outlined), label: 'Messages'),
                 ],
         ),
       ),

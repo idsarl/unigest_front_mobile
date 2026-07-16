@@ -43,7 +43,7 @@ class TeacherProfileController extends GetxController {
     }
     prenomController.text = prenom;
     nomController.text = nom;
-    
+
     passwordController.clear();
     confirmPasswordController.clear();
   }
@@ -95,10 +95,10 @@ class TeacherProfileController extends GetxController {
       _session.teacherName = newFullName;
       _session.teacherEmail = email;
       await _session.persist();
-      
+
       teacherName.value = newFullName;
       teacherEmail.value = email;
-      
+
       isEditMode.value = false; // Sortir du mode édition
 
       Get.snackbar(

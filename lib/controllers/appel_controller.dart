@@ -11,7 +11,8 @@ class AppelController extends GetxController {
   final RxBool isSaving = false.obs;
   final RxBool isAppelSaved = false.obs;
 
-  final RxList<Map<String, dynamic>> affectations = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> affectations =
+      <Map<String, dynamic>>[].obs;
   final RxInt selectedAffectationIndex = 0.obs;
   final RxInt selectedMatiereIndex = 0.obs;
   final RxList<Map<String, dynamic>> students = <Map<String, dynamic>>[].obs;
@@ -70,15 +71,16 @@ class AppelController extends GetxController {
       affectations.assignAll(
         affs.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList(),
       );
-      
+
       // Essayer de trouver la séance actuelle/prochaine via l'emploi du temps
       if (affectations.isNotEmpty) {
-        final emploisDuJour = await _repo.getEmploisDuTempsParDate(DateTime.now());
+        final emploisDuJour =
+            await _repo.getEmploisDuTempsParDate(DateTime.now());
         final now = DateTime.now();
         final currentMins = now.hour * 60 + now.minute;
-        
+
         Map<String, dynamic>? currentEmploi;
-        
+
         for (final e in emploisDuJour) {
           final map = Map<String, dynamic>.from(e as Map);
           final startStr = map['heureDebut']?.toString();
@@ -101,35 +103,36 @@ class AppelController extends GetxController {
             } catch (_) {}
           }
         }
-        
+
         if (currentEmploi != null) {
           final classeMap = currentEmploi['classe'] as Map?;
           final matiereMap = currentEmploi['matiere'] as Map?;
           final cId = classeMap?['id']?.toString();
           final matNom = matiereMap?['nom']?.toString();
-          
+
           if (cId != null) {
-             final index = affectations.indexWhere((a) {
-                final aC = a['classe'];
-                if (aC is Map) {
-                  return aC['id']?.toString() == cId;
+            final index = affectations.indexWhere((a) {
+              final aC = a['classe'];
+              if (aC is Map) {
+                return aC['id']?.toString() == cId;
+              }
+              return false;
+            });
+            if (index != -1) {
+              selectedAffectationIndex.value = index;
+              // Selectionner la matiere si possible
+              if (matNom != null) {
+                final mats = currentMatieres;
+                final matIndex =
+                    mats.indexWhere((m) => m['nom']?.toString() == matNom);
+                if (matIndex != -1) {
+                  selectedMatiereIndex.value = matIndex;
                 }
-                return false;
-             });
-             if (index != -1) {
-               selectedAffectationIndex.value = index;
-               // Selectionner la matiere si possible
-               if (matNom != null) {
-                 final mats = currentMatieres;
-                 final matIndex = mats.indexWhere((m) => m['nom']?.toString() == matNom);
-                 if (matIndex != -1) {
-                   selectedMatiereIndex.value = matIndex;
-                 }
-               }
-             }
+              }
+            }
           }
         }
-        
+
         await selectAffectation(selectedAffectationIndex.value);
       }
     } catch (e) {
@@ -165,10 +168,12 @@ class AppelController extends GetxController {
     try {
       final matiereNom = matiereLabel == '—' ? '' : matiereLabel;
 
-      var seances = await _repo.getSeancesAffectationDate(affId, DateTime.now());
+      var seances =
+          await _repo.getSeancesAffectationDate(affId, DateTime.now());
       int? sid;
-      
-      final matchingSeance = seances.firstWhereOrNull((s) => s is Map && s['matiere'] == matiereNom);
+
+      final matchingSeance = seances
+          .firstWhereOrNull((s) => s is Map && s['matiere'] == matiereNom);
 
       if (matchingSeance != null) {
         sid = int.tryParse((matchingSeance as Map)['id']?.toString() ?? '');
@@ -181,7 +186,8 @@ class AppelController extends GetxController {
       seanceId.value = sid;
 
       final etudiants = await _repo.getEtudiantsClasse(cId);
-      final appels = sid != null ? await _repo.getAppelsSeance(sid) : <dynamic>[];
+      final appels =
+          sid != null ? await _repo.getAppelsSeance(sid) : <dynamic>[];
 
       final appelParEtudiant = <int, Map<String, dynamic>>{};
       for (final a in appels) {

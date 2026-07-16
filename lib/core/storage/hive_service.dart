@@ -16,7 +16,7 @@ class HiveService {
   /// Initialise Hive
   Future<void> init() async {
     await Hive.initFlutter();
-    
+
     // Ouvre les boxes
     await Hive.openBox(_boxCache);
     await Hive.openBox(_boxQueuedRequests);
@@ -140,7 +140,8 @@ class HiveService {
   }
 
   /// Sauvegarde un message
-  Future<void> saveMessage(int conversationId, Map<String, dynamic> message) async {
+  Future<void> saveMessage(
+      int conversationId, Map<String, dynamic> message) async {
     final box = Hive.box(_boxMessages);
     final key = '$conversationId-${message['id']}';
     await box.put(key, message);

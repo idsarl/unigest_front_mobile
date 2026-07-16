@@ -18,7 +18,8 @@ class _NoteViewState extends State<NoteView> {
 
   final TextEditingController _titreController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _noteMaxController = TextEditingController(text: '20');
+  final TextEditingController _noteMaxController =
+      TextEditingController(text: '20');
   final Map<int, TextEditingController> _noteControllers = {};
 
   String _selectedType = 'DEVOIR';
@@ -74,7 +75,8 @@ class _NoteViewState extends State<NoteView> {
               onSurface: Colors.black87,
             ),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFF6C5CE7)),
+              style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF6C5CE7)),
             ),
           ),
           child: child!,
@@ -86,10 +88,21 @@ class _NoteViewState extends State<NoteView> {
       setState(() {
         _selectedDateObj = picked;
         const mois = [
-          'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-          'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+          'Janvier',
+          'Février',
+          'Mars',
+          'Avril',
+          'Mai',
+          'Juin',
+          'Juillet',
+          'Août',
+          'Septembre',
+          'Octobre',
+          'Novembre',
+          'Décembre'
         ];
-        _dateController.text = "${picked.day} ${mois[picked.month - 1]} ${picked.year}";
+        _dateController.text =
+            "${picked.day} ${mois[picked.month - 1]} ${picked.year}";
       });
     }
   }
@@ -142,7 +155,8 @@ class _NoteViewState extends State<NoteView> {
               child: Column(
                 children: [
                   Obx(() {
-                    if (_controller.isLoading.value && _controller.evaluations.isEmpty) {
+                    if (_controller.isLoading.value &&
+                        _controller.evaluations.isEmpty) {
                       return const Padding(
                         padding: EdgeInsets.all(40),
                         child: Center(child: CircularProgressIndicator()),
@@ -155,32 +169,44 @@ class _NoteViewState extends State<NoteView> {
                             // Dropdown Classe
                             Expanded(
                               child: DropdownButtonFormField<int>(
-                                value: _controller.selectedAffectationIndex.value,
+                                value:
+                                    _controller.selectedAffectationIndex.value,
                                 isExpanded: true,
                                 decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.groups_outlined, color: Color(0xFF6C5CE7), size: 20),
+                                  prefixIcon: const Icon(Icons.groups_outlined,
+                                      color: Color(0xFF6C5CE7), size: 20),
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 12),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.grey.shade200),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade200),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.grey.shade200),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade200),
                                   ),
                                 ),
-                                items: List.generate(_controller.affectations.length, (i) {
+                                items: List.generate(
+                                    _controller.affectations.length, (i) {
                                   final a = _controller.affectations[i];
-                                  final label = a['classe']?['nom']?.toString() ?? 'Classe';
+                                  final label =
+                                      a['classe']?['nom']?.toString() ??
+                                          'Classe';
                                   return DropdownMenuItem(
-                                    value: i, 
-                                    child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                    value: i,
+                                    child: Text(label,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13)),
                                   );
                                 }),
                                 onChanged: (v) {
-                                  if (v != null) _controller.selectAffectation(v);
+                                  if (v != null)
+                                    _controller.selectAffectation(v);
                                 },
                               ),
                             ),
@@ -191,25 +217,37 @@ class _NoteViewState extends State<NoteView> {
                                 value: _controller.selectedMatiereIndex.value,
                                 isExpanded: true,
                                 decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.menu_book_outlined, color: Color(0xFF6C5CE7), size: 20),
+                                  prefixIcon: const Icon(
+                                      Icons.menu_book_outlined,
+                                      color: Color(0xFF6C5CE7),
+                                      size: 20),
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 12),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.grey.shade200),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade200),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.grey.shade200),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey.shade200),
                                   ),
                                 ),
-                                items: List.generate(_controller.currentMatieres.length, (i) {
+                                items: List.generate(
+                                    _controller.currentMatieres.length, (i) {
                                   final m = _controller.currentMatieres[i];
-                                  final label = m['nom']?.toString() ?? 'Matière';
+                                  final label =
+                                      m['nom']?.toString() ?? 'Matière';
                                   return DropdownMenuItem(
-                                    value: i, 
-                                    child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
+                                    value: i,
+                                    child: Text(label,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13),
+                                        overflow: TextOverflow.ellipsis),
                                   );
                                 }),
                                 onChanged: (v) {
@@ -272,14 +310,17 @@ class _NoteViewState extends State<NoteView> {
             children: [
               IconButton(
                 onPressed: () => setState(() => _isViewingStudents = false),
-                icon: const Icon(Icons.arrow_back_ios, size: 18, color: Colors.black),
+                icon: const Icon(Icons.arrow_back_ios,
+                    size: 18, color: Colors.black),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
               const Expanded(
                 child: Center(
                   child: Padding(
-                    padding: EdgeInsets.only(right: 24), // Compense la flèche retour pour centrer le texte
+                    padding: EdgeInsets.only(
+                        right:
+                            24), // Compense la flèche retour pour centrer le texte
                     child: Text(
                       'Évaluations',
                       style: TextStyle(
@@ -325,18 +366,24 @@ class _NoteViewState extends State<NoteView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              _titreController.text.isNotEmpty ? _titreController.text : 'Nouvelle évaluation',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              _titreController.text.isNotEmpty
+                                  ? _titreController.text
+                                  : 'Nouvelle évaluation',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFEDEEFC),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 '/${_noteMaxController.text.isNotEmpty ? _noteMaxController.text : '20'}',
-                                style: const TextStyle(color: Color(0xFF6C5CE7), fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Color(0xFF6C5CE7),
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
@@ -347,24 +394,35 @@ class _NoteViewState extends State<NoteView> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.menu_book_outlined, color: Color(0xFF6C5CE7), size: 18),
+                                const Icon(Icons.menu_book_outlined,
+                                    color: Color(0xFF6C5CE7), size: 18),
                                 const SizedBox(width: 6),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(_controller.matiereLabel, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                    Text(_controller.classeLabel, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                                    Text(_controller.matiereLabel,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13)),
+                                    Text(_controller.classeLabel,
+                                        style: const TextStyle(
+                                            color: Colors.grey, fontSize: 11)),
                                   ],
                                 )
                               ],
                             ),
                             Row(
                               children: [
-                                Icon(Icons.calendar_today_outlined, color: Colors.grey.shade600, size: 18),
+                                Icon(Icons.calendar_today_outlined,
+                                    color: Colors.grey.shade600, size: 18),
                                 const SizedBox(width: 6),
                                 Text(
-                                  _dateController.text.isNotEmpty ? _dateController.text : 'Date non spécifiée',
-                                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                                  _dateController.text.isNotEmpty
+                                      ? _dateController.text
+                                      : 'Date non spécifiée',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13),
                                 ),
                               ],
                             ),
@@ -374,20 +432,23 @@ class _NoteViewState extends State<NoteView> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Rechercher un étudiant...',
-                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                      suffixIcon: const Icon(Icons.search, color: Colors.grey, size: 22),
+                      hintStyle:
+                          const TextStyle(color: Colors.grey, fontSize: 14),
+                      suffixIcon: const Icon(Icons.search,
+                          color: Colors.grey, size: 22),
                       filled: true,
                       fillColor: const Color(0xFFEFEFEF),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none),
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -397,41 +458,62 @@ class _NoteViewState extends State<NoteView> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Etudiant', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14)),
-                              Text('Note /${_noteMaxController.text.isNotEmpty ? _noteMaxController.text : '20'}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14)),
+                              const Text('Etudiant',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 14)),
+                              Text(
+                                  'Note /${_noteMaxController.text.isNotEmpty ? _noteMaxController.text : '20'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 14)),
                             ],
                           ),
                         ),
                         const Divider(height: 1, indent: 16, endIndent: 16),
-
                         ..._displayStudents.map((student) {
                           final bool isLast = _displayStudents.last == student;
                           final studentId = student['id'] as int;
                           final studentNoteController = _noteControllerFor(
                             studentId,
-                            _isReadOnly ? student['note']?.toString() ?? '' : '',
+                            _isReadOnly
+                                ? student['note']?.toString() ?? ''
+                                : '',
                           );
 
                           return Column(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 10),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       children: [
                                         CircleAvatar(
                                           radius: 18,
-                                          backgroundColor: const Color(0xFF536DFE),
-                                          child: Text(student['initial'], style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                                          backgroundColor:
+                                              const Color(0xFF536DFE),
+                                          child: Text(student['initial'],
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold)),
                                         ),
                                         const SizedBox(width: 12),
-                                        Text(student['name'], style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+                                        Text(student['name'],
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14)),
                                       ],
                                     ),
                                     SizedBox(
@@ -444,15 +526,25 @@ class _NoteViewState extends State<NoteView> {
                                         readOnly: _isReadOnly,
                                         decoration: InputDecoration(
                                           contentPadding: EdgeInsets.zero,
-                                          fillColor: _isReadOnly ? Colors.grey.shade100 : Colors.white,
+                                          fillColor: _isReadOnly
+                                              ? Colors.grey.shade100
+                                              : Colors.white,
                                           filled: _isReadOnly,
                                           enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                            borderSide: BorderSide(color: _isReadOnly ? Colors.grey.shade300 : Colors.grey.shade400),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            borderSide: BorderSide(
+                                                color: _isReadOnly
+                                                    ? Colors.grey.shade300
+                                                    : Colors.grey.shade400),
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                            borderSide: BorderSide(color: _isReadOnly ? Colors.grey.shade300 : const Color(0xFF6C5CE7)),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            borderSide: BorderSide(
+                                                color: _isReadOnly
+                                                    ? Colors.grey.shade300
+                                                    : const Color(0xFF6C5CE7)),
                                           ),
                                         ),
                                       ),
@@ -460,7 +552,9 @@ class _NoteViewState extends State<NoteView> {
                                   ],
                                 ),
                               ),
-                              if (!isLast) const Divider(height: 1, indent: 16, endIndent: 16),
+                              if (!isLast)
+                                const Divider(
+                                    height: 1, indent: 16, endIndent: 16),
                             ],
                           );
                         }),
@@ -471,7 +565,6 @@ class _NoteViewState extends State<NoteView> {
               ),
             ),
           ),
-
           if (!_isReadOnly)
             Padding(
               padding: const EdgeInsets.all(16),
@@ -483,13 +576,15 @@ class _NoteViewState extends State<NoteView> {
                             bool hasNotes = false;
                             for (var s in _displayStudents) {
                               final noteText = _noteControllers[s['id']]?.text;
-                              if (noteText != null && noteText.trim().isNotEmpty) {
+                              if (noteText != null &&
+                                  noteText.trim().isNotEmpty) {
                                 hasNotes = true;
                                 break;
                               }
                             }
                             if (!hasNotes) {
-                              Get.snackbar('Info', 'Veuillez saisir au moins une note',
+                              Get.snackbar(
+                                  'Info', 'Veuillez saisir au moins une note',
                                   snackPosition: SnackPosition.BOTTOM);
                               return;
                             }
@@ -506,10 +601,13 @@ class _NoteViewState extends State<NoteView> {
                               title: _titreController.text.trim(),
                               type: _selectedType,
                               dateIso: d.toIso8601String().split('T').first,
-                              noteMax: double.tryParse(_noteMaxController.text) ?? 20,
+                              noteMax:
+                                  double.tryParse(_noteMaxController.text) ??
+                                      20,
                               studentNotes: notes,
                             );
-                            if (!_controller.isSaving.value && _controller.error.isEmpty) {
+                            if (!_controller.isSaving.value &&
+                                _controller.error.isEmpty) {
                               // Réinitialiser les contrôleurs
                               _titreController.clear();
                               _dateController.clear();
@@ -523,10 +621,12 @@ class _NoteViewState extends State<NoteView> {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 28),
                       backgroundColor: const Color(0xFF6C5CE7),
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     child: _controller.isSaving.value
                         ? const SizedBox(
@@ -538,7 +638,10 @@ class _NoteViewState extends State<NoteView> {
                             ),
                           )
                         : const Text('Publier les notes',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15)),
                   )),
             ),
         ],
@@ -582,17 +685,14 @@ class _NoteViewState extends State<NoteView> {
             ],
           ),
           const SizedBox(height: 10),
-
           _buildFieldLabel("Titre de l'évaluation"),
           _buildTextField(controller: _titreController, hint: "Ex: Devoir n°3"),
-
           _buildFieldLabel("Type de l'évaluation"),
           _buildDropdownField(
             currentValue: _selectedType,
             items: _typeEvaluationList,
             onChanged: (val) => setState(() => _selectedType = val!),
           ),
-
           _buildFieldLabel("Date de l'évaluation"),
           _buildTextField(
             controller: _dateController,
@@ -601,16 +701,13 @@ class _NoteViewState extends State<NoteView> {
             readOnly: true,
             onTap: _selectDate,
           ),
-
           _buildFieldLabel("Note maximale"),
           _buildTextField(
             controller: _noteMaxController,
             hint: "Ex: 20",
             keyboardType: TextInputType.number,
           ),
-
           const SizedBox(height: 30),
-
           Row(
             children: [
               Expanded(
@@ -619,9 +716,13 @@ class _NoteViewState extends State<NoteView> {
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     side: const BorderSide(color: Color(0xFF6C5CE7)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('Annuler', style: TextStyle(color: Color(0xFF6C5CE7), fontWeight: FontWeight.bold)),
+                  child: const Text('Annuler',
+                      style: TextStyle(
+                          color: Color(0xFF6C5CE7),
+                          fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(width: 16),
@@ -630,18 +731,24 @@ class _NoteViewState extends State<NoteView> {
                   onPressed: () {
                     // Validation des champs
                     if (_titreController.text.trim().isEmpty) {
-                      Get.snackbar('Erreur', 'Veuillez saisir un titre', snackPosition: SnackPosition.BOTTOM);
+                      Get.snackbar('Erreur', 'Veuillez saisir un titre',
+                          snackPosition: SnackPosition.BOTTOM);
                       return;
                     }
-                    if (_dateController.text.trim().isEmpty || _selectedDateObj == null) {
-                      Get.snackbar('Erreur', 'Veuillez sélectionner une date', snackPosition: SnackPosition.BOTTOM);
+                    if (_dateController.text.trim().isEmpty ||
+                        _selectedDateObj == null) {
+                      Get.snackbar('Erreur', 'Veuillez sélectionner une date',
+                          snackPosition: SnackPosition.BOTTOM);
                       return;
                     }
-                    if (_noteMaxController.text.trim().isEmpty || double.tryParse(_noteMaxController.text) == null) {
-                      Get.snackbar('Erreur', 'Veuillez saisir une note maximale valide', snackPosition: SnackPosition.BOTTOM);
+                    if (_noteMaxController.text.trim().isEmpty ||
+                        double.tryParse(_noteMaxController.text) == null) {
+                      Get.snackbar(
+                          'Erreur', 'Veuillez saisir une note maximale valide',
+                          snackPosition: SnackPosition.BOTTOM);
                       return;
                     }
-                    
+
                     setState(() {
                       _isAdding = false;
                       _isReadOnly = false;
@@ -652,9 +759,12 @@ class _NoteViewState extends State<NoteView> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     backgroundColor: const Color(0xFF6C5CE7),
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('Continuer', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text('Continuer',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -667,7 +777,11 @@ class _NoteViewState extends State<NoteView> {
   Widget _buildFieldLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87)),
+      child: Text(label,
+          style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: Colors.black87)),
     );
   }
 
@@ -687,10 +801,17 @@ class _NoteViewState extends State<NoteView> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, size: 18, color: Colors.grey) : null,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.grey.shade300)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF6C5CE7))),
+        suffixIcon: suffixIcon != null
+            ? Icon(suffixIcon, size: 18, color: Colors.grey)
+            : null,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFF6C5CE7))),
       ),
     );
   }
@@ -715,7 +836,8 @@ class _NoteViewState extends State<NoteView> {
           items: items.map((String val) {
             return DropdownMenuItem<String>(
               value: val,
-              child: Text(val, style: const TextStyle(color: Colors.black87, fontSize: 14)),
+              child: Text(val,
+                  style: const TextStyle(color: Colors.black87, fontSize: 14)),
             );
           }).toList(),
           onChanged: onChanged,
@@ -743,18 +865,22 @@ class _NoteViewState extends State<NoteView> {
               });
             },
             icon: const Icon(Icons.add, color: Colors.white, size: 18),
-            label: const Text('Nouvelle évaluation', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            label: const Text('Nouvelle évaluation',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6C5CE7),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
               elevation: 0,
             ),
           ),
         ),
         const SizedBox(height: 24),
         if (_controller.evaluations.isEmpty)
-          const Text('Aucune évaluation enregistrée pour cette classe.', style: TextStyle(color: Colors.black54))
+          const Text('Aucune évaluation enregistrée pour cette classe.',
+              style: TextStyle(color: Colors.black54))
         else
           ..._controller.evaluations.map((eval) => _buildEvaluationCard(
                 eval['title']?.toString() ?? 'Évaluation',
@@ -766,9 +892,8 @@ class _NoteViewState extends State<NoteView> {
     );
   }
 
-
-
-  Widget _buildEvaluationCard(String title, String date, String noteMax, [Map<String, dynamic>? eval]) {
+  Widget _buildEvaluationCard(String title, String date, String noteMax,
+      [Map<String, dynamic>? eval]) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -796,16 +921,23 @@ class _NoteViewState extends State<NoteView> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text(title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15)),
                 const SizedBox(height: 8),
-                Text(date, style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
+                Text(date,
+                    style:
+                        TextStyle(color: Colors.grey.shade500, fontSize: 13)),
               ],
             ),
             Row(
               children: [
-                Text('/$noteMax', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                Text('/$noteMax',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 18)),
                 const SizedBox(width: 12),
-                const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 14),
+                const Icon(Icons.arrow_forward_ios,
+                    color: Colors.grey, size: 14),
               ],
             ),
           ],

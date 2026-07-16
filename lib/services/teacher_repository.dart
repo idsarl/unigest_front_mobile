@@ -60,12 +60,9 @@ class TeacherRepository {
     await _api.put('/api/messages/conversation/$contactId/read');
   }
 
-  Future<Map<String, dynamic>> sendMessage(int destinataireId, String contenu) async {
-    final data = await _api.post('/api/messages', body: {
-      'destinataireId': destinataireId,
-      'contenu': contenu,
-    });
-    return Map<String, dynamic>.from(data as Map);
+  Future<Map<String, dynamic>> sendMessage(
+      int destinataireId, String contenu) async {
+    return _api.sendMessageWithFiles(destinataireId, contenu, const []);
   }
 
   Future<Map<String, dynamic>> sendMessageWithFiles(
@@ -249,7 +246,8 @@ class TeacherRepository {
   Future<Map<String, dynamic>> getDashboardAbsences() async {
     final cacheKey = 'dashboard_absences_$teacherId';
     try {
-      final data = await _api.get('/api/seances/enseignant/$teacherId/absences/jour');
+      final data =
+          await _api.get('/api/seances/enseignant/$teacherId/absences/jour');
       if (data is Map) {
         final result = Map<String, dynamic>.from(data);
         await _hive.saveCache(cacheKey, result);
@@ -269,8 +267,10 @@ class TeacherRepository {
     final cacheKey = 'prochaine_seance_$teacherId';
     try {
       final now = DateTime.now();
-      final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-      final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+      final dateStr =
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      final timeStr =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
       final data = await _api.get(
         '/api/seances/enseignant/$teacherId/prochaine',
         query: {'date': dateStr, 'time': timeStr},
@@ -293,8 +293,8 @@ class TeacherRepository {
   Future<Map<String, dynamic>?> getMoyenneMatiere() async {
     final cacheKey = 'moyenne_matiere_$teacherId';
     try {
-      final data =
-          await _api.get('/api/seances/enseignant/$teacherId/moyenne-matiere/encours');
+      final data = await _api
+          .get('/api/seances/enseignant/$teacherId/moyenne-matiere/encours');
       if (data is Map) {
         final result = Map<String, dynamic>.from(data);
         await _hive.saveCache(cacheKey, result);
@@ -324,7 +324,7 @@ class TeacherRepository {
     if (password != null && password.isNotEmpty) {
       queryParams['password'] = password;
     }
-    
+
     await _api.put(
       '/api/utilisateurs/$teacherId',
       query: queryParams,

@@ -230,7 +230,7 @@ class TeacherHomeView extends StatelessWidget {
     }
 
     final minutes = prochaine['minutesRestantes'] ?? 0;
-    final String timeString = minutes >= 60 
+    final String timeString = minutes >= 60
         ? '${(minutes / 60).floor()}h ${minutes % 60} min'
         : '$minutes min';
 
@@ -611,6 +611,4 @@ class TeacherHomeView extends StatelessWidget {
       ),
     );
   }
-
-
 }

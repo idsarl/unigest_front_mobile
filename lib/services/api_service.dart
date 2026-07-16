@@ -7,11 +7,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../core/constants/app_constants.dart';
 import '../core/session/app_session.dart';
 import '../core/storage/hive_service.dart';
-import '../models/child_model.dart';
-import '../models/note_model.dart';
-import '../models/absence_model.dart';
-import '../models/emploi_model.dart';
-import '../core/config/app_config.dart';
 
 /// Service HTTP centralisé avec support hors ligne.
 class ApiService {
@@ -46,13 +41,15 @@ class ApiService {
   }
 
   String _cacheKey(String endpoint, [Map<String, String>? query]) {
-    final queryStr = query?.entries.map((e) => '${e.key}=${e.value}').join('&') ?? '';
+    final queryStr =
+        query?.entries.map((e) => '${e.key}=${e.value}').join('&') ?? '';
     return '${_session.teacherId}_${endpoint}_$queryStr';
   }
 
-  Future<dynamic> get(String endpoint, {Map<String, String>? query, bool useCache = true}) async {
+  Future<dynamic> get(String endpoint,
+      {Map<String, String>? query, bool useCache = true}) async {
     final cacheKey = _cacheKey(endpoint, query);
-    
+
     // Vérifie la connexion
     final hasConnection = await isConnected;
 
@@ -66,7 +63,8 @@ class ApiService {
     }
 
     try {
-      final response = await http.get(_uri(endpoint, query), headers: _headers());
+      final response =
+          await http.get(_uri(endpoint, query), headers: _headers());
       final data = _handleResponse(response);
       // Sauvegarde dans le cache (TTL de 1 heure par défaut)
       if (useCache) {
@@ -164,7 +162,8 @@ class ApiService {
     }
   }
 
-  Future<dynamic> delete(String endpoint, {Map<String, String>? query, bool queueIfOffline = true}) async {
+  Future<dynamic> delete(String endpoint,
+      {Map<String, String>? query, bool queueIfOffline = true}) async {
     final hasConnection = await isConnected;
 
     if (!hasConnection && queueIfOffline) {
@@ -177,7 +176,8 @@ class ApiService {
     }
 
     try {
-      final response = await http.delete(_uri(endpoint, query), headers: _headers());
+      final response =
+          await http.delete(_uri(endpoint, query), headers: _headers());
       return _handleResponse(response);
     } catch (e) {
       if (queueIfOffline) {
@@ -208,10 +208,12 @@ class ApiService {
 
         switch (method) {
           case 'POST':
-            await post(endpoint, body: body, query: queryParams, queueIfOffline: false);
+            await post(endpoint,
+                body: body, query: queryParams, queueIfOffline: false);
             break;
           case 'PUT':
-            await put(endpoint, body: body, query: queryParams, queueIfOffline: false);
+            await put(endpoint,
+                body: body, query: queryParams, queueIfOffline: false);
             break;
           case 'DELETE':
             await delete(endpoint, query: queryParams, queueIfOffline: false);
@@ -296,81 +298,6 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Download file: $e');
-    }
-  }
-
-  // --- Méthodes statiques de la branche entrante ---
-  static String get staticBaseUrl => AppConfig.baseUrl;
-
-  static Future<List<ChildModel>> getChildren(String parentId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$staticBaseUrl/parents/$parentId/children'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => ChildModel.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to load children');
-      }
-    } catch (e) {
-      throw Exception('Error fetching children: $e');
-    }
-  }
-
-  static Future<List<NoteModel>> getNotes(String childId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$staticBaseUrl/children/$childId/notes'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => NoteModel.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to load notes');
-      }
-    } catch (e) {
-      throw Exception('Error fetching notes: $e');
-    }
-  }
-
-  static Future<List<AbsenceModel>> getAbsences(String childId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$staticBaseUrl/children/$childId/absences'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => AbsenceModel.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to load absences');
-      }
-    } catch (e) {
-      throw Exception('Error fetching absences: $e');
-    }
-  }
-
-  static Future<List<EmploiModel>> getEmploiDuTemps(String childId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('$staticBaseUrl/children/$childId/emploi'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => EmploiModel.fromJson(json)).toList();
-      } else {
-        throw Exception('Failed to load emploi du temps');
-      }
-    } catch (e) {
-      throw Exception('Error fetching emploi du temps: $e');
     }
   }
 }

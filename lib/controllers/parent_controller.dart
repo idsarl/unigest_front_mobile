@@ -21,17 +21,19 @@ class ParentController extends GetxController {
   final RxString error = ''.obs;
   final RxBool isSending = false.obs;
 
-  final RxList<Map<String, dynamic>> affectations = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> affectations =
+      <Map<String, dynamic>>[].obs;
   final RxInt selectedAffectationIndex = 0.obs;
   final RxList<Map<String, dynamic>> students = <Map<String, dynamic>>[].obs;
   final RxString searchQuery = ''.obs;
 
-  final RxList<Map<String, dynamic>> conversations = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> conversations =
+      <Map<String, dynamic>>[].obs;
   final RxList<Map<String, dynamic>> messages = <Map<String, dynamic>>[].obs;
   final Rxn<Map<String, dynamic>> activeContact = Rxn<Map<String, dynamic>>();
   final RxString chatSearch = ''.obs;
   final RxString activeTab = 'Tous'.obs;
-  
+
   // File attachment
   final RxList<PlatformFile> selectedFiles = <PlatformFile>[].obs;
 
@@ -52,7 +54,8 @@ class ParentController extends GetxController {
     if (aff == null) return [];
     final mats = aff['matieres'] as List?;
     if (mats == null) return [];
-    return mats.map((m) => m['nom']?.toString() ?? '')
+    return mats
+        .map((m) => m['nom']?.toString() ?? '')
         .where((n) => n.isNotEmpty)
         .toSet()
         .toList();
@@ -82,8 +85,8 @@ class ParentController extends GetxController {
     return list;
   }
 
-  int get totalUnread =>
-      conversations.fold<int>(0, (sum, c) => sum + (c['unreadCount'] as int? ?? 0));
+  int get totalUnread => conversations.fold<int>(
+      0, (sum, c) => sum + (c['unreadCount'] as int? ?? 0));
 
   @override
   void onInit() {
@@ -231,8 +234,9 @@ class ParentController extends GetxController {
           'fichiers': m['fichiers'] ?? [],
         };
       }));
-      
-      final index = conversations.indexWhere((c) => c['contactId'] == contactId);
+
+      final index =
+          conversations.indexWhere((c) => c['contactId'] == contactId);
       if (index != -1) {
         final updatedContact = Map<String, dynamic>.from(conversations[index]);
         updatedContact['unreadCount'] = 0;
@@ -253,7 +257,9 @@ class ParentController extends GetxController {
 
   Future<void> sendMessage(String contenu) async {
     final contact = activeContact.value;
-    if (contact == null || (contenu.trim().isEmpty && selectedFiles.isEmpty)) return;
+    if (contact == null || (contenu.trim().isEmpty && selectedFiles.isEmpty)) {
+      return;
+    }
 
     isSending.value = true;
     try {
@@ -286,7 +292,8 @@ class ParentController extends GetxController {
   Future<void> openConversationWithParent(Map<String, dynamic> student) async {
     final parentId = student['parentId'] as int?;
     if (parentId == null || parentId == 0) {
-      Get.snackbar('Info', 'Aucun parent associé', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Info', 'Aucun parent associé',
+          snackPosition: SnackPosition.BOTTOM);
       return;
     }
 
@@ -343,8 +350,6 @@ class ParentController extends GetxController {
     await _repo.downloadFile(url, savePath);
   }
 
-
-
   Future<void> selectAffectationByClass(String className) async {
     final idx = affectations.indexWhere(
       (a) => a['classe']?['nom']?.toString() == className,
@@ -356,8 +361,8 @@ class ParentController extends GetxController {
   }
 
   Future<void> loadStudents() async {
-    final cId = int.tryParse(
-        selectedAffectation?['classe']?['id']?.toString() ?? '');
+    final cId =
+        int.tryParse(selectedAffectation?['classe']?['id']?.toString() ?? '');
     if (cId == null) return;
 
     isLoading.value = true;

@@ -15,7 +15,8 @@ class ParentView extends StatefulWidget {
   State<ParentView> createState() => _ParentViewState();
 }
 
-class _ParentViewState extends State<ParentView> with SingleTickerProviderStateMixin {
+class _ParentViewState extends State<ParentView>
+    with SingleTickerProviderStateMixin {
   final ParentController _apiController = Get.put(ParentController());
   final _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -51,7 +52,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
           : '';
     }
     return Obx(() {
-      if (_apiController.activeContact.value != null) return _buildChatRoomView();
+      if (_apiController.activeContact.value != null)
+        return _buildChatRoomView();
 
       if (_selectedStudent != null) return _buildStudentInfoView();
       if (_isViewingStudents) return _buildStudentListView();
@@ -62,7 +64,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
         body: SafeArea(
           top: false,
           child: Obx(() {
-            if (_apiController.isLoading.value && _apiController.conversations.isEmpty) {
+            if (_apiController.isLoading.value &&
+                _apiController.conversations.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
             final isTeacher = AppSession.instance.role == 'ENSEIGNANT';
@@ -78,18 +81,25 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                         TextField(
                           onChanged: (v) => _apiController.chatSearch.value = v,
                           decoration: InputDecoration(
-                            hintText: isTeacher ? 'Rechercher un parent...' : 'Rechercher un enseignant...',
-                            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                            suffixIcon: Icon(Icons.search, color: Colors.grey.shade700, size: 24),
+                            hintText: isTeacher
+                                ? 'Rechercher un parent...'
+                                : 'Rechercher un enseignant...',
+                            hintStyle: TextStyle(
+                                color: Colors.grey.shade400, fontSize: 14),
+                            suffixIcon: Icon(Icons.search,
+                                color: Colors.grey.shade700, size: 24),
                             filled: true,
                             fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
+                              borderSide:
+                                  BorderSide(color: Colors.grey.shade300),
                             ),
                             focusedBorder: const OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(12)),
                               borderSide: BorderSide(color: Color(0xFF6366F1)),
                             ),
                           ),
@@ -122,7 +132,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
       body: SafeArea(
         top: false,
         child: Obx(() {
-          if (_apiController.isLoading.value && _apiController.students.isEmpty) {
+          if (_apiController.isLoading.value &&
+              _apiController.students.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
           final students = _apiController.filteredStudents;
@@ -138,13 +149,17 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                     children: [
                       _buildDropdownSelector(
                         icon: Icons.groups_outlined,
-                        selectedValue: _currentClass.isEmpty ? classList.first : _currentClass,
+                        selectedValue: _currentClass.isEmpty
+                            ? classList.first
+                            : _currentClass,
                         items: classList,
                         onChanged: (newValue) async {
                           setState(() => _currentClass = newValue!);
-                          await _apiController.selectAffectationByClass(newValue!);
+                          await _apiController
+                              .selectAffectationByClass(newValue!);
                           if (_apiController.subjectList.isNotEmpty) {
-                            setState(() => _currentSubject = _apiController.subjectList.first);
+                            setState(() => _currentSubject =
+                                _apiController.subjectList.first);
                           }
                         },
                       ),
@@ -152,9 +167,12 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                       if (subjectList.isNotEmpty)
                         _buildDropdownSelector(
                           icon: Icons.menu_book_outlined,
-                          selectedValue: _currentSubject.isEmpty ? subjectList.first : _currentSubject,
+                          selectedValue: _currentSubject.isEmpty
+                              ? subjectList.first
+                              : _currentSubject,
                           items: subjectList,
-                          onChanged: (newValue) => setState(() => _currentSubject = newValue!),
+                          onChanged: (newValue) =>
+                              setState(() => _currentSubject = newValue!),
                         ),
                     ],
                   ),
@@ -163,13 +181,20 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                   onChanged: (v) => _apiController.searchQuery.value = v,
                   decoration: InputDecoration(
                     hintText: 'Rechercher un étudiant ou parent...',
-                    hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                    suffixIcon: Icon(Icons.search, color: Colors.grey.shade700, size: 24),
+                    hintStyle:
+                        TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                    suffixIcon: Icon(Icons.search,
+                        color: Colors.grey.shade700, size: 24),
                     filled: true,
                     fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF6366F1))),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey.shade300)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF6366F1))),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -188,18 +213,31 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: students.length,
-                          separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade100, indent: 70),
+                          separatorBuilder: (context, index) => Divider(
+                              height: 1,
+                              color: Colors.grey.shade100,
+                              indent: 70),
                           itemBuilder: (context, index) {
                             final student = students[index];
                             return ListTile(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 6),
                               leading: CircleAvatar(
                                 radius: 24,
                                 backgroundColor: student['bg'] as Color,
-                                child: Text(student['initial'], style: TextStyle(color: student['txt'] as Color, fontWeight: FontWeight.bold, fontSize: 15)),
+                                child: Text(student['initial'],
+                                    style: TextStyle(
+                                        color: student['txt'] as Color,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15)),
                               ),
-                              title: Text(student['name'], style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: Colors.black87)),
-                              onTap: () => setState(() => _selectedStudent = student),
+                              title: Text(student['name'],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      color: Colors.black87)),
+                              onTap: () =>
+                                  setState(() => _selectedStudent = student),
                             );
                           },
                         ),
@@ -231,14 +269,16 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                   _apiController.closeConversation();
                   _messageController.clear();
                 },
-                icon: const Icon(Icons.arrow_back_ios, size: 18, color: Colors.black),
+                icon: const Icon(Icons.arrow_back_ios,
+                    size: 18, color: Colors.black),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: 8),
               CircleAvatar(
                 radius: 18,
-                backgroundColor: contact['bg'] as Color? ?? const Color(0xFFE8F5E9),
+                backgroundColor:
+                    contact['bg'] as Color? ?? const Color(0xFFE8F5E9),
                 child: Text(
                   contact['initial']?.toString() ?? '?',
                   style: TextStyle(
@@ -251,7 +291,10 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
               const SizedBox(width: 12),
               Text(
                 contact['name']?.toString() ?? 'Contact',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
               ),
             ],
           ),
@@ -277,8 +320,9 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                         style: TextStyle(color: Colors.black54)),
                   );
                 }
-                
-                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _scrollToBottom());
 
                 return ListView.builder(
                   controller: _scrollController,
@@ -299,7 +343,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                           right: mine ? 0 : 40,
                           bottom: 16,
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           color: mine ? const Color(0xFFB4B7FA) : Colors.white,
                           borderRadius: BorderRadius.only(
@@ -339,7 +384,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
 
             // Zone des fichiers sélectionnés
             Obx(() {
-              if (_apiController.selectedFiles.isEmpty) return const SizedBox.shrink();
+              if (_apiController.selectedFiles.isEmpty)
+                return const SizedBox.shrink();
               return Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
                 child: SizedBox(
@@ -351,7 +397,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                       final file = _apiController.selectedFiles[index];
                       return Container(
                         margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
@@ -367,11 +414,17 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(_getFileIcon(file.extension), color: _getFileColor(file.extension), size: 20),
+                            Icon(_getFileIcon(file.extension),
+                                color: _getFileColor(file.extension), size: 20),
                             const SizedBox(width: 8),
                             Text(
-                              file.name.length > 15 ? '${file.name.substring(0, 12)}...' : file.name,
-                              style: TextStyle(fontSize: 13, color: Colors.grey.shade800, fontWeight: FontWeight.w500),
+                              file.name.length > 15
+                                  ? '${file.name.substring(0, 12)}...'
+                                  : file.name,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade800,
+                                  fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(width: 8),
                             InkWell(
@@ -382,7 +435,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                                   color: Colors.grey.shade200,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.close, color: Colors.black54, size: 14),
+                                child: const Icon(Icons.close,
+                                    color: Colors.black54, size: 14),
                               ),
                             ),
                           ],
@@ -393,10 +447,11 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                 ),
               );
             }),
-            
+
             // Barre de saisie inférieure (Message + Icônes)
             Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 4),
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, bottom: 16, top: 4),
               child: Row(
                 children: [
                   Expanded(
@@ -414,7 +469,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                             children: [
                               const SizedBox(width: 8),
                               IconButton(
-                                icon: const Icon(Icons.attach_file, color: Colors.black87, size: 22),
+                                icon: const Icon(Icons.attach_file,
+                                    color: Colors.black87, size: 22),
                                 onPressed: () => _apiController.pickFiles(),
                               ),
                               Expanded(
@@ -422,10 +478,12 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                                   controller: _messageController,
                                   decoration: const InputDecoration(
                                     hintText: 'Message',
-                                    hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                                    hintStyle: TextStyle(
+                                        color: Colors.grey, fontSize: 14),
                                     border: InputBorder.none,
                                     isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 14),
                                   ),
                                   onSubmitted: (_) => _sendChatMessage(),
                                 ),
@@ -450,11 +508,14 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                               ? const SizedBox(
                                   width: 18,
                                   height: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 )
-                              : const Icon(Icons.send_outlined, color: Color(0xFF6366F1), size: 20),
-                          onPressed:
-                              _apiController.isSending.value ? null : _sendChatMessage,
+                              : const Icon(Icons.send_outlined,
+                                  color: Color(0xFF6366F1), size: 20),
+                          onPressed: _apiController.isSending.value
+                              ? null
+                              : _sendChatMessage,
                         )),
                   ),
                 ],
@@ -491,10 +552,17 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                 child: DropdownButton<String>(
                   value: selectedValue,
                   isExpanded: true,
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20),
+                  icon: const Icon(Icons.keyboard_arrow_down,
+                      color: Colors.grey, size: 20),
                   dropdownColor: Colors.white,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87),
-                  items: items.map((String val) => DropdownMenuItem<String>(value: val, child: Text(val))).toList(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: Colors.black87),
+                  items: items
+                      .map((String val) => DropdownMenuItem<String>(
+                          value: val, child: Text(val)))
+                      .toList(),
                   onChanged: onChanged,
                 ),
               ),
@@ -505,7 +573,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
     );
   }
 
-  PreferredSizeWidget _buildSimpleAppBar(String title, {bool showBack = true, VoidCallback? onBack}) {
+  PreferredSizeWidget _buildSimpleAppBar(String title,
+      {bool showBack = true, VoidCallback? onBack}) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
@@ -517,7 +586,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
             if (showBack)
               IconButton(
                 onPressed: onBack,
-                icon: const Icon(Icons.arrow_back_ios, size: 18, color: Colors.black),
+                icon: const Icon(Icons.arrow_back_ios,
+                    size: 18, color: Colors.black),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
@@ -526,7 +596,11 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.only(right: showBack ? 30 : 0),
-                  child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                  child: Text(title,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black)),
                 ),
               ),
             ),
@@ -548,9 +622,14 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
         suffixIcon: Icon(Icons.search, color: Colors.grey.shade700, size: 24),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF6366F1))),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade300)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF6366F1))),
       ),
     );
   }
@@ -561,7 +640,7 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
     await _apiController.sendMessage(text);
     _messageController.clear();
   }
-  
+
   IconData _getFileIcon(String? extension) {
     switch (extension?.toLowerCase()) {
       case 'pdf':
@@ -588,18 +667,18 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
   Widget _buildFileItem(String fileUrl) {
     // Debug print
     print('=== File URL: $fileUrl ===');
-    
+
     // Try multiple ways to extract the filename
     String fileName = "Document";
     String extension = "";
-    
+
     try {
       // Decode URL in case it's encoded
       final decodedUrl = Uri.decodeFull(fileUrl);
-      
+
       // Try to find filename in various parts of the URL
       final parts = decodedUrl.split('/');
-      
+
       // Start from the end and find the first part that has a dot (likely the filename)
       for (int i = parts.length - 1; i >= 0; i--) {
         if (parts[i].contains('.')) {
@@ -607,7 +686,7 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
           break;
         }
       }
-      
+
       // If still just "Document", check if the URL has a file extension
       if (fileName == "Document" && decodedUrl.contains('.')) {
         // Fallback: extract extension from URL and use generic name
@@ -620,18 +699,18 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
           extension = fileName.split('.').last.toLowerCase();
         }
       }
-      
+
       // Clean extension
       extension = extension.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
     } catch (e) {
       print('Error parsing filename: $e');
     }
-    
+
     // Format file size (we'll use placeholder for now)
     const fileSize = "14 Ko";
-    
+
     print('=== Extracted: fileName=$fileName, extension=$extension ===');
-    
+
     return InkWell(
       onTap: () => _downloadAndOpenFile(fileUrl, fileName),
       child: Container(
@@ -726,7 +805,7 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
         snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 2),
       );
-      
+
       // For web: open the URL in a new tab
       if (kIsWeb) {
         final uri = Uri.parse(fileUrl);
@@ -745,19 +824,21 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
         // For mobile: download and open
         final directory = await getTemporaryDirectory();
         final savePath = '${directory.path}/$fileName';
-        
+
         // Download the file
         await _apiController.downloadFile(fileUrl, savePath);
-        
+
         // Open the file
         final result = await OpenFilex.open(savePath);
-        
+
         if (result.type != ResultType.done) {
-          Get.snackbar('Erreur', 'Impossible d\'ouvrir le fichier', snackPosition: SnackPosition.BOTTOM);
+          Get.snackbar('Erreur', 'Impossible d\'ouvrir le fichier',
+              snackPosition: SnackPosition.BOTTOM);
         }
       }
     } catch (e) {
-      Get.snackbar('Erreur', 'Erreur lors du téléchargement: $e', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Erreur', 'Erreur lors du téléchargement: $e',
+          snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -771,7 +852,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
           child: Row(
             children: [
               _buildTabItem('Tous'),
-              _buildTabItem('Non Lues', showBadge: _apiController.totalUnread > 0),
+              _buildTabItem('Non Lues',
+                  showBadge: _apiController.totalUnread > 0),
             ],
           ),
         ));
@@ -787,7 +869,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
           decoration: BoxDecoration(
             color: isActive ? const Color(0xFFE0E7FF) : Colors.transparent,
             border: isActive
-                ? const Border(bottom: BorderSide(color: Color(0xFF6366F1), width: 2))
+                ? const Border(
+                    bottom: BorderSide(color: Color(0xFF6366F1), width: 2))
                 : null,
           ),
           child: Row(
@@ -805,7 +888,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                 const SizedBox(width: 6),
                 Container(
                   padding: const EdgeInsets.all(5),
-                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                  decoration: const BoxDecoration(
+                      color: Colors.red, shape: BoxShape.circle),
                   child: Text(
                     '${_apiController.totalUnread}',
                     style: const TextStyle(
@@ -870,7 +954,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                 ),
               ),
               title: Text(chat['name'],
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15)),
               subtitle: Text(
                 chat['message'],
                 maxLines: 1,
@@ -880,8 +965,10 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(chat['time'], style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                  if ((chat['unreadCount'] as int) > 0) const SizedBox(height: 4),
+                  Text(chat['time'],
+                      style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  if ((chat['unreadCount'] as int) > 0)
+                    const SizedBox(height: 4),
                   if ((chat['unreadCount'] as int) > 0)
                     Container(
                       padding: const EdgeInsets.all(6),
@@ -932,7 +1019,8 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
     final student = _selectedStudent!;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: _buildSimpleAppBar('Info Etudiant', onBack: () => setState(() => _selectedStudent = null)),
+      appBar: _buildSimpleAppBar('Info Etudiant',
+          onBack: () => setState(() => _selectedStudent = null)),
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
@@ -944,11 +1032,30 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                 padding: const EdgeInsets.only(bottom: 24, top: 24),
                 child: Column(
                   children: [
-                    CircleAvatar(radius: 43, backgroundColor: student['bg'], child: Text(student['initial'], style: TextStyle(color: student['txt'], fontWeight: FontWeight.bold, fontSize: 28))),
+                    CircleAvatar(
+                        radius: 43,
+                        backgroundColor: student['bg'],
+                        child: Text(student['initial'],
+                            style: TextStyle(
+                                color: student['txt'],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 28))),
                     const SizedBox(height: 14),
-                    Text(student['name'], style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text(student['name'],
+                        style: const TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5), decoration: BoxDecoration(color: const Color(0xFFEDF8EE), borderRadius: BorderRadius.circular(20)), child: Text(student['class'], style: const TextStyle(color: Color(0xFF1E863C), fontWeight: FontWeight.bold, fontSize: 12))),
+                    Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xFFEDF8EE),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: Text(student['class'],
+                            style: const TextStyle(
+                                color: Color(0xFF1E863C),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12))),
                   ],
                 ),
               ),
@@ -956,14 +1063,22 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade200)),
                   child: Column(
                     children: [
-                      _buildInfoRow(Icons.calendar_today_outlined, 'Date de naissance', student['dateNaissance']?.toString() ?? '—'),
+                      _buildInfoRow(
+                          Icons.calendar_today_outlined,
+                          'Date de naissance',
+                          student['dateNaissance']?.toString() ?? '—'),
                       const Divider(height: 1, indent: 45),
-                      _buildInfoRow(Icons.phone_outlined, 'Téléphone', student['phone']),
+                      _buildInfoRow(
+                          Icons.phone_outlined, 'Téléphone', student['phone']),
                       const Divider(height: 1, indent: 45),
-                      _buildInfoRow(Icons.mail_outline, 'Email', student['email']),
+                      _buildInfoRow(
+                          Icons.mail_outline, 'Email', student['email']),
                     ],
                   ),
                 ),
@@ -983,29 +1098,46 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('PARENT / TUTEUR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
+            const Text('PARENT / TUTEUR',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Colors.black87)),
             const SizedBox(height: 16),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: const Color(0xFFE8EAF6), borderRadius: BorderRadius.circular(20)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                      color: const Color(0xFFE8EAF6),
+                      borderRadius: BorderRadius.circular(20)),
                   child: Row(
                     children: [
-                      const Icon(Icons.person_outline, size: 16, color: Color(0xFF3F51B5)),
+                      const Icon(Icons.person_outline,
+                          size: 16, color: Color(0xFF3F51B5)),
                       const SizedBox(width: 8),
-                      Text(student['parent'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF3F51B5))),
+                      Text(student['parent'],
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Color(0xFF3F51B5))),
                     ],
                   ),
                 ),
                 const Spacer(),
-                _buildCircularAction(Icons.phone_outlined, const Color(0xFFEDEEFC), const Color(0xFF5A67F2)),
+                _buildCircularAction(Icons.phone_outlined,
+                    const Color(0xFFEDEEFC), const Color(0xFF5A67F2)),
                 const SizedBox(width: 12),
-                _buildCircularAction(Icons.mail_outline, const Color(0xFFEDF8EE), const Color(0xFF1E863C)),
+                _buildCircularAction(Icons.mail_outline,
+                    const Color(0xFFEDF8EE), const Color(0xFF1E863C)),
               ],
             ),
             const SizedBox(height: 20),
@@ -1025,9 +1157,18 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
                   });
                   await _apiController.openConversationWithParent(student);
                 },
-                icon: const Icon(Icons.chat_bubble_outline, size: 18, color: Color(0xFF6366F1)),
-                label: const Text('Envoyer un message', style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold, fontSize: 14)),
-                style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF6366F1), width: 1.2), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                icon: const Icon(Icons.chat_bubble_outline,
+                    size: 18, color: Color(0xFF6366F1)),
+                label: const Text('Envoyer un message',
+                    style: TextStyle(
+                        color: Color(0xFF6366F1),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14)),
+                style: OutlinedButton.styleFrom(
+                    side:
+                        const BorderSide(color: Color(0xFF6366F1), width: 1.2),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10))),
               ),
             ),
           ],
@@ -1039,15 +1180,31 @@ class _ParentViewState extends State<ParentView> with SingleTickerProviderStateM
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      child: Row(children: [Icon(icon, size: 18, color: Colors.grey), const SizedBox(width: 12), Text(label, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)), const Spacer(), Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))]),
+      child: Row(children: [
+        Icon(icon, size: 18, color: Colors.grey),
+        const SizedBox(width: 12),
+        Text(label,
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+        const Spacer(),
+        Text(value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))
+      ]),
     );
   }
 
   Widget _buildCircularAction(IconData icon, Color bg, Color iconColor) {
-    return Container(padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: bg, shape: BoxShape.circle), child: Icon(icon, color: iconColor, size: 16));
+    return Container(
+        padding: const EdgeInsets.all(7),
+        decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+        child: Icon(icon, color: iconColor, size: 16));
   }
 
   Widget _buildContactLine(IconData icon, String text) {
-    return Row(children: [Icon(icon, size: 18, color: Colors.grey), const SizedBox(width: 12), Text(text, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))]);
+    return Row(children: [
+      Icon(icon, size: 18, color: Colors.grey),
+      const SizedBox(width: 12),
+      Text(text,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))
+    ]);
   }
 }

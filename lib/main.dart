@@ -10,20 +10,21 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
-  
+
   // Initialise Hive
   await HiveService.instance.init();
-  
+
   // Restaure la session utilisateur
   await AppSession.instance.restore();
-  
+
   // Ecoute les changements de connectivité
   Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
     if (!results.contains(ConnectivityResult.none)) {
@@ -31,6 +32,6 @@ void main() async {
       ApiService.instance.syncQueuedRequests();
     }
   });
-  
+
   runApp(const MyApp());
 }

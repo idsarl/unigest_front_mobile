@@ -20,10 +20,28 @@ class _AppelViewState extends State<AppelView> {
 
   String _formatToday() {
     final now = DateTime.now();
-    const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const jours = [
+      'Lundi',
+      'Mardi',
+      'Mercredi',
+      'Jeudi',
+      'Vendredi',
+      'Samedi',
+      'Dimanche'
+    ];
     const mois = [
-      'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-      'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+      'janvier',
+      'février',
+      'mars',
+      'avril',
+      'mai',
+      'juin',
+      'juillet',
+      'août',
+      'septembre',
+      'octobre',
+      'novembre',
+      'décembre'
     ];
     return '${jours[now.weekday - 1]} ${now.day} ${mois[now.month - 1]} ${now.year}';
   }
@@ -76,7 +94,6 @@ class _AppelViewState extends State<AppelView> {
                 ),
               ),
               const SizedBox(height: 20),
-
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -92,35 +109,45 @@ class _AppelViewState extends State<AppelView> {
                         CircleAvatar(
                           radius: 20,
                           backgroundColor: const Color(0xFF536DFE),
-                          child: Text(_selectedInitial!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          child: Text(_selectedInitial!,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
                         ),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_selectedName!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                            Text(_selectedName!,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 15)),
                             const SizedBox(height: 2),
-                            const Text('3ème IG', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                            const Text('3ème IG',
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 13)),
                           ],
                         ),
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: _selectedColor!.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         _selectedStatus!,
-                        style: TextStyle(color: _selectedColor, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: TextStyle(
+                            color: _selectedColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-
               _buildInfoRow('Date', _formatToday(), Colors.black),
               const SizedBox(height: 12),
               _buildInfoRow(
@@ -131,8 +158,8 @@ class _AppelViewState extends State<AppelView> {
               const SizedBox(height: 12),
               _buildInfoRow('Statut actuel', _selectedStatus!, _selectedColor!),
               const SizedBox(height: 20),
-
-              const Text('Motif', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Text('Motif',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
               TextField(
                 controller: _motifController,
@@ -149,7 +176,6 @@ class _AppelViewState extends State<AppelView> {
                 ),
               ),
               const SizedBox(height: 24),
-
               Row(
                 children: [
                   Expanded(
@@ -158,9 +184,13 @@ class _AppelViewState extends State<AppelView> {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: const BorderSide(color: Color(0xFF6C5CE7)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text('Fermer', style: TextStyle(color: Color(0xFF6C5CE7), fontWeight: FontWeight.bold)),
+                      child: const Text('Fermer',
+                          style: TextStyle(
+                              color: Color(0xFF6C5CE7),
+                              fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -179,9 +209,13 @@ class _AppelViewState extends State<AppelView> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         backgroundColor: const Color(0xFF6C5CE7),
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text('Valider', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      child: const Text('Valider',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -199,10 +233,20 @@ class _AppelViewState extends State<AppelView> {
       children: [
         SizedBox(
           width: 110,
-          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14)),
+          child: Text(label,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 14)),
         ),
         Expanded(
-          child: Text(value, style: TextStyle(color: valueColor, fontSize: 14, fontWeight: valueColor != Colors.black ? FontWeight.bold : FontWeight.normal)),
+          child: Text(value,
+              style: TextStyle(
+                  color: valueColor,
+                  fontSize: 14,
+                  fontWeight: valueColor != Colors.black
+                      ? FontWeight.bold
+                      : FontWeight.normal)),
         ),
       ],
     );
@@ -228,7 +272,11 @@ class _AppelViewState extends State<AppelView> {
         title: const Padding(
           padding: EdgeInsets.symmetric(horizontal: 4),
           child: Center(
-            child: Text('Appel de la classe', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20)),
+            child: Text('Appel de la classe',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20)),
           ),
         ),
         bottom: PreferredSize(
@@ -267,254 +315,336 @@ class _AppelViewState extends State<AppelView> {
         final students = _controller.filteredStudents;
 
         return Column(
-        children: [
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _controller.loadData,
-              child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _controller.loadData,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
                     children: [
-                      // Dropdown Classe
-                      Expanded(
-                        child: DropdownButtonFormField<int>(
-                          value: _controller.selectedAffectationIndex.value,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.groups_outlined, color: Color(0xFF6C5CE7), size: 20),
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade200),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade200),
+                      Row(
+                        children: [
+                          // Dropdown Classe
+                          Expanded(
+                            child: DropdownButtonFormField<int>(
+                              value: _controller.selectedAffectationIndex.value,
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.groups_outlined,
+                                    color: Color(0xFF6C5CE7), size: 20),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade200),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade200),
+                                ),
+                              ),
+                              items: List.generate(
+                                  _controller.affectations.length, (i) {
+                                final a = _controller.affectations[i];
+                                final label =
+                                    a['classe']?['nom']?.toString() ?? 'Classe';
+                                return DropdownMenuItem(
+                                  value: i,
+                                  child: Text(label,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13)),
+                                );
+                              }),
+                              onChanged: (v) {
+                                if (v != null) _controller.selectAffectation(v);
+                              },
                             ),
                           ),
-                          items: List.generate(_controller.affectations.length, (i) {
-                            final a = _controller.affectations[i];
-                            final label = a['classe']?['nom']?.toString() ?? 'Classe';
-                            return DropdownMenuItem(
-                              value: i, 
-                              child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                            );
-                          }),
-                          onChanged: (v) {
-                            if (v != null) _controller.selectAffectation(v);
-                          },
+                          const SizedBox(width: 12),
+                          // Dropdown Matiere
+                          Expanded(
+                            child: DropdownButtonFormField<int>(
+                              value: _controller.selectedMatiereIndex.value,
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.menu_book_outlined,
+                                    color: Color(0xFF6C5CE7), size: 20),
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade200),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade200),
+                                ),
+                              ),
+                              items: List.generate(
+                                  _controller.currentMatieres.length, (i) {
+                                final m = _controller.currentMatieres[i];
+                                final label = m['nom']?.toString() ?? 'Matière';
+                                return DropdownMenuItem(
+                                  value: i,
+                                  child: Text(label,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13),
+                                      overflow: TextOverflow.ellipsis),
+                                );
+                              }),
+                              onChanged: (v) {
+                                if (v != null) _controller.selectMatiere(v);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                            color: const Color(0xFFEDEEFC),
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.calendar_today_outlined,
+                                    color: Color(0xFF6C5CE7), size: 18),
+                                const SizedBox(width: 8),
+                                Text(_formatToday(),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13)),
+                              ],
+                            ),
+                            const Row(
+                              children: [
+                                Icon(Icons.access_time,
+                                    color: Colors.black87, size: 18),
+                                SizedBox(width: 8),
+                                Text('Aujourd\'hui',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13)),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      // Dropdown Matiere
-                      Expanded(
-                        child: DropdownButtonFormField<int>(
-                          value: _controller.selectedMatiereIndex.value,
-                          isExpanded: true,
-                          decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.menu_book_outlined, color: Color(0xFF6C5CE7), size: 20),
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade200),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildStatItem(
+                                '${resume['effectif'] ?? students.length}',
+                                'Effectif',
+                                const Color(0xFF536DFE),
+                                Icons.people_outline),
+                            _buildStatItem(
+                                '${resume['present'] ?? 0}',
+                                'Presents',
+                                Colors.green,
+                                Icons.check_circle_outline),
+                            _buildStatItem('${resume['retard'] ?? 0}',
+                                'Retards', Colors.orange, Icons.access_time),
+                            _buildStatItem('${resume['absent'] ?? 0}',
+                                'Absents', Colors.red, Icons.cancel_outlined),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        onChanged: (v) => _controller.searchQuery.value = v,
+                        decoration: InputDecoration(
+                          hintText: 'Rechercher un étudiant...',
+                          hintStyle:
+                              const TextStyle(color: Colors.grey, fontSize: 14),
+                          suffixIcon: const Icon(Icons.search,
+                              color: Colors.grey, size: 22),
+                          filled: true,
+                          fillColor: const Color(0xFFEFEFEF),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 14),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Column(
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Nom Etudiant',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 14)),
+                                  Text('Statut',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontSize: 14)),
+                                ],
+                              ),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey.shade200),
-                            ),
-                          ),
-                          items: List.generate(_controller.currentMatieres.length, (i) {
-                            final m = _controller.currentMatieres[i];
-                            final label = m['nom']?.toString() ?? 'Matière';
-                            return DropdownMenuItem(
-                              value: i, 
-                              child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
-                            );
-                          }),
-                          onChanged: (v) {
-                            if (v != null) _controller.selectMatiere(v);
-                          },
+                            const Divider(height: 1, indent: 16, endIndent: 16),
+                            if (students.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.all(24),
+                                child: Text(
+                                    'Aucun étudiant inscrit dans cette classe'),
+                              )
+                            else
+                              ...students.asMap().entries.map((entry) {
+                                final student = entry.value;
+                                final bool isLast =
+                                    entry.key == students.length - 1;
+                                return Column(
+                                  children: [
+                                    _buildStudentRow(student),
+                                    if (!isLast)
+                                      const Divider(
+                                          height: 1, indent: 16, endIndent: 16),
+                                  ],
+                                );
+                              }),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(color: const Color(0xFFEDEEFC), borderRadius: BorderRadius.circular(12)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.calendar_today_outlined, color: Color(0xFF6C5CE7), size: 18),
-                            const SizedBox(width: 8),
-                            Text(_formatToday(), style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
-                          ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: hasSelection
+                          ? () => _showJustifyBottomSheet(context)
+                          : null,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(
+                          color: hasSelection
+                              ? const Color(0xFF6C5CE7)
+                              : Colors.grey.shade300,
+                          width: 1.2,
                         ),
-                        const Row(
-                          children: [
-                            Icon(Icons.access_time, color: Colors.black87, size: 18),
-                            SizedBox(width: 8),
-                            Text('Aujourd\'hui', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
-                          ],
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'Justifier',
+                        style: TextStyle(
+                          color: hasSelection
+                              ? const Color(0xFF6C5CE7)
+                              : Colors.grey.shade400,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatItem('${resume['effectif'] ?? students.length}', 'Effectif', const Color(0xFF536DFE), Icons.people_outline),
-                        _buildStatItem('${resume['present'] ?? 0}', 'Presents', Colors.green, Icons.check_circle_outline),
-                        _buildStatItem('${resume['retard'] ?? 0}', 'Retards', Colors.orange, Icons.access_time),
-                        _buildStatItem('${resume['absent'] ?? 0}', 'Absents', Colors.red, Icons.cancel_outlined),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    onChanged: (v) => _controller.searchQuery.value = v,
-                    decoration: InputDecoration(
-                      hintText: 'Rechercher un étudiant...',
-                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                      suffixIcon: const Icon(Icons.search, color: Colors.grey, size: 22),
-                      filled: true,
-                      fillColor: const Color(0xFFEFEFEF),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: Column(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Nom Etudiant', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14)),
-                              Text('Statut', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 14)),
-                            ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Obx(() => ElevatedButton(
+                          onPressed: (_controller.isSaving.value ||
+                                  _controller.isAppelSaved.value)
+                              ? null
+                              : _controller.saveAppels,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: _controller.isAppelSaved.value
+                                ? Colors.grey
+                                : const Color(0xFF6C5CE7),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
-                        ),
-                        const Divider(height: 1, indent: 16, endIndent: 16),
-                        if (students.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.all(24),
-                            child: Text('Aucun étudiant inscrit dans cette classe'),
-                          )
-                        else
-                        ...students.asMap().entries.map((entry) {
-                          final student = entry.value;
-                          final bool isLast = entry.key == students.length - 1;
-                          return Column(
-                            children: [
-                              _buildStudentRow(student),
-                              if (!isLast) const Divider(height: 1, indent: 16, endIndent: 16),
-                            ],
-                          );
-                        }),
-                      ],
-                    ),
+                          child: _controller.isSaving.value
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white),
+                                )
+                              : Text(
+                                  _controller.isAppelSaved.value
+                                      ? 'Enregistré'
+                                      : 'Enregistrer',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15)),
+                        )),
                   ),
                 ],
               ),
             ),
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: hasSelection ? () => _showJustifyBottomSheet(context) : null,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(
-                        color: hasSelection ? const Color(0xFF6C5CE7) : Colors.grey.shade300,
-                        width: 1.2,
-                      ),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: Text(
-                      'Justifier',
-                      style: TextStyle(
-                        color: hasSelection ? const Color(0xFF6C5CE7) : Colors.grey.shade400,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Obx(() => ElevatedButton(
-                    onPressed: (_controller.isSaving.value || _controller.isAppelSaved.value) ? null : _controller.saveAppels,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: _controller.isAppelSaved.value ? Colors.grey : const Color(0xFF6C5CE7),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: _controller.isSaving.value
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : Text(
-                            _controller.isAppelSaved.value ? 'Enregistré' : 'Enregistrer',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)
-                          ),
-                  )),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
+          ],
+        );
       }),
     );
   }
 
-
-
-  Widget _buildStatItem(String value, String label, Color color, IconData icon) {
+  Widget _buildStatItem(
+      String value, String label, Color color, IconData icon) {
     return Column(
       children: [
         Row(
           children: [
             Icon(icon, color: color, size: 22),
             const SizedBox(width: 6),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.grey)),
+            Text(value,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.grey)),
           ],
         ),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87)),
+        Text(label,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: Colors.black87)),
       ],
     );
   }
@@ -550,7 +680,9 @@ class _AppelViewState extends State<AppelView> {
         });
       },
       child: Container(
-        color: isSelected ? const Color(0xFF6C5CE7).withOpacity(0.05) : Colors.transparent,
+        color: isSelected
+            ? const Color(0xFF6C5CE7).withOpacity(0.05)
+            : Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -560,13 +692,20 @@ class _AppelViewState extends State<AppelView> {
                 CircleAvatar(
                   radius: 18,
                   backgroundColor: const Color(0xFF536DFE),
-                  child: Text(initial, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text(initial,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(width: 12),
-                Text(name, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: Colors.black87)),
+                Text(name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.black87)),
               ],
             ),
-
             PopupMenuButton<String>(
               tooltip: 'Changer le statut',
               onSelected: (String newStatus) {
@@ -580,18 +719,24 @@ class _AppelViewState extends State<AppelView> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: baseColor.withOpacity(0.4), width: 1),
+                  border:
+                      Border.all(color: baseColor.withOpacity(0.4), width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(_getStatusIcon(status), color: baseColor, size: 16),
                     const SizedBox(width: 6),
-                    Text(status, style: TextStyle(color: baseColor, fontWeight: FontWeight.bold, fontSize: 12)),
+                    Text(status,
+                        style: TextStyle(
+                            color: baseColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12)),
                     const SizedBox(width: 4),
                     Icon(Icons.keyboard_arrow_down, color: baseColor, size: 16),
                   ],
@@ -600,7 +745,8 @@ class _AppelViewState extends State<AppelView> {
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                 _buildPopupItem('Présent', Colors.green, Icons.check_circle),
                 const PopupMenuDivider(height: 1),
-                _buildPopupItem('En retard', Colors.orange, Icons.access_time_filled),
+                _buildPopupItem(
+                    'En retard', Colors.orange, Icons.access_time_filled),
                 const PopupMenuDivider(height: 1),
                 _buildPopupItem('Absent', Colors.red, Icons.cancel),
               ],
@@ -611,7 +757,8 @@ class _AppelViewState extends State<AppelView> {
     );
   }
 
-  PopupMenuItem<String> _buildPopupItem(String value, Color color, IconData icon) {
+  PopupMenuItem<String> _buildPopupItem(
+      String value, Color color, IconData icon) {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
@@ -620,7 +767,8 @@ class _AppelViewState extends State<AppelView> {
           const SizedBox(width: 10),
           Text(
             value,
-            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13),
+            style: TextStyle(
+                color: color, fontWeight: FontWeight.bold, fontSize: 13),
           ),
         ],
       ),

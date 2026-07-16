@@ -44,7 +44,7 @@ class ScheduleController extends GetxController {
         } catch (_) {}
       }
     }
-    
+
     // Forcer la mise à jour des observateurs si de nouvelles classes ont été chargées
     if (added) {
       classStudentCounts.refresh();
@@ -63,14 +63,22 @@ class ScheduleController extends GetxController {
         final emploiMap = map['emploiDuTemps'] as Map? ?? map;
         final classeMap = emploiMap['classe'] as Map?;
         final matiereMap = emploiMap['matiere'] as Map?;
-        final classeId = classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null;
-        
-        final statutLocal = _calculateStatus(date, emploiMap['heureDebut']?.toString(), emploiMap['heureFin']?.toString());
+        final classeId = classeMap != null
+            ? int.tryParse(classeMap['id']?.toString() ?? '')
+            : null;
+
+        final statutLocal = _calculateStatus(
+            date,
+            emploiMap['heureDebut']?.toString(),
+            emploiMap['heureFin']?.toString());
 
         return {
           'id': emploiMap['id'],
-          'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
-          'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
+          'matiere': matiereMap != null
+              ? (matiereMap['nom']?.toString() ?? 'Cours')
+              : 'Cours',
+          'classe':
+              classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
           'classeId': classeId,
           'heureDebut': emploiMap['heureDebut']?.toString() ?? '',
           'heureFin': emploiMap['heureFin']?.toString() ?? '',
@@ -90,7 +98,8 @@ class ScheduleController extends GetxController {
 
   Future<void> loadWeekSeances() async {
     try {
-      final start = selectedDate.value.subtract(Duration(days: selectedDate.value.weekday - 1));
+      final start = selectedDate.value
+          .subtract(Duration(days: selectedDate.value.weekday - 1));
       final List<Map<String, dynamic>> allWeek = [];
       for (int i = 0; i < 7; i++) {
         final day = start.add(Duration(days: i));
@@ -100,14 +109,22 @@ class ScheduleController extends GetxController {
           final emploiMap = map['emploiDuTemps'] as Map? ?? map;
           final classeMap = emploiMap['classe'] as Map?;
           final matiereMap = emploiMap['matiere'] as Map?;
-          final classeId = classeMap != null ? int.tryParse(classeMap['id']?.toString() ?? '') : null;
-          
-          final statutLocal = _calculateStatus(day, emploiMap['heureDebut']?.toString(), emploiMap['heureFin']?.toString());
+          final classeId = classeMap != null
+              ? int.tryParse(classeMap['id']?.toString() ?? '')
+              : null;
+
+          final statutLocal = _calculateStatus(
+              day,
+              emploiMap['heureDebut']?.toString(),
+              emploiMap['heureFin']?.toString());
 
           allWeek.add({
             'id': emploiMap['id'],
-            'matiere': matiereMap != null ? (matiereMap['nom']?.toString() ?? 'Cours') : 'Cours',
-            'classe': classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
+            'matiere': matiereMap != null
+                ? (matiereMap['nom']?.toString() ?? 'Cours')
+                : 'Cours',
+            'classe':
+                classeMap != null ? (classeMap['nom']?.toString() ?? '') : '',
             'classeId': classeId,
             'heureDebut': emploiMap['heureDebut']?.toString() ?? '',
             'heureFin': emploiMap['heureFin']?.toString() ?? '',
@@ -123,22 +140,22 @@ class ScheduleController extends GetxController {
 
   String _calculateStatus(DateTime date, String? startStr, String? endStr) {
     if (startStr == null || endStr == null) return 'PLANIFIEE';
-    
+
     final now = DateTime.now();
-    
+
     // Si le jour est passé
     final startOfDay = DateTime(date.year, date.month, date.day);
     final todayStartOfDay = DateTime(now.year, now.month, now.day);
-    
+
     if (startOfDay.isBefore(todayStartOfDay)) {
       return 'TERMINEE';
     }
-    
+
     // Si le jour est à venir
     if (startOfDay.isAfter(todayStartOfDay)) {
       return 'PLANIFIEE';
     }
-    
+
     // C'est aujourd'hui, on vérifie l'heure
     try {
       final p1 = startStr.split(':');
@@ -147,11 +164,11 @@ class ScheduleController extends GetxController {
       final m1 = int.parse(p1[1]);
       final h2 = int.parse(p2[0]);
       final m2 = int.parse(p2[1]);
-      
+
       final currentMins = now.hour * 60 + now.minute;
       final startMins = h1 * 60 + m1;
       final endMins = h2 * 60 + m2;
-      
+
       if (currentMins > endMins) return 'TERMINEE';
       if (currentMins >= startMins && currentMins <= endMins) return 'EN_COURS';
       return 'PLANIFIEE';
@@ -283,14 +300,32 @@ class ScheduleController extends GetxController {
 
   String get dayProgramLabel {
     final d = selectedDate.value;
-    const days = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI', 'DIMANCHE'];
+    const days = [
+      'LUNDI',
+      'MARDI',
+      'MERCREDI',
+      'JEUDI',
+      'VENDREDI',
+      'SAMEDI',
+      'DIMANCHE'
+    ];
     return '${days[d.weekday - 1]} ${d.day} ${_monthShort(d.month).toUpperCase()}';
   }
 
   String _monthShort(int m) {
     const mois = [
-      'jan', 'fév', 'mars', 'avr', 'mai', 'juin',
-      'juil', 'août', 'sept', 'oct', 'nov', 'déc'
+      'jan',
+      'fév',
+      'mars',
+      'avr',
+      'mai',
+      'juin',
+      'juil',
+      'août',
+      'sept',
+      'oct',
+      'nov',
+      'déc'
     ];
     return mois[m - 1];
   }

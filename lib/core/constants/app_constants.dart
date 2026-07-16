@@ -5,7 +5,7 @@ class AppConstants {
   /// Application name
   static const String appName = 'unigest_app';
 
-  /// URL du backend Spring local
+  /// URL du backend Spring local utilisée par le module enseignant.
   static String get baseUrl {
     if (kIsWeb) {
       return 'http://localhost:5400';
@@ -15,7 +15,8 @@ class AppConstants {
       return 'http://localhost:5400';
     }
   }
-  
+
+
   /// Storage keys
   static const String tokenKey = 'auth_token';
   static const String userKey = 'user_data';

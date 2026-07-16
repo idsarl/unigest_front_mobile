@@ -45,7 +45,8 @@ class TeacherProfileView extends StatelessWidget {
               // Avatar et informations de base (Joli Card)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
@@ -64,19 +65,21 @@ class TeacherProfileView extends StatelessWidget {
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF6C5CE7).withOpacity(0.3), width: 3),
+                        border: Border.all(
+                            color: const Color(0xFF6C5CE7).withOpacity(0.3),
+                            width: 3),
                       ),
                       child: CircleAvatar(
                         radius: 50,
                         backgroundColor: const Color(0xFF6C5CE7),
                         child: Obx(() => Text(
-                          _initials(controller.teacherName.value),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
+                              _initials(controller.teacherName.value),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -92,7 +95,8 @@ class TeacherProfileView extends StatelessWidget {
                     Obx(() => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.email_outlined, size: 16, color: Colors.grey),
+                            const Icon(Icons.email_outlined,
+                                size: 16, color: Colors.grey),
                             const SizedBox(width: 5),
                             Text(
                               controller.teacherEmail.value,
@@ -106,7 +110,8 @@ class TeacherProfileView extends StatelessWidget {
                         )),
                     const SizedBox(height: 15),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 6),
                       decoration: BoxDecoration(
                         color: const Color(0xFF6C5CE7).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(30),
@@ -114,7 +119,8 @@ class TeacherProfileView extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: const [
-                          Icon(Icons.school, size: 16, color: Color(0xFF6C5CE7)),
+                          Icon(Icons.school,
+                              size: 16, color: Color(0xFF6C5CE7)),
                           SizedBox(width: 8),
                           Text(
                             'Enseignant',
@@ -158,31 +164,40 @@ class TeacherProfileView extends StatelessWidget {
                           // Champ Prénom
                           _buildTextFieldLabel('Prénom'),
                           const SizedBox(height: 8),
-                          _buildTextField(controller.prenomController, 'Entrez votre prénom', Icons.person_outline),
+                          _buildTextField(controller.prenomController,
+                              'Entrez votre prénom', Icons.person_outline),
                           const SizedBox(height: 15),
 
                           // Champ Nom
                           _buildTextFieldLabel('Nom'),
                           const SizedBox(height: 8),
-                          _buildTextField(controller.nomController, 'Entrez votre nom', Icons.person_outline),
+                          _buildTextField(controller.nomController,
+                              'Entrez votre nom', Icons.person_outline),
                           const SizedBox(height: 15),
 
                           // Champ Email
                           _buildTextFieldLabel('Email'),
                           const SizedBox(height: 8),
-                          _buildTextField(controller.emailController, 'Entrez votre email', Icons.email_outlined, isEmail: true),
+                          _buildTextField(controller.emailController,
+                              'Entrez votre email', Icons.email_outlined,
+                              isEmail: true),
                           const SizedBox(height: 15),
 
                           // Champ Nouveau mot de passe
-                          _buildTextFieldLabel('Nouveau mot de passe (optionnel)'),
+                          _buildTextFieldLabel(
+                              'Nouveau mot de passe (optionnel)'),
                           const SizedBox(height: 8),
-                          _buildTextField(controller.passwordController, 'Nouveau mot de passe', Icons.lock_outline, isPassword: true),
+                          _buildTextField(controller.passwordController,
+                              'Nouveau mot de passe', Icons.lock_outline,
+                              isPassword: true),
                           const SizedBox(height: 15),
 
                           // Champ Confirmer mot de passe
                           _buildTextFieldLabel('Confirmer le mot de passe'),
                           const SizedBox(height: 8),
-                          _buildTextField(controller.confirmPasswordController, 'Confirmer le mot de passe', Icons.lock_outline, isPassword: true),
+                          _buildTextField(controller.confirmPasswordController,
+                              'Confirmer le mot de passe', Icons.lock_outline,
+                              isPassword: true),
                           const SizedBox(height: 20),
 
                           // Message d'erreur
@@ -208,11 +223,15 @@ class TeacherProfileView extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: TextButton(
-                                  onPressed: controller.isLoading.value ? null : controller.toggleEditMode,
+                                  onPressed: controller.isLoading.value
+                                      ? null
+                                      : controller.toggleEditMode,
                                   style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
                                   ),
-                                  child: const Text('Annuler', style: TextStyle(color: Colors.grey)),
+                                  child: const Text('Annuler',
+                                      style: TextStyle(color: Colors.grey)),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -223,26 +242,43 @@ class TeacherProfileView extends StatelessWidget {
                                       ? null
                                       : () {
                                           controller.updateProfile(
-                                            prenom: controller.prenomController.text,
+                                            prenom: controller
+                                                .prenomController.text,
                                             nom: controller.nomController.text,
-                                            email: controller.emailController.text,
+                                            email:
+                                                controller.emailController.text,
                                           );
                                         },
                                   style: ButtonStyle(
                                     backgroundColor: WidgetStateProperty.all(
-                                      controller.isLoading.value ? Colors.grey : const Color(0xFF6C5CE7),
+                                      controller.isLoading.value
+                                          ? Colors.grey
+                                          : const Color(0xFF6C5CE7),
                                     ),
-                                    foregroundColor: WidgetStateProperty.all(Colors.white),
-                                    padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 14)),
-                                    shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                    foregroundColor:
+                                        WidgetStateProperty.all(Colors.white),
+                                    padding: WidgetStateProperty.all(
+                                        const EdgeInsets.symmetric(
+                                            vertical: 14)),
+                                    shape: WidgetStateProperty.all(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10))),
                                   ),
                                   child: controller.isLoading.value
                                       ? const SizedBox(
                                           height: 20,
                                           width: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.white)),
                                         )
-                                      : const Text('Enregistrer', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                                      : const Text('Enregistrer',
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600)),
                                 ),
                               ),
                             ],
@@ -275,20 +311,27 @@ class TeacherProfileView extends StatelessWidget {
                             width: double.infinity,
                             child: ElevatedButton.icon(
                               onPressed: controller.toggleEditMode,
-                              icon: const Icon(Icons.edit, color: Color(0xFF6C5CE7)),
+                              icon: const Icon(Icons.edit,
+                                  color: Color(0xFF6C5CE7)),
                               label: const Text(
                                 'Modifier mon profil',
-                                style: TextStyle(color: Color(0xFF6C5CE7), fontSize: 15),
+                                style: TextStyle(
+                                    color: Color(0xFF6C5CE7), fontSize: 15),
                               ),
                               style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(const Color(0xFFE8E6FF)),
+                                backgroundColor: WidgetStateProperty.all(
+                                    const Color(0xFFE8E6FF)),
                                 alignment: Alignment.centerLeft,
-                                padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 12, horizontal: 16)),
-                                shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+                                padding: WidgetStateProperty.all(
+                                    const EdgeInsets.symmetric(
+                                        vertical: 12, horizontal: 16)),
+                                shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10))),
                               ),
                             ),
                           ),
-
                         ],
                       ),
                     )),
@@ -317,7 +360,9 @@ class TeacherProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, IconData icon, {bool isEmail = false, bool isPassword = false}) {
+  Widget _buildTextField(
+      TextEditingController controller, String hint, IconData icon,
+      {bool isEmail = false, bool isPassword = false}) {
     return TextField(
       controller: controller,
       keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,

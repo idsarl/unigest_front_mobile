@@ -12,7 +12,8 @@ class NoteController extends GetxController {
   final RxString error = ''.obs;
   final RxBool isSaving = false.obs;
 
-  final RxList<Map<String, dynamic>> affectations = <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, dynamic>> affectations =
+      <Map<String, dynamic>>[].obs;
   final RxInt selectedAffectationIndex = 0.obs;
   final RxInt selectedMatiereIndex = 0.obs;
   final RxList<Map<String, dynamic>> evaluations = <Map<String, dynamic>>[].obs;
@@ -90,8 +91,8 @@ class NoteController extends GetxController {
 
   Future<void> loadNotes() async {
     final affId = affectationId;
-    final cId = int.tryParse(
-        selectedAffectation?['classe']?['id']?.toString() ?? '');
+    final cId =
+        int.tryParse(selectedAffectation?['classe']?['id']?.toString() ?? '');
     if (affId == null || cId == null) return;
 
     isLoading.value = true;
@@ -102,10 +103,12 @@ class NoteController extends GetxController {
 
       for (final n in notes) {
         if (n is! Map) continue;
-        
+
         final mId = n['matiere']?['id']?.toString();
-        if (currentMatId != null && mId != null && mId != currentMatId.toString()) {
-           continue; 
+        if (currentMatId != null &&
+            mId != null &&
+            mId != currentMatId.toString()) {
+          continue;
         }
 
         final type = n['type']?.toString() ?? 'DEVOIR';
@@ -113,7 +116,8 @@ class NoteController extends GetxController {
         if (n['dateEvaluation'] is List) {
           final l = n['dateEvaluation'] as List;
           if (l.length >= 3) {
-            date = '${l[0]}-${l[1].toString().padLeft(2, '0')}-${l[2].toString().padLeft(2, '0')}';
+            date =
+                '${l[0]}-${l[1].toString().padLeft(2, '0')}-${l[2].toString().padLeft(2, '0')}';
           }
         }
         final key = '$type|$date';
@@ -123,7 +127,9 @@ class NoteController extends GetxController {
             'type': type,
             'date': date,
             'dateLabel': _formatDateLabel(date),
-            'title': HiveService.instance.getCache('titre_eval_${affId}_${type}_$date') ?? _typeLabel(type),
+            'title': HiveService.instance
+                    .getCache('titre_eval_${affId}_${type}_$date') ??
+                _typeLabel(type),
             'noteMax': '20',
             'notes': <Map<String, dynamic>>[],
           },
@@ -186,7 +192,7 @@ class NoteController extends GetxController {
             snackPosition: SnackPosition.BOTTOM);
         return;
       }
-      
+
       await _repo.saveNotesBatch(batch);
 
       // Sauvegarde du titre localement SEULEMENT en cas de succès
@@ -207,19 +213,22 @@ class NoteController extends GetxController {
       } catch (_) {}
     } catch (e) {
       String errorMsg = e.toString();
-      if (errorMsg.contains('Duplicate entry') || errorMsg.contains('uk_note_unique') || errorMsg.contains('DataIntegrityViolationException')) {
-        errorMsg = "Une évaluation de ce type (ex: Devoir) existe déjà à cette date pour cette classe. Veuillez choisir une autre date ou un autre type.";
+      if (errorMsg.contains('Duplicate entry') ||
+          errorMsg.contains('uk_note_unique') ||
+          errorMsg.contains('DataIntegrityViolationException')) {
+        errorMsg =
+            "Une évaluation de ce type (ex: Devoir) existe déjà à cette date pour cette classe. Veuillez choisir une autre date ou un autre type.";
       } else {
         // Nettoyage de l'erreur brute pour la rendre plus lisible
         if (errorMsg.contains('"message":')) {
-           final RegExp regex = RegExp(r'"message":"(.*?)"');
-           final match = regex.firstMatch(errorMsg);
-           if (match != null) {
-              errorMsg = match.group(1) ?? errorMsg;
-           }
+          final RegExp regex = RegExp(r'"message":"(.*?)"');
+          final match = regex.firstMatch(errorMsg);
+          if (match != null) {
+            errorMsg = match.group(1) ?? errorMsg;
+          }
         }
       }
-      Get.snackbar('Attention', errorMsg, 
+      Get.snackbar('Attention', errorMsg,
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange.shade800,
           colorText: Colors.white,
@@ -255,8 +264,18 @@ class NoteController extends GetxController {
     try {
       final d = DateTime.parse(iso);
       const mois = [
-        'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        'Janvier',
+        'Février',
+        'Mars',
+        'Avril',
+        'Mai',
+        'Juin',
+        'Juillet',
+        'Août',
+        'Septembre',
+        'Octobre',
+        'Novembre',
+        'Décembre'
       ];
       return '${d.day} ${mois[d.month - 1]} ${d.year}';
     } catch (_) {
