@@ -3,6 +3,7 @@ import '../../../core/state_management/getx_helpers.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/session/app_session.dart';
 
 class AuthController extends BaseController {
   final RxString email = ''.obs;
@@ -56,11 +57,24 @@ class AuthController extends BaseController {
         // Récupérer les infos utilisateur complètes pour obtenir l'ID
         await _fetchUserInfo();
 
+        // Le module enseignant utilise une session persistée pour ses appels
+        // API, son profil et son fonctionnement hors ligne.
+        AppSession.instance.setFromLogin(
+          authToken: token?.toString() ?? '',
+          id: userId.value,
+          displayName: '$prenom $nom'.trim(),
+          email: email.value,
+          userRole: role?.toString() ?? '',
+        );
+        await AppSession.instance.persist();
+
         // Redirection selon le rôle
         if (role == 'PARENT') {
           Get.offAllNamed('/parent-home');
         } else if (role == 'ETUDIANT') {
           Get.offAllNamed('/student-home');
+        } else if (role == 'ENSEIGNANT') {
+          Get.offAllNamed('/teacher-home');
         } else {
           authError.value = 'Rôle non reconnu: $role';
         }
@@ -97,8 +111,9 @@ class AuthController extends BaseController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  void logout() {
+  Future<void> logout() async {
     ApiService.clearToken();
+    await AppSession.instance.clearStorage();
     userRole.value = '';
     userId.value = 0;
     userName.value = '';

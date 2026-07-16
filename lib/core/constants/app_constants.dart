@@ -1,13 +1,18 @@
+import 'package:flutter/foundation.dart';
+
 /// Application-level constants
 class AppConstants {
   /// Application name
   static const String appName = 'unigest_app';
 
-  /// API endpoints
-  static const String baseUrl = String.fromEnvironment(
-    'UNIGEST_API_BASE_URL',
-    defaultValue: 'http://127.0.0.1:5400/api',
-  );
+  /// URL du backend Spring local utilisée par le module enseignant.
+  static String get baseUrl {
+    if (kIsWeb) return 'http://localhost:5400';
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://10.0.2.2:5400';
+    }
+    return 'http://localhost:5400';
+  }
 
   /// Storage keys
   static const String tokenKey = 'auth_token';
