@@ -6,10 +6,12 @@ import '../../../models/note_model.dart';
 import '../../../models/emploi_model.dart';
 import '../../../models/absence_model.dart';
 import '../../../models/notification_model.dart';
+import '../../../models/bulletin_model.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../../core/services/emploi_service.dart';
 import '../../../core/services/absences_service.dart';
 import '../../../core/services/notifications_service.dart';
+import '../../../core/services/bulletin_service.dart';
 import '../../../services/storage_service.dart';
 
 class StudentHomeController extends BaseController {
@@ -19,12 +21,15 @@ class StudentHomeController extends BaseController {
   final RxList<EmploiModel> emploiDuTemps = <EmploiModel>[].obs;
   final RxList<AbsenceModel> absences = <AbsenceModel>[].obs;
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
+  final RxList<BulletinModel> bulletins = <BulletinModel>[].obs;
+  final RxBool isDownloadingBulletin = false.obs;
 
   final RxDouble moyenneGenerale = 0.0.obs;
   final RxMap<int, double> moyennesParTrimestre =
       <int, double>{1: 0.0, 2: 0.0, 3: 0.0}.obs;
   final RxDouble moyenneRecente = 0.0.obs;
   final RxInt trimestreRecent = 1.obs;
+  final RxInt selectedTrimestre = 0.obs; // 0 = tous les trimestres
   final RxInt unreadCount = 0.obs;
   final RxString studentFullName = ''.obs;
   final RxString studentMatricule = ''.obs;
@@ -88,6 +93,16 @@ class StudentHomeController extends BaseController {
       emploiDuTemps.value = results[1] as List<EmploiModel>;
       absences.value = results[2] as List<AbsenceModel>;
 
+      try {
+        bulletins.value =
+            await BulletinService.getBulletinsByStudentId(studentId);
+      } catch (_) {
+        // Le bulletin n'est pas critique pour le reste de l'écran : on
+        // n'interrompt pas le chargement des notes/emploi/absences si
+        // aucun bulletin n'a encore été généré côté admin.
+        bulletins.clear();
+      }
+
       notifications.value = await NotificationsService.getStudentNotifications(
         studentId,
         childName: studentFullName.value,
@@ -128,6 +143,9 @@ class StudentHomeController extends BaseController {
       if (dernierTrimestre > 0) {
         trimestreRecent.value = dernierTrimestre;
         moyenneRecente.value = moyennesParTrimestre[dernierTrimestre] ?? 0.0;
+        if (selectedTrimestre.value == 0) {
+          selectedTrimestre.value = dernierTrimestre;
+        }
       }
     } catch (e) {
       throw Exception('Erreur lors du chargement des données: $e');
@@ -188,6 +206,16 @@ class StudentHomeController extends BaseController {
     }
   }
 
+  List<NoteModel> get notesForSelectedTrimestre {
+    if (selectedTrimestre.value == 0) return notes;
+    return notes.where((n) => n.trimestre == selectedTrimestre.value).toList();
+  }
+
+  void selectTrimestre(int trimestre) {
+    selectedTrimestre.value =
+        selectedTrimestre.value == trimestre ? 0 : trimestre;
+  }
+
   void changeTab(int index) {
     currentIndex.value = index;
   }
@@ -226,6 +254,20 @@ class StudentHomeController extends BaseController {
       childName: notification.childName,
     );
     unreadCount.value = notifications.where((n) => !n.isRead).length;
+  }
+
+  Future<void> downloadBulletinPdf(BulletinModel bulletin) async {
+    if (isDownloadingBulletin.value) return;
+    isDownloadingBulletin.value = true;
+    try {
+      final fileName =
+          'bulletin_${bulletin.periodeLabel.replaceAll(' ', '_')}.pdf';
+      await BulletinService.downloadAndOpenPdf(bulletin.id, fileName);
+    } catch (e) {
+      setError('Impossible de télécharger le bulletin : $e');
+    } finally {
+      isDownloadingBulletin.value = false;
+    }
   }
 
   Future<void> logout() async {

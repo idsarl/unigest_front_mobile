@@ -10,7 +10,8 @@ class AppConstants {
     if (kIsWeb) {
       return 'http://localhost:5400';
     } else if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:5400'; // IP spéciale pour accéder à l'hôte local depuis l'émulateur Android
+      return 'http://192.168.1.6:5400'; // IP spéciale pour accéder à l'hôte local depuis l'émulateur Android
+      // return 'http://10.0.2.2:5400'; // IP spéciale pour accéder à l'hôte local depuis l'émulateur Android
     } else {
       return 'http://localhost:5400';
     }

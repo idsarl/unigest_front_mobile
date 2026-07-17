@@ -32,7 +32,7 @@ class _NoteViewState extends State<NoteView> {
   ];
 
   List<Map<String, dynamic>> get _displayStudents {
-    if (_currentEvaluation != null && _isReadOnly) {
+    if (_currentEvaluation != null) {
       return _controller.notesForEvaluation(_currentEvaluation!);
     }
     return _controller.students;
@@ -54,6 +54,38 @@ class _NoteViewState extends State<NoteView> {
       studentId,
       () => TextEditingController(text: initialValue),
     );
+  }
+
+  Future<void> _confirmDeleteNote(int noteId, String studentName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Supprimer cette note ?'),
+        content: Text(
+            'La note de $studentName pour cette évaluation sera définitivement supprimée.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Supprimer',
+                style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    await _controller.deleteNote(noteId);
+    if (mounted) {
+      setState(() {
+        _currentEvaluation = null;
+        _isViewingStudents = false;
+        _isReadOnly = false;
+      });
+    }
   }
 
   DateTime? _selectedDateObj;
@@ -332,6 +364,12 @@ class _NoteViewState extends State<NoteView> {
                   ),
                 ),
               ),
+              if (_isReadOnly && _currentEvaluation != null)
+                IconButton(
+                  onPressed: () => setState(() => _isReadOnly = false),
+                  icon: const Icon(Icons.edit, size: 20, color: Color(0xFF6C5CE7)),
+                  tooltip: 'Modifier les notes',
+                ),
             ],
           ),
         ),
@@ -549,6 +587,19 @@ class _NoteViewState extends State<NoteView> {
                                         ),
                                       ),
                                     ),
+                                    if (!_isReadOnly &&
+                                        _currentEvaluation != null &&
+                                        student['noteId'] != null)
+                                      IconButton(
+                                        onPressed: () => _confirmDeleteNote(
+                                            student['noteId'] as int,
+                                            student['name']?.toString() ?? ''),
+                                        icon: const Icon(Icons.delete_outline,
+                                            color: Colors.redAccent, size: 20),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                        tooltip: 'Supprimer cette note',
+                                      ),
                                   ],
                                 ),
                               ),
@@ -596,16 +647,24 @@ class _NoteViewState extends State<NoteView> {
                                 'note': _noteControllers[id]?.text,
                               };
                             }).toList();
-                            final d = _selectedDateObj ?? DateTime.now();
-                            await _controller.saveEvaluationNotes(
-                              title: _titreController.text.trim(),
-                              type: _selectedType,
-                              dateIso: d.toIso8601String().split('T').first,
-                              noteMax:
-                                  double.tryParse(_noteMaxController.text) ??
-                                      20,
-                              studentNotes: notes,
-                            );
+
+                            if (_currentEvaluation != null) {
+                              await _controller.updateEvaluationNotes(
+                                eval: _currentEvaluation!,
+                                studentNotes: notes,
+                              );
+                            } else {
+                              final d = _selectedDateObj ?? DateTime.now();
+                              await _controller.saveEvaluationNotes(
+                                title: _titreController.text.trim(),
+                                type: _selectedType,
+                                dateIso: d.toIso8601String().split('T').first,
+                                noteMax: double.tryParse(
+                                        _noteMaxController.text) ??
+                                    20,
+                                studentNotes: notes,
+                              );
+                            }
                             if (!_controller.isSaving.value &&
                                 _controller.error.isEmpty) {
                               // Réinitialiser les contrôleurs
@@ -637,8 +696,11 @@ class _NoteViewState extends State<NoteView> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Publier les notes',
-                            style: TextStyle(
+                        : Text(
+                            _currentEvaluation != null
+                                ? 'Enregistrer les modifications'
+                                : 'Publier les notes',
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15)),

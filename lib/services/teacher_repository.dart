@@ -243,6 +243,18 @@ class TeacherRepository {
     await _api.post('/api/notes/batch', body: notes, queueIfOffline: false);
   }
 
+  Future<void> updateNote(int noteId, double valeur, String type) async {
+    await _api.put(
+      '/api/notes/$noteId',
+      query: {'valeur': valeur.toString(), 'type': type},
+      queueIfOffline: false,
+    );
+  }
+
+  Future<void> deleteNote(int noteId) async {
+    await _api.delete('/api/notes/$noteId', queueIfOffline: false);
+  }
+
   Future<Map<String, dynamic>> getDashboardAbsences() async {
     final cacheKey = 'dashboard_absences_$teacherId';
     try {

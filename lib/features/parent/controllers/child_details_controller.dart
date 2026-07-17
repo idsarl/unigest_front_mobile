@@ -6,12 +6,16 @@ import '../../../core/services/notes_service.dart';
 import '../../../core/services/absences_service.dart';
 import '../../../core/services/emploi_service.dart';
 import '../../../core/services/messages_service.dart';
+import '../../../core/services/bulletin_service.dart';
+import '../../../core/services/paiement_service.dart';
 import '../../../models/child_model.dart';
 import '../../../models/note_model.dart';
 import '../../../models/absence_model.dart';
 import '../../../models/emploi_model.dart';
 import '../../../models/message_model.dart';
 import '../../../models/teacher_model.dart';
+import '../../../models/bulletin_model.dart';
+import '../../../models/paiement_model.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class ChildDetailsController extends BaseController
@@ -26,12 +30,16 @@ class ChildDetailsController extends BaseController
   final RxList<TeacherModel> teachers = <TeacherModel>[].obs;
   final Rx<TeacherModel?> selectedTeacher = Rx<TeacherModel?>(null);
   final RxString messageText = ''.obs;
+  final RxList<BulletinModel> bulletins = <BulletinModel>[].obs;
+  final RxBool isDownloadingBulletin = false.obs;
+  final RxList<PaiementModel> paiements = <PaiementModel>[].obs;
+  final Rx<PaiementResumeModel?> paiementResume = Rx<PaiementResumeModel?>(null);
   late TabController tabController;
 
   @override
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 4, vsync: this);
+    tabController = TabController(length: 6, vsync: this);
     if (Get.arguments != null) {
       child.value = Get.arguments as ChildModel;
       loadAllData();
@@ -78,8 +86,11 @@ class ChildDetailsController extends BaseController
         }
       }
 
-      // Charger les enseignants séparément
+      // Charger les enseignants, bulletins et paiements séparément :
+      // leur absence ne doit pas empêcher l'affichage des notes/absences/emploi.
       loadTeachers();
+      loadBulletins();
+      loadPaiements();
 
       clearError();
     } catch (e) {
@@ -205,6 +216,60 @@ class ChildDetailsController extends BaseController
       setError(e.toString());
     } finally {
       setLoading(false);
+    }
+  }
+
+  Future<void> loadBulletins() async {
+    try {
+      final childIdVal = int.tryParse(child.value?.id ?? '') ?? 0;
+      if (childIdVal != 0) {
+        bulletins.value =
+            await BulletinService.getBulletinsByStudentId(childIdVal);
+      }
+    } catch (_) {
+      // Aucun bulletin publié pour l'instant : pas une erreur bloquante.
+      bulletins.clear();
+    }
+  }
+
+  Future<void> downloadBulletinPdf(BulletinModel bulletin) async {
+    if (isDownloadingBulletin.value) return;
+    isDownloadingBulletin.value = true;
+    try {
+      final fileName =
+          'bulletin_${bulletin.periodeLabel.replaceAll(' ', '_')}.pdf';
+      await BulletinService.downloadAndOpenPdf(bulletin.id, fileName);
+    } catch (e) {
+      setError('Impossible de télécharger le bulletin : $e');
+    } finally {
+      isDownloadingBulletin.value = false;
+    }
+  }
+
+  Future<void> loadPaiements() async {
+    try {
+      final childIdVal = int.tryParse(child.value?.id ?? '') ?? 0;
+      if (childIdVal == 0) return;
+
+      paiements.value =
+          await PaiementService.getPaiementsByStudentId(childIdVal);
+
+      final inscriptionsResponse =
+          await ApiService.get('/inscriptions/etudiant/$childIdVal');
+      final inscriptions =
+          ApiService.decodeJson(inscriptionsResponse) as List<dynamic>;
+      if (inscriptions.isNotEmpty) {
+        final inscription = inscriptions.first as Map<String, dynamic>;
+        final inscriptionId =
+            int.tryParse(inscription['id']?.toString() ?? '');
+        if (inscriptionId != null) {
+          paiementResume.value = await PaiementService.getResume(inscriptionId);
+        }
+      }
+    } catch (_) {
+      // Aucun paiement enregistré, ou inscription introuvable : pas bloquant.
+      paiements.clear();
+      paiementResume.value = null;
     }
   }
 

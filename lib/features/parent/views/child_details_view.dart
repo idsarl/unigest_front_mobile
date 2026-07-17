@@ -6,6 +6,8 @@ import '../../../models/note_model.dart';
 import '../../../models/absence_model.dart';
 import '../../../models/emploi_model.dart';
 import '../../../models/message_model.dart';
+import '../../../models/bulletin_model.dart';
+import '../../../models/paiement_model.dart';
 
 class ChildDetailsView extends GetView<ChildDetailsController> {
   const ChildDetailsView({super.key});
@@ -335,6 +337,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       child: TabBar(
         controller: controller.tabController,
         onTap: (index) => controller.selectedTab.value = index,
+        isScrollable: true,
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textSecondary,
         labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -357,6 +360,12 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
           Tab(
               icon: Icon(Icons.chat_bubble_outline, size: 18),
               text: 'Messages'),
+          Tab(
+              icon: Icon(Icons.description_outlined, size: 18),
+              text: 'Bulletin'),
+          Tab(
+              icon: Icon(Icons.payments_outlined, size: 18),
+              text: 'Paiements'),
         ],
       ),
     );
@@ -372,6 +381,10 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
         return _buildEmploiTab();
       case 3:
         return _buildMessagesTab();
+      case 4:
+        return _buildBulletinTab();
+      case 5:
+        return _buildPaiementsTab();
       default:
         return _buildNotesTab();
     }
@@ -1194,6 +1207,327 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               icon: const Icon(Icons.send, color: Colors.white, size: 20),
               onPressed: controller.sendMessage,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBulletinTab() {
+    return Obx(() {
+      if (controller.isLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (controller.bulletins.isEmpty) {
+        return _buildEmptyState(
+          Icons.description_outlined,
+          'Aucun bulletin',
+          "Aucun bulletin n'a encore été publié pour cet enfant.",
+        );
+      }
+      final sorted = [...controller.bulletins]
+        ..sort((a, b) => b.periode.compareTo(a.periode));
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Bulletins', Icons.description_outlined),
+            const SizedBox(height: 12),
+            ...sorted.map((b) => _buildBulletinCard(b)),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildBulletinCard(BulletinModel bulletin) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      bulletin.periodeLabel,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (bulletin.anneeScolaire.isNotEmpty)
+                      Text(
+                        bulletin.anneeScolaire,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12),
+                      ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    bulletin.moyenneGenerale.toStringAsFixed(2),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  if (bulletin.rang != null)
+                    Text('Rang: ${bulletin.rang}',
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...bulletin.lignes.map((ligne) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                        child: Text(ligne.matiere,
+                            style: const TextStyle(fontSize: 13))),
+                    Text(ligne.moyenneMatiere.toStringAsFixed(2),
+                        style: const TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              )),
+          if (bulletin.appreciation != null &&
+              bulletin.appreciation!.trim().isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              bulletin.appreciation!,
+              style: const TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: AppColors.textSecondary,
+                  fontSize: 13),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Obx(() => TextButton.icon(
+                  onPressed: controller.isDownloadingBulletin.value
+                      ? null
+                      : () => controller.downloadBulletinPdf(bulletin),
+                  icon: controller.isDownloadingBulletin.value
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.picture_as_pdf, size: 18),
+                  label: const Text('Télécharger le PDF'),
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaiementsTab() {
+    return Obx(() {
+      if (controller.isLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      final resume = controller.paiementResume.value;
+      final paiements = controller.paiements;
+      if (resume == null && paiements.isEmpty) {
+        return _buildEmptyState(
+          Icons.payments_outlined,
+          'Aucune information de paiement',
+          "Aucun frais de scolarité n'a encore été enregistré pour cet enfant.",
+        );
+      }
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (resume != null) ...[
+              _buildSectionTitle('État des frais de scolarité',
+                  Icons.account_balance_wallet_outlined),
+              const SizedBox(height: 12),
+              _buildPaiementResumeCard(resume),
+              const SizedBox(height: 20),
+            ],
+            _buildSectionTitle('Historique des paiements', Icons.history),
+            const SizedBox(height: 12),
+            if (paiements.isEmpty)
+              _buildEmptyState(
+                Icons.receipt_long_outlined,
+                'Aucun paiement enregistré',
+                "L'historique des paiements apparaîtra ici.",
+              )
+            else
+              ...paiements.map((p) => _buildPaiementCard(p)),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildPaiementResumeCard(PaiementResumeModel resume) {
+    final Color statutColor = resume.statutPaiement == 'COMPLET'
+        ? AppColors.success
+        : resume.statutPaiement == 'PARTIEL'
+            ? Colors.orange
+            : AppColors.error;
+    final String statutLabel = resume.statutPaiement == 'COMPLET'
+        ? 'Complet'
+        : resume.statutPaiement == 'PARTIEL'
+            ? 'Partiel'
+            : 'Impayé';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Statut',
+                  style: TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w600)),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: statutColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  statutLabel,
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24),
+          _buildPaiementResumeLine('Frais total', resume.totalBrut),
+          if (resume.reduction > 0)
+            _buildPaiementResumeLine('Réduction', -resume.reduction),
+          _buildPaiementResumeLine('Net à payer', resume.totalNet),
+          _buildPaiementResumeLine('Déjà payé', resume.totalPaye),
+          const Divider(height: 24),
+          _buildPaiementResumeLine('Reste à payer', resume.resteAPayer,
+              emphasize: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaiementResumeLine(String label, double value,
+      {bool emphasize = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label,
+              style: TextStyle(
+                  fontSize: emphasize ? 15 : 13,
+                  fontWeight: emphasize ? FontWeight.bold : FontWeight.normal,
+                  color: AppColors.textPrimary)),
+          Text(
+            '${value.toStringAsFixed(0)} FCFA',
+            style: TextStyle(
+              fontSize: emphasize ? 16 : 13,
+              fontWeight: emphasize ? FontWeight.bold : FontWeight.w600,
+              color: emphasize ? AppColors.primary : AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaiementCard(PaiementModel paiement) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${paiement.montant.toStringAsFixed(0)} FCFA',
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary),
+              ),
+              const SizedBox(height: 4),
+              Text(paiement.datePaiement,
+                  style: const TextStyle(
+                      fontSize: 12, color: AppColors.textSecondary)),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(paiement.modePaiement,
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w600)),
+              if (paiement.reference != null &&
+                  paiement.reference!.isNotEmpty)
+                Text('Réf: ${paiement.reference}',
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.textSecondary)),
+            ],
           ),
         ],
       ),

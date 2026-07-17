@@ -255,8 +255,95 @@ class NoteController extends GetxController {
       return {
         ...s,
         'note': existing != null ? existing['valeur']?.toString() ?? '' : '',
+        'noteId': existing?['id'],
       };
     }).toList();
+  }
+
+  /// Modifie les notes déjà publiées d'une évaluation existante (édition),
+  /// et crée une note pour les étudiants qui n'en avaient pas encore.
+  Future<void> updateEvaluationNotes({
+    required Map<String, dynamic> eval,
+    required List<Map<String, dynamic>> studentNotes,
+  }) async {
+    final affId = affectationId;
+    final matId = matiereId;
+    if (affId == null || matId == null) return;
+
+    isSaving.value = true;
+    try {
+      final type = eval['type']?.toString() ?? 'DEVOIR';
+      final dateIso = eval['date']?.toString() ?? '';
+      final existingByStudentId = <int, Map<String, dynamic>>{
+        for (final n in notesForEvaluation(eval)) (n['id'] as int): n,
+      };
+
+      for (final s in studentNotes) {
+        final studentId = s['id'] as int;
+        final existing = existingByStudentId[studentId];
+        final noteId = existing?['noteId'] as int?;
+        final valeurStr = s['note']?.toString().trim() ?? '';
+        final valeur = double.tryParse(valeurStr);
+
+        if (noteId != null) {
+          if (valeur == null) continue;
+          final currentValeurStr = existing?['note']?.toString() ?? '';
+          if (currentValeurStr == valeurStr) continue;
+          await _repo.updateNote(noteId, valeur, type);
+        } else if (valeur != null) {
+          await _repo.saveNotesBatch([
+            {
+              'etudiantId': studentId,
+              'affectationId': affId,
+              'matiereId': matId,
+              'valeur': valeur,
+              'type': type,
+              'periode': 1,
+              'typePeriode': 'SEMESTRE',
+              'dateEvaluation': dateIso,
+            }
+          ]);
+        }
+      }
+
+      await loadNotes();
+      Get.snackbar('Succès', 'Notes mises à jour',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white);
+    } catch (e) {
+      String errorMsg = e.toString();
+      if (errorMsg.contains('"message":')) {
+        final RegExp regex = RegExp(r'"message":"(.*?)"');
+        final match = regex.firstMatch(errorMsg);
+        if (match != null) {
+          errorMsg = match.group(1) ?? errorMsg;
+        }
+      }
+      Get.snackbar('Attention', errorMsg,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange.shade800,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5));
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  Future<void> deleteNote(int noteId) async {
+    try {
+      await _repo.deleteNote(noteId);
+      await loadNotes();
+      Get.snackbar('Succès', 'Note supprimée',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white);
+    } catch (e) {
+      Get.snackbar('Erreur', 'Impossible de supprimer la note : $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
+    }
   }
 
   String _formatDateLabel(String iso) {

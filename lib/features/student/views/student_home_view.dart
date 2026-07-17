@@ -4,6 +4,7 @@ import '../controllers/student_home_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../models/notification_model.dart';
+import '../../../models/bulletin_model.dart';
 
 class StudentHomeView extends GetView<StudentHomeController> {
   const StudentHomeView({super.key});
@@ -27,6 +28,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   _buildEmploiTab(),
                   _buildNotificationsTab(),
                   _buildAbsencesTab(),
+                  _buildBulletinTab(),
                   _buildProfilTab(),
                 ],
               );
@@ -139,7 +141,8 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   _buildNavItem(Icons.schedule, 'Emploi', 1),
                   _buildNavItem(Icons.notifications, 'Alertes', 2),
                   _buildNavItem(Icons.event_busy, 'Absences', 3),
-                  _buildNavItem(Icons.person, 'Profil', 4),
+                  _buildNavItem(Icons.description, 'Bulletin', 4),
+                  _buildNavItem(Icons.person, 'Profil', 5),
                 ],
               ),
             ),
@@ -185,7 +188,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
 
   Widget _buildNotesTab() {
     return Obx(() {
-      final recentNotes = controller.notes.take(3).toList();
+      final filteredNotes = controller.notesForSelectedTrimestre;
 
       return RefreshIndicator(
         onRefresh: controller.loadData,
@@ -235,19 +238,21 @@ class StudentHomeView extends GetView<StudentHomeController> {
             _buildTrimestreMoyennes(),
             const SizedBox(height: 20),
             _buildHomeSectionHeader(
-              'Dernières notes',
-              'Voir tout',
-              () => controller.changeTab(0),
+              controller.selectedTrimestre.value == 0
+                  ? 'Toutes les notes'
+                  : 'Notes du trimestre ${controller.selectedTrimestre.value}',
+              'Toutes les périodes',
+              () => controller.selectTrimestre(0),
             ),
             const SizedBox(height: 12),
-            if (recentNotes.isEmpty)
+            if (filteredNotes.isEmpty)
               _buildHomeEmptyCard(
                 Icons.grade_outlined,
                 'Aucune note disponible',
                 'Tes prochaines évaluations apparaîtront ici.',
               )
             else
-              ...recentNotes.map((note) => _buildNoteCard(note)).toList(),
+              ...filteredNotes.map((note) => _buildNoteCard(note)),
           ],
         ),
       );
@@ -732,29 +737,39 @@ class StudentHomeView extends GetView<StudentHomeController> {
   }
 
   Widget _buildTrimestreCard(int trimestre) {
-    return Obx(() => Container(
+    return Obx(() {
+      final isSelected = controller.selectedTrimestre.value == trimestre;
+      return InkWell(
+        onTap: () => controller.selectTrimestre(trimestre),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                AppColors.primary.withOpacity(0.1),
-                AppColors.primary.withOpacity(0.05),
-              ],
+              colors: isSelected
+                  ? [AppColors.primary, AppColors.primaryDark]
+                  : [
+                      AppColors.primary.withOpacity(0.1),
+                      AppColors.primary.withOpacity(0.05),
+                    ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
-            border:
-                Border.all(color: AppColors.primary.withOpacity(0.3), width: 1),
+            border: Border.all(
+                color: AppColors.primary.withOpacity(isSelected ? 0.6 : 0.3),
+                width: isSelected ? 2 : 1),
           ),
           child: Column(
             children: [
               Text(
                 'T$trimestre',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: isSelected
+                      ? Colors.white.withOpacity(0.85)
+                      : AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -762,23 +777,27 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 controller.moyennesParTrimestre[trimestre]
                         ?.toStringAsFixed(2) ??
                     '0.00',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: isSelected ? Colors.white : AppColors.primary,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 '/ 20',
                 style: TextStyle(
                   fontSize: 10,
-                  color: AppColors.textHint,
+                  color: isSelected
+                      ? Colors.white.withOpacity(0.7)
+                      : AppColors.textHint,
                 ),
               ),
             ],
           ),
-        ));
+        ),
+      );
+    });
   }
 
   Widget _buildSectionTitle(String title) {
@@ -2235,6 +2254,146 @@ class StudentHomeView extends GetView<StudentHomeController> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildBulletinTab() {
+    return Obx(() {
+      if (controller.bulletins.isEmpty) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text(
+              "Aucun bulletin n'a encore été publié pour vous.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            ),
+          ),
+        );
+      }
+      final sorted = [...controller.bulletins]
+        ..sort((a, b) => b.periode.compareTo(a.periode));
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle('Mes Bulletins'),
+            const SizedBox(height: 16),
+            ...sorted.map((b) => _buildBulletinCard(b)),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildBulletinCard(BulletinModel bulletin) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: AppColors.primary.withOpacity(0.15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      bulletin.periodeLabel,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    if (bulletin.anneeScolaire.isNotEmpty)
+                      Text(
+                        bulletin.anneeScolaire,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12),
+                      ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    bulletin.moyenneGenerale.toStringAsFixed(2),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  if (bulletin.rang != null)
+                    Text('Rang: ${bulletin.rang}',
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...bulletin.lignes.map((ligne) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                        child: Text(ligne.matiere,
+                            style: const TextStyle(fontSize: 13))),
+                    Text(ligne.moyenneMatiere.toStringAsFixed(2),
+                        style: const TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              )),
+          if (bulletin.appreciation != null &&
+              bulletin.appreciation!.trim().isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              bulletin.appreciation!,
+              style: const TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: AppColors.textSecondary,
+                  fontSize: 13),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Obx(() => TextButton.icon(
+                  onPressed: controller.isDownloadingBulletin.value
+                      ? null
+                      : () => controller.downloadBulletinPdf(bulletin),
+                  icon: controller.isDownloadingBulletin.value
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.picture_as_pdf, size: 18),
+                  label: const Text('Télécharger le PDF'),
+                )),
+          ),
+        ],
+      ),
     );
   }
 
