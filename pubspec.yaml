@@ -12,6 +12,11 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.6.6
+  dio: ^5.4.0
+  shared_preferences: ^2.2.2
+  sqflite: ^2.3.2
+  path: ^1.9.0
+  connectivity_plus: ^5.0.2
 
 dev_dependencies:
   flutter_test:

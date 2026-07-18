@@ -1,34 +1,45 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../core/constants/app_constants.dart';
 import '../models/user.dart';
 import 'api_service.dart';
 
-/// Authentication service
 class AuthService {
   final ApiService apiService;
 
   AuthService({required this.apiService});
 
-  Future<User> login(String email, String password) async {
-    // Implement login logic
-    await Future.delayed(const Duration(seconds: 1)); // Simulate API call
-    return User(
-      id: '1',
-      email: email,
-      name: 'Test User',
-    );
-  }
+  Future<User> login(String login, String password) async {
+    final data = await apiService.post('/api/auth/login', {
+      'login': login,
+      'password': password,
+    });
 
-  Future<User> register(String email, String password, String name) async {
-    // Implement registration logic
-    await Future.delayed(const Duration(seconds: 1)); // Simulate API call
-    return User(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      email: email,
-      name: name,
-    );
+    final token = data['token'] as String;
+    final user = User.fromLoginResponse(data as Map<String, dynamic>);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConstants.tokenKey, token);
+    await prefs.setString(AppConstants.userKey, jsonEncode(user.toJson()));
+
+    return user;
   }
 
   Future<void> logout() async {
-    // Implement logout logic
-    await Future.delayed(const Duration(milliseconds: 500));
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(AppConstants.tokenKey);
+    await prefs.remove(AppConstants.userKey);
+  }
+
+  Future<User?> getSavedUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(AppConstants.userKey);
+    if (raw == null) return null;
+    return User.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+  }
+
+  Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey(AppConstants.tokenKey);
   }
 }

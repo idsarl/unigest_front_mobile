@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../models/user.dart';
 import '../../../services/auth_service.dart';
 
 class AuthController extends GetxController {
@@ -12,31 +14,42 @@ class AuthController extends GetxController {
   final RxnString _error = RxnString();
   String? get error => _error.value;
 
-  final RxBool _isAuthenticated = false.obs;
-  bool get isAuthenticated => _isAuthenticated.value;
+  final Rx<User?> _user = Rx<User?>(null);
+  User? get user => _user.value;
+  bool get isAuthenticated => _user.value != null;
 
-  final RxnString _userEmail = RxnString();
-  String? get userEmail => _userEmail.value;
+  @override
+  void onInit() {
+    super.onInit();
+    _restoreSession();
+  }
 
-  Future<void> login(String email, String password) async {
+  Future<void> _restoreSession() async {
+    if (await authService.isLoggedIn()) {
+      _user.value = await authService.getSavedUser();
+      if (_user.value != null) {
+        Get.offAllNamed(AppConstants.homeRoute);
+      }
+    }
+  }
+
+  Future<void> login(String login, String password) async {
     _isLoading.value = true;
     _error.value = null;
 
     try {
-      final user = await authService.login(email, password);
-      _userEmail.value = user.email;
-      _isAuthenticated.value = true;
+      _user.value = await authService.login(login, password);
+      Get.offAllNamed(AppConstants.homeRoute);
     } catch (e) {
-      _error.value = 'Login failed: $e';
-      _isAuthenticated.value = false;
+      _error.value = e.toString();
     } finally {
       _isLoading.value = false;
     }
   }
 
-  void logout() {
-    _isAuthenticated.value = false;
-    _userEmail.value = null;
-    _error.value = null;
+  Future<void> logout() async {
+    await authService.logout();
+    _user.value = null;
+    Get.offAllNamed(AppConstants.loginRoute);
   }
 }
