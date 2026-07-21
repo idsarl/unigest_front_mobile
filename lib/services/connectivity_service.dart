@@ -63,11 +63,11 @@ class ConnectivityService extends GetxService {
 
         switch (method) {
           case 'POST':
-            await _api.post(endpoint, body);
+            await _api.post(endpoint, body: body);
           case 'PATCH':
-            await _api.patch(endpoint, body);
+            await _api.patch(endpoint, body: body);
           case 'PUT':
-            await _api.put(endpoint, body);
+            await _api.put(endpoint, body: body);
         }
         await DatabaseHelper.markActionSynced(action['id'] as int);
         synced++;

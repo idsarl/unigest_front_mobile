@@ -21,7 +21,7 @@ class AppelService {
   }
 
   Future<void> soumettreAppels(int seanceId, List<AppelEntry> appels) async {
-    await api.post('/api/appels/batch', {
+    await api.post('/api/appels/batch', body: {
       'seanceId': seanceId,
       'appels': appels.map((a) => a.toJson()).toList(),
     });
@@ -29,6 +29,10 @@ class AppelService {
 
   Future<void> modifierAppel(int appelId, String statut,
       {int retard = 0, String? motif}) async {
-    await api.put('/api/appels/$appelId', null);
+    await api.put('/api/appels/$appelId', body: {
+      'statut': statut,
+      'retard': retard,
+      if (motif != null) 'motif': motif,
+    });
   }
 }

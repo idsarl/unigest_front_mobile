@@ -15,7 +15,7 @@ class NoteService {
   Future<List<NoteModel>> soumettreNotes(List<NoteBatchItem> notes) async {
     final data = await api.post(
       '/api/notes/batch',
-      notes.map((n) => n.toJson()).toList(),
+      body: notes.map((n) => n.toJson()).toList(),
     );
     return (data as List<dynamic>)
         .map((e) => NoteModel.fromJson(e as Map<String, dynamic>))
@@ -23,7 +23,10 @@ class NoteService {
   }
 
   Future<NoteModel> modifierNote(int noteId, double valeur, String type) async {
-    final data = await api.put('/api/notes/$noteId?valeur=$valeur&type=$type', null);
+    final data = await api.put(
+      '/api/notes/$noteId',
+      query: {'valeur': valeur.toString(), 'type': type},
+    );
     return NoteModel.fromJson(data as Map<String, dynamic>);
   }
 
@@ -31,7 +34,7 @@ class NoteService {
       int etudiantId, int periode, String typePeriode) async {
     final data = await api.get(
       '/api/notes/etudiant/$etudiantId/moyenne',
-      params: {'periode': periode.toString(), 'typePeriode': typePeriode},
+      query: {'periode': periode.toString(), 'typePeriode': typePeriode},
     );
     return (data as num).toDouble();
   }

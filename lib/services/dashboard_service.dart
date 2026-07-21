@@ -28,6 +28,7 @@ class DashboardService {
     return SeanceModel.fromJson(data as Map<String, dynamic>);
   }
 
+
   Future<List<AffectationModel>> getAffectations(int enseignantId) async {
     final data = await api.get('/api/affectations/enseignant/$enseignantId');
     return (data as List<dynamic>)

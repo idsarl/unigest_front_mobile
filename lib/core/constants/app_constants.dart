@@ -1,11 +1,17 @@
-class AppConstants {
-  static const String appName = 'UniGest';
+import 'package:flutter/foundation.dart';
 
-  // Android emulator → http://10.0.2.2:5400
-  // iOS simulator / macOS → http://localhost:5400
-  // Appareil réel → IP locale de la machine, ex. http://192.168.1.x:5400
-  static const String baseUrl = 'http://192.168.1.22:5400';
-  // static const String baseUrl = 'http://localhost:5400';
+class AppConstants {
+  static const String appName = 'unigest_app';
+
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:5400';
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://192.168.1.29:5400';
+    } else {
+      return 'http://localhost:5400';
+    }
+  }
 
   static const String tokenKey = 'auth_token';
   static const String userKey = 'user_data';

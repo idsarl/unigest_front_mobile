@@ -57,7 +57,7 @@ class EmploiService {
       int enseignantId, String date) async {
     final data = await api.get(
       '/api/emplois-du-temps/enseignant/$enseignantId/date',
-      params: {'date': date},
+      query: {'date': date},
     );
     return (data as List<dynamic>)
         .map((e) => EmploiModel.fromJson(e as Map<String, dynamic>))
