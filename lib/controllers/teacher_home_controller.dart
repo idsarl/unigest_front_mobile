@@ -263,8 +263,6 @@ class TeacherHomeController extends GetxController {
 
       // 4. Moyennes matière en cours
       final moyenneData = await _repo.getMoyenneMatiere();
-      print('=== DEBUG Moyenne Matiere ===');
-      print('moyenneData: $moyenneData');
       if (moyenneData != null) {
         moyenneMatiere.value = moyenneData;
       } else {
@@ -289,12 +287,10 @@ class TeacherHomeController extends GetxController {
       return;
     }
     try {
-      final result = await _repo.demarrerSeance(affectationId, matiere);
-      if (result != null) {
-        await fetchDashboardData();
-        Get.snackbar('Succès', 'Séance démarrée !',
-            snackPosition: SnackPosition.BOTTOM);
-      }
+      await _repo.demarrerSeance(affectationId, matiere);
+      await fetchDashboardData();
+      Get.snackbar('Succès', 'Séance démarrée !',
+          snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
       Get.snackbar('Erreur', 'Impossible de démarrer la séance : $e',
           snackPosition: SnackPosition.BOTTOM);
@@ -313,12 +309,10 @@ class TeacherHomeController extends GetxController {
       return;
     }
     try {
-      final result = await _repo.terminerSeance(seanceId);
-      if (result != null) {
-        await fetchDashboardData();
-        Get.snackbar('Succès', 'Séance terminée !',
-            snackPosition: SnackPosition.BOTTOM);
-      }
+      await _repo.terminerSeance(seanceId);
+      await fetchDashboardData();
+      Get.snackbar('Succès', 'Séance terminée !',
+          snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
       Get.snackbar('Erreur', 'Impossible de terminer la séance : $e',
           snackPosition: SnackPosition.BOTTOM);

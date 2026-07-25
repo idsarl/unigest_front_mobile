@@ -125,7 +125,7 @@ class ParentController extends GetxController {
             },
           );
         },
-        onWebSocketError: (dynamic error) => print('WebSocket error: $error'),
+        onWebSocketError: (dynamic error) {},
       ),
     );
     _stompClient?.activate();
@@ -162,7 +162,7 @@ class ParentController extends GetxController {
       // Refresh conversations list
       loadConversations();
     } catch (e) {
-      print('Error parsing message: $e');
+      // ignore
     }
   }
 

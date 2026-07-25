@@ -2862,8 +2862,25 @@ class StudentHomeView extends GetView<StudentHomeController> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: () {
-          controller.logout();
+        onPressed: () async {
+          final confirmed = await Get.dialog<bool>(
+            AlertDialog(
+              title: const Text('Déconnexion'),
+              content: const Text('Voulez-vous vraiment vous déconnecter ?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(result: false),
+                  child: const Text('Annuler'),
+                ),
+                TextButton(
+                  onPressed: () => Get.back(result: true),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: const Text('Déconnecter'),
+                ),
+              ],
+            ),
+          );
+          if (confirmed == true) controller.logout();
         },
         icon: const Icon(Icons.logout, size: 20),
         label: const Text(

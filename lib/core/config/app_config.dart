@@ -22,7 +22,7 @@ class AppConfig {
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return '10.0.2.2';
+        return '192.168.1.29';
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:
       case TargetPlatform.linux:

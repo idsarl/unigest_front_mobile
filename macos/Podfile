@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+platform :osx, '10.14'
+=======
 platform :osx, '10.15'
+>>>>>>> 1456d4f458822efa7202caea67aea2fb8631f55c
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -28,6 +32,10 @@ flutter_macos_podfile_setup
 
 target 'Runner' do
   use_frameworks!
+<<<<<<< HEAD
+  use_modular_headers!
+=======
+>>>>>>> 1456d4f458822efa7202caea67aea2fb8631f55c
 
   flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do

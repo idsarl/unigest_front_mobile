@@ -82,7 +82,7 @@ class TeacherRepository {
     try {
       await _api.post('/api/seances/generer-jour');
     } catch (e) {
-      print('Erreur génération séances: $e');
+      // ignore
     }
   }
 

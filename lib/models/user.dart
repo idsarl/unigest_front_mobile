@@ -1,37 +1,48 @@
-/// User model for MVC pattern
 class User {
   final String id;
-  final String email;
-  final String name;
-  final String? profileImage;
+  final String nom;
+  final String prenom;
+  final String role;
+  final String? enseignantId;
 
   User({
     required this.id,
-    required this.email,
-    required this.name,
-    this.profileImage,
+    required this.nom,
+    required this.prenom,
+    required this.role,
+    this.enseignantId,
   });
+
+  String get fullName => '$prenom $nom';
+  bool get isEnseignant => role == 'ENSEIGNANT';
+  bool get isAdmin => role == 'ADMIN';
+  bool get isComptable => role == 'COMPTABLE';
+
+  factory User.fromLoginResponse(Map<String, dynamic> json) {
+    return User(
+      id: json['id']?.toString() ?? '',
+      nom: json['nom'] ?? '',
+      prenom: json['prenom'] ?? '',
+      role: json['role'] ?? '',
+      enseignantId: json['enseignantId']?.toString(),
+    );
+  }
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id']?.toString() ?? '',
-      email: json['email'] ?? '',
-      name: json['name'] ?? '',
-      profileImage: json['profileImage'],
+      nom: json['nom'] ?? '',
+      prenom: json['prenom'] ?? '',
+      role: json['role'] ?? '',
+      enseignantId: json['enseignantId']?.toString(),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'name': name,
-      'profileImage': profileImage,
-    };
-  }
-
-  @override
-  String toString() {
-    return 'User(id: $id, email: $email, name: $name)';
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'nom': nom,
+        'prenom': prenom,
+        'role': role,
+        'enseignantId': enseignantId,
+      };
 }

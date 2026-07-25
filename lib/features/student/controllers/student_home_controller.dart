@@ -274,7 +274,7 @@ class StudentHomeController extends BaseController {
     try {
       await StorageService.logout();
       final authController = Get.find<AuthController>();
-      authController.logout();
+      await authController.logout();
     } catch (e) {
       Get.offAllNamed('/auth');
     }

@@ -8,16 +8,25 @@ class AuthService {
   final ApiService _api = ApiService.instance;
   final AppSession _session = AppSession.instance;
 
-  Future<User> login(String email, String password) async {
-    final data = await _api.post('/api/auth/login', body: {
-      'login': email.trim(),
-      'password': password,
-    }, queueIfOffline: false);
+  Future<User> login(String login, String password) async {
+    final raw = await _api.post('/api/auth/login',
+        body: {'login': login, 'password': password},
+        queueIfOffline: false);
 
-    final token = data['token']?.toString();
-    if (token == null || token.isEmpty) {
-      throw Exception('Token manquant dans la réponse');
+    if (raw is! Map) {
+      throw Exception('Réponse du serveur invalide');
     }
+    final data = Map<String, dynamic>.from(raw);
+
+    // Le token peut s'appeler token, accessToken ou jwt selon le backend
+    final token = data['token']?.toString() ??
+        data['accessToken']?.toString() ??
+        data['jwt']?.toString() ?? '';
+    if (token.isEmpty) {
+      throw Exception('Token absent de la réponse du serveur');
+    }
+
+    final user = User.fromLoginResponse(data);
 
     final prenom = data['prenom']?.toString() ?? '';
     final nom = data['nom']?.toString() ?? '';
@@ -25,34 +34,34 @@ class AuthService {
     final displayName =
         '$prenom $nom'.trim().isEmpty ? 'Utilisateur' : '$prenom $nom';
 
+    // L'identifiant peut s'appeler id, enseignantId ou etudiantId
     final userId = int.tryParse(data['id']?.toString() ?? '') ??
-        int.tryParse(data['enseignantId']?.toString() ?? '');
+        int.tryParse(data['enseignantId']?.toString() ?? '') ??
+        int.tryParse(data['etudiantId']?.toString() ?? '') ??
+        int.tryParse(data['userId']?.toString() ?? '');
     _session.setFromLogin(
       authToken: token,
       id: userId != null && userId > 0 ? userId : _session.teacherId,
       displayName: displayName,
-      email: email.trim(),
+      email: login.trim(),
       userRole: role,
     );
 
     try {
       await _loadCurrentUser();
-    } catch (_) {
-      // /me optionnel si le profil est déjà dans la réponse login
-    }
+    } catch (_) {}
 
     core_api.ApiService.setToken(token);
     await _session.persist();
 
-    return User(
-      id: _session.teacherId.toString(),
-      email: _session.teacherEmail,
-      name: _session.teacherName,
-    );
+    // Vider les requêtes d'une session précédente pour éviter les 403
+    await _api.clearQueuedRequests();
+
+    return user;
   }
 
   Future<User> register(String email, String password, String name) async {
-    throw UnsupportedError('Inscription non exposée par l’API mobile actuelle');
+    throw UnsupportedError('Inscription non exposée par l\'API mobile actuelle');
   }
 
   Future<bool> restoreSession() async {
@@ -72,22 +81,26 @@ class AuthService {
 
   Future<void> _loadCurrentUser() async {
     final me = await _api.get('/api/auth/me');
-    if (me is! Map<String, dynamic>) return;
+    if (me is! Map) return;
+    final meData = Map<String, dynamic>.from(me);
 
-    final id = int.tryParse(me['id']?.toString() ?? '') ??
-        int.tryParse(me['idUser']?.toString() ?? '');
+    final id = int.tryParse(meData['id']?.toString() ?? '') ??
+        int.tryParse(meData['idUser']?.toString() ?? '') ??
+        int.tryParse(meData['etudiantId']?.toString() ?? '') ??
+        int.tryParse(meData['enseignantId']?.toString() ?? '');
     if (id != null && id > 0) {
       _session.teacherId = id;
     }
-    final email = me['email']?.toString();
+    final email = meData['email']?.toString();
     if (email != null && email.isNotEmpty) {
       _session.teacherEmail = email;
     }
-    final role = me['role']?.toString();
+    final role = meData['role']?.toString();
     if (role != null) _session.role = role;
   }
 
   Future<void> logout() async {
+    await _api.clearQueuedRequests();
     core_api.ApiService.clearToken();
     await _session.clearStorage();
   }

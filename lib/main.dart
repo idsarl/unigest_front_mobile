@@ -15,6 +15,8 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
+
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
@@ -26,9 +28,11 @@ Future<void> main() async {
   await AppSession.instance.restore();
 
   // Ecoute les changements de connectivité
-  Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
-    if (!results.contains(ConnectivityResult.none)) {
-      // Lorsque la connexion revient, synchronise les requêtes en attente
+  Connectivity().onConnectivityChanged.listen((dynamic result) {
+    final connected = result is List
+        ? !result.contains(ConnectivityResult.none)
+        : result != ConnectivityResult.none;
+    if (connected) {
       ApiService.instance.syncQueuedRequests();
     }
   });

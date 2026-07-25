@@ -106,6 +106,12 @@ class HiveService {
     await box.delete(requestId);
   }
 
+  /// Vide toute la file d'attente (à appeler à la connexion/déconnexion)
+  Future<void> clearQueuedRequests() async {
+    final box = Hive.box(_boxQueuedRequests);
+    await box.clear();
+  }
+
   // --- Conversations et messages ---
 
   /// Sauvegarde une conversation

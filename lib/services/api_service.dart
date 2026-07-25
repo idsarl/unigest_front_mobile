@@ -162,6 +162,45 @@ class ApiService {
     }
   }
 
+  Future<dynamic> patch(
+    String endpoint, {
+    dynamic body,
+    Map<String, String>? query,
+    bool queueIfOffline = true,
+  }) async {
+    final hasConnection = await isConnected;
+
+    if (!hasConnection && queueIfOffline) {
+      await _hive.addQueuedRequest({
+        'method': 'PATCH',
+        'endpoint': endpoint,
+        'body': body,
+        'query': query,
+      });
+      return {'success': true, 'queued': true};
+    }
+
+    try {
+      final response = await http.patch(
+        _uri(endpoint, query),
+        headers: _headers(),
+        body: body == null ? null : json.encode(body),
+      );
+      return _handleResponse(response);
+    } catch (e) {
+      if (queueIfOffline) {
+        await _hive.addQueuedRequest({
+          'method': 'PATCH',
+          'endpoint': endpoint,
+          'body': body,
+          'query': query,
+        });
+        return {'success': true, 'queued': true};
+      }
+      rethrow;
+    }
+  }
+
   Future<dynamic> delete(String endpoint,
       {Map<String, String>? query, bool queueIfOffline = true}) async {
     final hasConnection = await isConnected;
@@ -222,11 +261,18 @@ class ApiService {
         // Supprime la requête de la file une fois traitée
         await _hive.removeQueuedRequest(req['id'] as String);
       } catch (e) {
-        print('Erreur synchronisation requête ${req['id']}: $e');
-        // On continue avec la prochaine requête
+        final msg = e.toString();
+        // 401/403 = jamais autorisé pour cet utilisateur : supprimer définitivement
+        if (msg.contains('401') || msg.contains('403')) {
+          await _hive.removeQueuedRequest(req['id'] as String);
+        }
+        // autre erreur réseau : garder pour la prochaine tentative
       }
     }
   }
+
+  /// Vide la file des requêtes en attente (à appeler à la connexion/déconnexion)
+  Future<void> clearQueuedRequests() => _hive.clearQueuedRequests();
 
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode == 204) return {};

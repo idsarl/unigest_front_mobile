@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import '../../../services/auth_service.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../models/user.dart';
+import '../../../services/auth_service.dart';
 import '../../../core/session/app_session.dart';
 
 class AuthController extends GetxController {
@@ -22,6 +23,16 @@ class AuthController extends GetxController {
   final RxInt userId = 0.obs;
   final RxString userName = ''.obs;
   final RxString userPrenom = ''.obs;
+
+  User? get user {
+    if (!isAuthenticated.value) return null;
+    return User(
+      id: userId.value.toString(),
+      nom: userName.value,
+      prenom: userPrenom.value,
+      role: userRole.value,
+    );
+  }
 
   @override
   void onInit() {
@@ -68,12 +79,24 @@ class AuthController extends GetxController {
       await authService.login(emailVal, passwordVal);
       _syncUserFields();
       isAuthenticated.value = true;
+      _navigateAfterLogin();
     } catch (e) {
       error.value = _formatError(e);
       authError.value = error.value;
       isAuthenticated.value = false;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void _navigateAfterLogin() {
+    final role = AppSession.instance.role.toUpperCase();
+    if (role == 'PARENT') {
+      Get.offAllNamed('/parent-home');
+    } else if (role == 'ETUDIANT' || role == 'ELEVE' || role == 'STUDENT') {
+      Get.offAllNamed('/student-home');
+    } else {
+      Get.offAllNamed('/teacher-home');
     }
   }
 
@@ -88,6 +111,7 @@ class AuthController extends GetxController {
     userRole.value = '';
     userId.value = 0;
     isAuthenticated.value = false;
+    Get.offAllNamed('/auth');
   }
 
   String _formatError(Object e) {

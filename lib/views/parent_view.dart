@@ -330,9 +330,6 @@ class _ParentViewState extends State<ParentView>
                   itemCount: msgs.length,
                   itemBuilder: (context, index) {
                     final m = msgs[index];
-                    print('=== Message ${m['id']} ===');
-                    print('Contenu: ${m['contenu']}');
-                    print('Fichiers: ${m['fichiers']}');
                     final mine = m['mine'] == true;
                     final fichiers = m['fichiers'] as List? ?? [];
                     return Align(
@@ -665,9 +662,6 @@ class _ParentViewState extends State<ParentView>
   }
 
   Widget _buildFileItem(String fileUrl) {
-    // Debug print
-    print('=== File URL: $fileUrl ===');
-
     // Try multiple ways to extract the filename
     String fileName = "Document";
     String extension = "";
@@ -703,13 +697,11 @@ class _ParentViewState extends State<ParentView>
       // Clean extension
       extension = extension.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
     } catch (e) {
-      print('Error parsing filename: $e');
+      // ignore
     }
 
     // Format file size (we'll use placeholder for now)
     const fileSize = "14 Ko";
-
-    print('=== Extracted: fileName=$fileName, extension=$extension ===');
 
     return InkWell(
       onTap: () => _downloadAndOpenFile(fileUrl, fileName),
@@ -717,7 +709,7 @@ class _ParentViewState extends State<ParentView>
         margin: const EdgeInsets.only(top: 4, bottom: 4),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.04),
+          color: Colors.black.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -729,7 +721,7 @@ class _ParentViewState extends State<ParentView>
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: _getFileColor(extension).withOpacity(0.15),
+                color: _getFileColor(extension).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -760,7 +752,7 @@ class _ParentViewState extends State<ParentView>
                   const SizedBox(height: 4),
                   Text(
                     "${extension.toUpperCase()} • $fileSize",
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.black54,
                     ),
