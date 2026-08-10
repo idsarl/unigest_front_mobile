@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimens.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/skeleton_loader.dart';
 import '../../../models/seance.dart';
+import '../../../widgets/common/state_widgets.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../controllers/dashboard_controller.dart';
 
@@ -27,7 +31,8 @@ class DashboardView extends StatelessWidget {
               flexibleSpace: FlexibleSpaceBar(
                 title: Obx(() => Text(
                       'Bonjour, ${auth.user?.prenom ?? ''}',
-                      style: const TextStyle(fontSize: 16),
+                      style: AppTextStyles.bodyLarge
+                          .copyWith(color: Colors.white),
                     )),
               ),
               actions: [
@@ -65,7 +70,7 @@ class DashboardView extends StatelessWidget {
                             label: 'Affectations',
                             value: s.totalAffectations,
                             icon: Icons.school,
-                            color: Colors.indigo,
+                            color: AppColors.primary,
                             onTap: () =>
                                 Get.toNamed(AppConstants.affectationsRoute),
                           ),
@@ -76,7 +81,7 @@ class DashboardView extends StatelessWidget {
                             label: 'Effectuées',
                             value: s.seancesEffectuees,
                             icon: Icons.check_circle,
-                            color: Colors.green,
+                            color: AppColors.success,
                             onTap: () =>
                                 Get.toNamed(AppConstants.seancesRoute),
                           ),
@@ -87,7 +92,7 @@ class DashboardView extends StatelessWidget {
                             label: 'Total séances',
                             value: s.totalSeances,
                             icon: Icons.event,
-                            color: Colors.orange,
+                            color: AppColors.warning,
                             onTap: () =>
                                 Get.toNamed(AppConstants.seancesRoute),
                           ),
@@ -155,14 +160,14 @@ class _StatCard extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.m),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(height: 8),
+              Icon(icon, color: color, size: AppIconSize.m),
+              const SizedBox(height: AppSpacing.s),
               Text(
                 '$value',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -172,7 +177,7 @@ class _StatCard extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
-                      ?.copyWith(color: Colors.grey[600])),
+                      ?.copyWith(color: AppColors.textSecondary)),
             ],
           ),
         ),
@@ -195,17 +200,17 @@ class _SeanceCard extends StatelessWidget {
       Color statusColor;
       switch (seance.statut) {
         case 'EN_COURS':
-          statusColor = Colors.green;
+          statusColor = AppColors.success;
         case 'TERMINEE':
-          statusColor = Colors.grey;
+          statusColor = AppColors.textSecondary;
         default:
-          statusColor = Colors.orange;
+          statusColor = AppColors.warning;
       }
 
       return Card(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: AppSpacing.s),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.m),
           child: Row(
             children: [
               Container(
@@ -216,19 +221,16 @@ class _SeanceCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.m),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(seance.matiere,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(seance.matiere, style: AppTextStyles.titleMedium),
                     Text('${seance.classe} · ${seance.filiere}',
-                        style: TextStyle(
-                            fontSize: 12, color: Colors.grey[600])),
+                        style: AppTextStyles.caption),
                     Text('${seance.heureDebut} – ${seance.heureFin}',
-                        style: TextStyle(
-                            fontSize: 12, color: Colors.grey[600])),
+                        style: AppTextStyles.caption),
                   ],
                 ),
               ),
@@ -274,7 +276,7 @@ class _ActionButton extends StatelessWidget {
     if (seance.isTerminee) {
       return TextButton.icon(
         onPressed: onAppel,
-        icon: const Icon(Icons.how_to_reg, size: 16),
+        icon: const Icon(Icons.how_to_reg, size: AppIconSize.s),
         label: const Text('Appel'),
       );
     }
@@ -284,17 +286,15 @@ class _ActionButton extends StatelessWidget {
         children: [
           OutlinedButton.icon(
             onPressed: onAppel,
-            icon: const Icon(Icons.how_to_reg, size: 14),
+            icon: const Icon(Icons.how_to_reg, size: AppIconSize.s),
             label: const Text('Appel'),
-            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           FilledButton.tonal(
             onPressed: onArreter,
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              backgroundColor: Colors.red[50],
-              foregroundColor: Colors.red,
+              backgroundColor: AppColors.error.withAlpha(20),
+              foregroundColor: AppColors.error,
             ),
             child: const Text('Arrêter'),
           ),
@@ -303,8 +303,6 @@ class _ActionButton extends StatelessWidget {
     }
     return FilledButton(
       onPressed: seance.isPlanifiee ? onDemarrer : null,
-      style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4)),
       child: const Text('Démarrer'),
     );
   }
@@ -315,18 +313,9 @@ class _EmptySeances extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        child: Column(
-          children: [
-            Icon(Icons.event_available, size: 48, color: Colors.grey[400]),
-            const SizedBox(height: 8),
-            Text('Aucune séance aujourd\'hui',
-                style: TextStyle(color: Colors.grey[500])),
-          ],
-        ),
-      ),
+    return const EmptyWidget(
+      icon: Icons.event_available,
+      title: 'Aucune séance aujourd\'hui',
     );
   }
 }

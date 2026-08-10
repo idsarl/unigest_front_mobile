@@ -12,6 +12,7 @@ import '../controllers/note_controller.dart';
 import '../controllers/schedule_controller.dart';
 import '../controllers/parent_controller.dart';
 import 'parent_home_view.dart';
+import '../core/theme/app_colors.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -45,14 +46,14 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final pages = isTeacher ? _teacherPages : _parentPages;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
       body: pages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border(
             top: BorderSide(
-              color: Colors.grey.shade300,
+              color: AppColors.divider,
               width: 1,
             ),
           ),
@@ -61,8 +62,8 @@ class _MainLayoutState extends State<MainLayout> {
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
           elevation: 0,
-          selectedItemColor: const Color(0xFF6C5CE7),
-          unselectedItemColor: Colors.grey,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.textSecondary,
           currentIndex: _currentIndex,
           onTap: (index) {
             setState(() {

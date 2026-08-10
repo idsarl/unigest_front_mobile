@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Gestionnaire d'erreurs centralisé
 /// Permet de normaliser la gestion des erreurs dans toute l'application
 class AppException implements Exception {
@@ -32,27 +34,27 @@ class TimeoutException extends AppException {
 }
 
 class UnauthorizedException extends AppException {
-  UnauthorizedException()
+  UnauthorizedException({String? message})
       : super(
-          message: 'Non autorisé',
+          message: message ?? 'Non autorisé',
           details: 'Votre session a expiré. Veuillez vous reconnecter.',
           statusCode: 401,
         );
 }
 
 class ForbiddenException extends AppException {
-  ForbiddenException()
+  ForbiddenException({String? message})
       : super(
-          message: 'Accès refusé',
+          message: message ?? 'Accès refusé',
           details: 'Vous n\'avez pas les permissions nécessaires.',
           statusCode: 403,
         );
 }
 
 class NotFoundException extends AppException {
-  NotFoundException()
+  NotFoundException({String? message})
       : super(
-          message: 'Ressource non trouvée',
+          message: message ?? 'Ressource non trouvée',
           details: 'La ressource demandée n\'existe pas.',
           statusCode: 404,
         );
@@ -70,7 +72,7 @@ class ServerException extends AppException {
 class HttpException extends AppException {
   HttpException(int statusCode, String body)
       : super(
-          message: 'Erreur HTTP $statusCode',
+          message: ErrorHandler.extractMessage(body) ?? 'Erreur HTTP $statusCode',
           details: body,
           statusCode: statusCode,
         );
@@ -131,28 +133,46 @@ class ErrorHandler {
   }
 
   /// Crée une exception non autorisée
-  static UnauthorizedException createUnauthorizedException() {
-    return UnauthorizedException();
+  static UnauthorizedException createUnauthorizedException({String? body}) {
+    return UnauthorizedException(message: body == null ? null : extractMessage(body));
   }
 
   /// Crée une exception accès refusé
-  static ForbiddenException createForbiddenException() {
-    return ForbiddenException();
+  static ForbiddenException createForbiddenException({String? body}) {
+    return ForbiddenException(message: body == null ? null : extractMessage(body));
   }
 
   /// Crée une exception non trouvée
-  static NotFoundException createNotFoundException() {
-    return NotFoundException();
+  static NotFoundException createNotFoundException({String? body}) {
+    return NotFoundException(message: body == null ? null : extractMessage(body));
   }
 
   /// Crée une exception serveur
-  static ServerException createServerException() {
-    return ServerException();
+  static ServerException createServerException({String? body}) {
+    return ServerException(message: body == null ? null : extractMessage(body));
   }
 
   /// Crée une exception HTTP personnalisée
   static HttpException createHttpException(int statusCode, String body) {
     return HttpException(statusCode, body);
+  }
+
+  /// Extrait le champ `message` d'une réponse JSON du backend
+  /// (`GlobalExceptionHandler` renvoie systématiquement `{"message": "..."}`).
+  /// Retourne `null` si le corps n'est pas un JSON exploitable, pour laisser
+  /// l'appelant retomber sur un message générique.
+  static String? extractMessage(String body) {
+    if (body.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map && decoded['message'] is String) {
+        final message = decoded['message'] as String;
+        return message.isEmpty ? null : message;
+      }
+    } catch (_) {
+      // Corps non-JSON (ex. page d'erreur HTML) : pas de message exploitable.
+    }
+    return null;
   }
 
   /// Retourne un message utilisateur-friendly pour une exception

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/parent_profile_controller.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_dimens.dart';
 import '../../../models/child_model.dart';
+import '../../../widgets/common/state_widgets.dart';
 
 class ParentProfileView extends GetView<ParentProfileController> {
   const ParentProfileView({super.key});
@@ -13,7 +16,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
       backgroundColor: AppColors.background,
       body: Obx(() {
         if (controller.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const LoadingWidget();
         }
 
         return RefreshIndicator(
@@ -81,10 +84,9 @@ class ParentProfileView extends GetView<ParentProfileController> {
                   child: Text(
                     _getInitials(
                         parent?.firstName ?? '', parent?.lastName ?? ''),
-                    style: const TextStyle(
+                    style: AppTextStyles.h1.copyWith(
                       color: Colors.white,
                       fontSize: 26,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -98,9 +100,8 @@ class ParentProfileView extends GetView<ParentProfileController> {
                       parent?.fullName ?? 'Profil parent',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: AppTextStyles.h1.copyWith(
                         fontSize: 25,
-                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
@@ -109,8 +110,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
                       parent?.email ?? '',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: AppTextStyles.bodyMedium.copyWith(
                         color: Colors.white.withValues(alpha: 0.86),
                       ),
                     ),
@@ -147,15 +147,11 @@ class ParentProfileView extends GetView<ParentProfileController> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 16),
+          Icon(icon, color: Colors.white, size: AppIconSize.s),
           const SizedBox(width: 7),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label.copyWith(color: Colors.white),
           ),
         ],
       ),
@@ -212,7 +208,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -229,31 +225,23 @@ class ParentProfileView extends GetView<ParentProfileController> {
             height: 34,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.s + 2),
             ),
-            child: Icon(icon, color: accent, size: 18),
+            child: Icon(icon, color: accent, size: AppIconSize.s + 2),
           ),
           const SizedBox(height: 12),
           Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: accent,
-            ),
+            style: AppTextStyles.h3.copyWith(fontSize: 19, color: accent),
           ),
           const SizedBox(height: 3),
           Text(
             label,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label.copyWith(fontSize: 11),
           ),
         ],
       ),
@@ -300,9 +288,9 @@ class ParentProfileView extends GetView<ParentProfileController> {
             height: 40,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.09),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
+            child: Icon(icon, color: AppColors.primary, size: AppIconSize.s + 4),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -311,22 +299,14 @@ class ParentProfileView extends GetView<ParentProfileController> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.label,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -342,11 +322,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
       icon: Icons.groups_2_outlined,
       trailing: Text(
         '${controller.children.length}',
-        style: const TextStyle(
-          color: AppColors.primary,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        style: AppTextStyles.titleMedium.copyWith(color: AppColors.primary),
       ),
       child: controller.children.isEmpty
           ? _buildEmptyChildren()
@@ -364,7 +340,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.l - 2),
         border: Border.all(color: AppColors.divider),
       ),
       child: Row(
@@ -379,9 +355,8 @@ class ParentProfileView extends GetView<ParentProfileController> {
             child: Center(
               child: Text(
                 _getInitials(child.firstName, child.lastName),
-                style: const TextStyle(
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.primary,
-                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -396,18 +371,14 @@ class ParentProfileView extends GetView<ParentProfileController> {
                   child.fullName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: AppTextStyles.titleMedium.copyWith(fontSize: 15),
                 ),
                 const SizedBox(height: 6),
                 Row(
                   children: [
                     const Icon(
                       Icons.school_outlined,
-                      size: 15,
+                      size: AppIconSize.s - 1,
                       color: AppColors.textSecondary,
                     ),
                     const SizedBox(width: 5),
@@ -416,11 +387,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
                         _fallback(child.className),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: AppTextStyles.label,
                       ),
                     ),
                   ],
@@ -434,13 +401,13 @@ class ParentProfileView extends GetView<ParentProfileController> {
             height: 32,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.s + 2),
               border: Border.all(color: AppColors.divider),
             ),
             child: const Icon(
               Icons.chevron_right,
               color: AppColors.textHint,
-              size: 22,
+              size: AppIconSize.m - 2,
             ),
           ),
         ],
@@ -454,30 +421,22 @@ class ParentProfileView extends GetView<ParentProfileController> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.l - 2),
         border: Border.all(color: AppColors.divider),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Icon(Icons.school_outlined, color: AppColors.primary, size: 30),
-          SizedBox(height: 10),
-          Text(
+          const Icon(Icons.school_outlined, color: AppColors.primary, size: AppIconSize.l - 2),
+          const SizedBox(height: 10),
+          const Text(
             'Aucun enfant rattaché',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.titleMedium,
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Text(
             'Les enfants associés à ce compte apparaîtront ici.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 13,
-              height: 1.35,
-            ),
+            style: AppTextStyles.bodySecondary.copyWith(fontSize: 13, height: 1.35),
           ),
         ],
       ),
@@ -521,7 +480,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
   Widget _buildSettingItem(IconData icon, String title, String subtitle) {
     return InkWell(
       onTap: () {},
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppRadius.m),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
@@ -531,9 +490,9 @@ class ParentProfileView extends GetView<ParentProfileController> {
               height: 40,
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.09),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.m),
               ),
-              child: Icon(icon, color: AppColors.primary, size: 20),
+              child: Icon(icon, color: AppColors.primary, size: AppIconSize.s + 4),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -542,19 +501,12 @@ class ParentProfileView extends GetView<ParentProfileController> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
+                    style: AppTextStyles.caption,
                   ),
                 ],
               ),
@@ -562,7 +514,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
             const Icon(
               Icons.chevron_right,
               color: AppColors.textHint,
-              size: 22,
+              size: AppIconSize.m - 2,
             ),
           ],
         ),
@@ -581,7 +533,7 @@ class ParentProfileView extends GetView<ParentProfileController> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l + 2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -600,19 +552,15 @@ class ParentProfileView extends GetView<ParentProfileController> {
                 height: 36,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(11),
+                  borderRadius: BorderRadius.circular(AppRadius.s + 3),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 19),
+                child: Icon(icon, color: AppColors.primary, size: AppIconSize.s + 3),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: AppTextStyles.h3,
                 ),
               ),
               if (trailing != null) trailing,
@@ -658,21 +606,15 @@ class ParentProfileView extends GetView<ParentProfileController> {
             ),
           );
         },
-        icon: const Icon(Icons.logout, size: 20),
-        label: const Text(
-          'Déconnexion',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        icon: const Icon(Icons.logout, size: AppIconSize.s + 4),
+        label: const Text('Déconnexion'),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.error,
           foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(AppRadius.l - 2),
           ),
         ),
       ),

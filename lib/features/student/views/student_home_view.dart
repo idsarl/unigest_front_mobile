@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import '../controllers/student_home_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_dimens.dart';
 import '../../../models/notification_model.dart';
 import '../../../models/bulletin_model.dart';
+import '../../../widgets/common/state_widgets.dart';
 
 class StudentHomeView extends GetView<StudentHomeController> {
   const StudentHomeView({super.key});
@@ -19,7 +22,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const LoadingWidget();
               }
               return IndexedStack(
                 index: controller.currentIndex.value,
@@ -79,20 +82,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
                         children: [
                           const Text(
                             'Bienvenue',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
+                            style: AppTextStyles.bodySecondary,
                           ),
                           Text(
                             fullName.isNotEmpty ? fullName : 'Étudiant',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
+                            style: AppTextStyles.h2.copyWith(color: AppColors.primary),
                           ),
                         ],
                       );
@@ -102,12 +98,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.m),
                     ),
                     child: const Icon(
                       Icons.person,
                       color: AppColors.primary,
-                      size: 24,
+                      size: AppIconSize.m,
                     ),
                   ),
                 ],
@@ -154,14 +150,14 @@ class StudentHomeView extends GetView<StudentHomeController> {
     final isSelected = controller.currentIndex.value == index;
     return InkWell(
       onTap: () => controller.changeTab(index),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppRadius.m),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withOpacity(0.1)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.m),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -169,16 +165,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
             Icon(
               icon,
               color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              size: 24,
+              size: AppIconSize.m,
             ),
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 11,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
+              style: AppTextStyles.label.copyWith(color: isSelected ? AppColors.primary : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal),
             ),
           ],
         ),
@@ -269,7 +261,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
           end: Alignment.bottomRight,
           colors: [AppColors.primary, AppColors.primaryDark],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.22),
@@ -285,13 +277,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 58,
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppRadius.l),
               border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
             ),
             child: const Icon(
               Icons.school_outlined,
               color: Colors.white,
-              size: 30,
+              size: AppIconSize.l,
             ),
           ),
           const SizedBox(width: 14),
@@ -303,23 +295,14 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   'Bonjour ${_firstNameOnly(_profileName())}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 7),
                 Text(
                   _homeMotivationText(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    height: 1.35,
-                    color: Colors.white.withValues(alpha: 0.86),
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.86), fontWeight: FontWeight.w600, height: 1.35),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -349,20 +332,16 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 15),
+          Icon(icon, color: Colors.white, size: AppIconSize.s),
           const SizedBox(width: 6),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyles.label.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -379,7 +358,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -396,31 +375,23 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 34,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
-            child: Icon(icon, color: accent, size: 18),
+            child: Icon(icon, color: accent, size: AppIconSize.s),
           ),
           const SizedBox(height: 12),
           Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: accent,
-            ),
+            style: AppTextStyles.h2.copyWith(color: accent),
           ),
           const SizedBox(height: 3),
           Text(
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label,
           ),
         ],
       ),
@@ -444,7 +415,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -460,12 +431,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.info.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
             child: const Icon(
               Icons.schedule_outlined,
               color: AppColors.info,
-              size: 24,
+              size: AppIconSize.m,
             ),
           ),
           const SizedBox(width: 12),
@@ -473,35 +444,23 @@ class StudentHomeView extends GetView<StudentHomeController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Prochain cours',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppTextStyles.label.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   emploi.subject,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   '${emploi.dayOfWeek} • ${emploi.formattedTime} • ${emploi.classroom}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.label,
                 ),
               ],
             ),
@@ -532,7 +491,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -560,12 +519,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
                     height: 34,
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppRadius.m),
                     ),
                     child: Icon(
                       _getNotificationIcon(notification.type),
                       color: color,
-                      size: 18,
+                      size: AppIconSize.s,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -574,21 +533,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
                       notification.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w700),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     notification.formattedTime,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textHint,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.label.copyWith(color: AppColors.textHint),
                   ),
                 ],
               ),
@@ -609,21 +560,14 @@ class StudentHomeView extends GetView<StudentHomeController> {
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
-              fontSize: 18,
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         TextButton(
           onPressed: onTap,
           style: TextButton.styleFrom(
             foregroundColor: AppColors.primary,
-            textStyle: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
+            textStyle: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
           ),
           child: Text(action),
         ),
@@ -637,7 +581,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         border: Border.all(color: AppColors.divider),
       ),
       child: Row(
@@ -647,9 +591,9 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 42,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(13),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 22),
+            child: Icon(icon, color: AppColors.primary, size: AppIconSize.m),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -658,20 +602,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    height: 1.35,
-                  ),
+                  style: AppTextStyles.caption.copyWith(height: 1.35),
                 ),
               ],
             ),
@@ -741,7 +677,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       final isSelected = controller.selectedTrimestre.value == trimestre;
       return InkWell(
         onTap: () => controller.selectTrimestre(trimestre),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -755,7 +691,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.l),
             border: Border.all(
                 color: AppColors.primary.withOpacity(isSelected ? 0.6 : 0.3),
                 width: isSelected ? 2 : 1),
@@ -764,34 +700,23 @@ class StudentHomeView extends GetView<StudentHomeController> {
             children: [
               Text(
                 'T$trimestre',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isSelected
+                style: AppTextStyles.label.copyWith(color: isSelected
                       ? Colors.white.withOpacity(0.85)
-                      : AppColors.textSecondary,
-                ),
+                      : AppColors.textSecondary),
               ),
               const SizedBox(height: 8),
               Text(
                 controller.moyennesParTrimestre[trimestre]
                         ?.toStringAsFixed(2) ??
                     '0.00',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isSelected ? Colors.white : AppColors.primary,
-                ),
+                style: AppTextStyles.h2.copyWith(color: isSelected ? Colors.white : AppColors.primary),
               ),
               const SizedBox(height: 4),
               Text(
                 '/ 20',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: isSelected
+                style: AppTextStyles.caption.copyWith(color: isSelected
                       ? Colors.white.withOpacity(0.7)
-                      : AppColors.textHint,
-                ),
+                      : AppColors.textHint),
               ),
             ],
           ),
@@ -810,19 +735,15 @@ class StudentHomeView extends GetView<StudentHomeController> {
             AppColors.primary.withOpacity(0.05),
           ],
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
       ),
       child: Row(
         children: [
-          Icon(Icons.grading, color: AppColors.primary, size: 24),
+          Icon(Icons.grading, color: AppColors.primary, size: AppIconSize.m),
           const SizedBox(width: 8),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
+            style: AppTextStyles.h2.copyWith(color: AppColors.primary),
           ),
         ],
       ),
@@ -848,7 +769,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppRadius.l),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.primary.withOpacity(0.15),
@@ -865,26 +786,18 @@ class StudentHomeView extends GetView<StudentHomeController> {
                     children: [
                       Text(
                         note.subject,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: _getTypeColor(note.type).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(AppRadius.l),
                         ),
                         child: Text(
                           note.type.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: _getTypeColor(note.type),
-                          ),
+                          style: AppTextStyles.label.copyWith(color: _getTypeColor(note.type)),
                         ),
                       ),
                     ],
@@ -897,26 +810,18 @@ class StudentHomeView extends GetView<StudentHomeController> {
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.m),
                           ),
                           child: Column(
                             children: [
                               const Text(
                                 'NOTE',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
-                                ),
+                                style: AppTextStyles.label,
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 note.formattedValue,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                ),
+                                style: AppTextStyles.h2.copyWith(color: AppColors.primary),
                               ),
                             ],
                           ),
@@ -928,26 +833,18 @@ class StudentHomeView extends GetView<StudentHomeController> {
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: AppColors.warning.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.m),
                           ),
                           child: Column(
                             children: [
                               const Text(
                                 'COEFF',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
-                                ),
+                                style: AppTextStyles.label,
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 note.coefficient,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.warning,
-                                ),
+                                style: AppTextStyles.h2.copyWith(color: AppColors.warning),
                               ),
                             ],
                           ),
@@ -958,20 +855,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   const SizedBox(height: 12),
                   Text(
                     note.date,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textHint,
-                    ),
+                    style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
                   ),
                   if (note.comment != null) ...[
                     const SizedBox(height: 8),
                     Text(
                       note.comment!,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: AppTextStyles.bodySecondary.copyWith(fontStyle: FontStyle.italic),
                     ),
                   ],
                 ],
@@ -1058,7 +948,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
@@ -1078,24 +968,20 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.m),
                 ),
                 child: Column(
                   children: [
                     const Icon(
                       Icons.access_time,
                       color: AppColors.primary,
-                      size: 17,
+                      size: AppIconSize.s,
                     ),
                     const SizedBox(height: 5),
                     Text(
                       emploi.startTime,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppTextStyles.label.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -1114,11 +1000,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                         emploi.subject,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1128,11 +1010,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 const SizedBox(height: 8),
                 Text(
                   emploi.formattedTime,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.bodySecondary.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 10),
                 Wrap(
@@ -1164,7 +1042,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
           end: Alignment.bottomRight,
           colors: [AppColors.primary, AppColors.primaryDark],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.22),
@@ -1180,13 +1058,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 58,
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppRadius.l),
               border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
             ),
             child: const Icon(
               Icons.calendar_month_outlined,
               color: Colors.white,
-              size: 30,
+              size: AppIconSize.l,
             ),
           ),
           const SizedBox(width: 14),
@@ -1194,25 +1072,16 @@ class StudentHomeView extends GetView<StudentHomeController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Emploi du temps',
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 7),
                 Text(
                   'Une vue claire de ta semaine de cours.',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    height: 1.35,
-                    color: Colors.white.withValues(alpha: 0.86),
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.86), fontWeight: FontWeight.w600, height: 1.35),
                 ),
                 const SizedBox(height: 12),
                 _buildScheduleHeroPill(
@@ -1232,20 +1101,16 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 15),
+          Icon(icon, color: Colors.white, size: AppIconSize.s),
           const SizedBox(width: 6),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyles.label.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -1262,7 +1127,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1278,9 +1143,9 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 40,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
-            child: Icon(icon, color: accent, size: 21),
+            child: Icon(icon, color: accent, size: AppIconSize.m),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1291,22 +1156,14 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: accent,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: accent),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.label,
                 ),
               ],
             ),
@@ -1323,7 +1180,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1339,12 +1196,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.success.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
             child: const Icon(
               Icons.play_circle_outline,
               color: AppColors.success,
-              size: 24,
+              size: AppIconSize.m,
             ),
           ),
           const SizedBox(width: 12),
@@ -1352,35 +1209,23 @@ class StudentHomeView extends GetView<StudentHomeController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'À venir',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppTextStyles.label.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   emploi.subject,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   '${emploi.dayOfWeek} • ${emploi.formattedTime} • ${emploi.classroom}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.label,
                 ),
               ],
             ),
@@ -1396,7 +1241,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.65),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         border: Border.all(color: AppColors.divider),
       ),
       child: Column(
@@ -1409,32 +1254,24 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 height: 34,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppRadius.m),
                 ),
                 child: const Icon(
                   Icons.today_outlined,
                   color: AppColors.primary,
-                  size: 18,
+                  size: AppIconSize.s,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   _formatDayLabel(day),
-                  style: const TextStyle(
-                    fontSize: 17,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               Text(
                 '${emplois.length} cours',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: AppTextStyles.label.copyWith(fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -1450,15 +1287,11 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.m),
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11,
-          color: color,
-          fontWeight: FontWeight.bold,
-        ),
+        style: AppTextStyles.label.copyWith(color: color, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -1468,21 +1301,17 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         border: Border.all(color: AppColors.divider),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.textSecondary),
+          Icon(icon, size: AppIconSize.s, color: AppColors.textSecondary),
           const SizedBox(width: 5),
           Text(
             _profileValue(label),
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyles.label.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -1505,7 +1334,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
             child: const Icon(
               Icons.calendar_month_outlined,
               color: AppColors.primary,
-              size: 38,
+              size: AppIconSize.xl,
             ),
           ),
         ),
@@ -1513,21 +1342,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
         const Text(
           'Aucun emploi du temps',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+          style: AppTextStyles.h2,
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Les cours de la semaine apparaîtront ici dès qu’ils seront disponibles.',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppColors.textSecondary,
-            height: 1.4,
-          ),
+          style: AppTextStyles.bodySecondary.copyWith(height: 1.4),
         ),
       ],
     );
@@ -1645,7 +1466,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
           end: Alignment.bottomRight,
           colors: [AppColors.primary, AppColors.primaryDark],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.22),
@@ -1661,13 +1482,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 58,
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppRadius.l),
               border: Border.all(color: Colors.white.withValues(alpha: 0.20)),
             ),
             child: const Icon(
               Icons.campaign_outlined,
               color: Colors.white,
-              size: 30,
+              size: AppIconSize.l,
             ),
           ),
           const SizedBox(width: 14),
@@ -1675,24 +1496,16 @@ class StudentHomeView extends GetView<StudentHomeController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Centre d’alertes',
-                  style: TextStyle(
-                    fontSize: 21,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: Colors.white),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   unreadCount > 0
                       ? '$unreadCount alerte${unreadCount > 1 ? 's' : ''} à lire'
                       : 'Toutes les alertes sont à jour',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.86),
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.86), fontWeight: FontWeight.w600),
                 ),
                 if (importantCount > 0) ...[
                   const SizedBox(height: 10),
@@ -1713,15 +1526,11 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-        ),
+        style: AppTextStyles.label.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -1736,7 +1545,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1752,9 +1561,9 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 40,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
-            child: Icon(icon, color: accent, size: 21),
+            child: Icon(icon, color: accent, size: AppIconSize.m),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1765,22 +1574,14 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: accent,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: accent),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.label,
                 ),
               ],
             ),
@@ -1797,14 +1598,11 @@ class StudentHomeView extends GetView<StudentHomeController> {
         if (unreadCount > 0)
           TextButton.icon(
             onPressed: controller.markAllAsRead,
-            icon: const Icon(Icons.done_all, size: 18),
+            icon: const Icon(Icons.done_all, size: AppIconSize.s),
             label: const Text('Tout lire'),
             style: TextButton.styleFrom(
               foregroundColor: AppColors.primary,
-              textStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
+              textStyle: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
       ],
@@ -1827,7 +1625,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
             child: const Icon(
               Icons.notifications_none_outlined,
               color: AppColors.primary,
-              size: 38,
+              size: AppIconSize.xl,
             ),
           ),
         ),
@@ -1835,21 +1633,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
         const Text(
           'Aucune alerte',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+          style: AppTextStyles.h2,
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Les nouvelles informations scolaires apparaîtront ici.',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppColors.textSecondary,
-            height: 1.4,
-          ),
+          style: AppTextStyles.bodySecondary.copyWith(height: 1.4),
         ),
       ],
     );
@@ -1872,7 +1662,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppRadius.l),
                 boxShadow: [
                   BoxShadow(
                     color: notification.isRead
@@ -1899,12 +1689,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
                         height: 48,
                         decoration: BoxDecoration(
                           color: color.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(AppRadius.m),
                         ),
                         child: Icon(
                           _getNotificationIcon(notification.type),
                           color: color,
-                          size: 24,
+                          size: AppIconSize.m,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -1916,13 +1706,9 @@ class StudentHomeView extends GetView<StudentHomeController> {
                               notification.title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: notification.isRead
+                              style: AppTextStyles.titleMedium.copyWith(color: notification.isRead
                                     ? AppColors.textSecondary
-                                    : AppColors.textPrimary,
-                              ),
+                                    : AppColors.textPrimary, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 7),
                             Wrap(
@@ -1947,15 +1733,11 @@ class StudentHomeView extends GetView<StudentHomeController> {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.10),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(AppRadius.m),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Nouveau',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppTextStyles.label.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                           ),
                         ),
                     ],
@@ -1965,13 +1747,9 @@ class StudentHomeView extends GetView<StudentHomeController> {
                     notification.message,
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: notification.isRead
+                    style: AppTextStyles.bodyMedium.copyWith(color: notification.isRead
                           ? AppColors.textHint
-                          : AppColors.textSecondary,
-                      height: 1.45,
-                    ),
+                          : AppColors.textSecondary, height: 1.45),
                   ),
                   const SizedBox(height: 12),
                   Row(
@@ -1981,26 +1759,19 @@ class StudentHomeView extends GetView<StudentHomeController> {
                           notification.formattedDate,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textHint,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTextStyles.label.copyWith(color: AppColors.textHint),
                         ),
                       ),
                       if (!notification.isRead)
                         TextButton.icon(
                           onPressed: () => controller
                               .markNotificationAsRead(notification.id),
-                          icon: const Icon(Icons.check, size: 17),
+                          icon: const Icon(Icons.check, size: AppIconSize.s),
                           label: const Text('Lu'),
                           style: TextButton.styleFrom(
                             foregroundColor: AppColors.primary,
                             visualDensity: VisualDensity.compact,
-                            textStyle: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            textStyle: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
                     ],
@@ -2019,15 +1790,11 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.m),
       ),
       child: Text(
         label,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
+        style: AppTextStyles.label.copyWith(color: color, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -2037,16 +1804,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         border: Border.all(color: AppColors.divider),
       ),
       child: Text(
         time,
-        style: const TextStyle(
-          color: AppColors.textSecondary,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-        ),
+        style: AppTextStyles.label,
       ),
     );
   }
@@ -2148,7 +1911,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppRadius.l),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.warning.withOpacity(0.15),
@@ -2171,11 +1934,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                     children: [
                       Text(
                         absence.date,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -2184,17 +1943,13 @@ class StudentHomeView extends GetView<StudentHomeController> {
                           color: absence.justified
                               ? AppColors.success.withOpacity(0.1)
                               : AppColors.warning.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(AppRadius.l),
                         ),
                         child: Text(
                           absence.justified ? 'Justifiée' : 'Non justifiée',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: absence.justified
+                          style: AppTextStyles.label.copyWith(color: absence.justified
                                 ? AppColors.success
-                                : AppColors.warning,
-                          ),
+                                : AppColors.warning),
                         ),
                       ),
                     ],
@@ -2203,24 +1958,18 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   Row(
                     children: [
                       const Icon(Icons.event_busy,
-                          size: 16, color: AppColors.warning),
+                          size: AppIconSize.s, color: AppColors.warning),
                       const SizedBox(width: 4),
                       Text(
                         absence.reason,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
-                        ),
+                        style: AppTextStyles.bodySecondary,
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
                     absence.subject,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
+                    style: AppTextStyles.bodySecondary,
                   ),
                   if (absence.justification != null) ...[
                     const SizedBox(height: 8),
@@ -2228,20 +1977,17 @@ class StudentHomeView extends GetView<StudentHomeController> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: AppColors.success.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppRadius.s),
                       ),
                       child: Row(
                         children: [
                           const Icon(Icons.check_circle,
-                              size: 16, color: AppColors.success),
+                              size: AppIconSize.s, color: AppColors.success),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               absence.justification!,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.success,
-                              ),
+                              style: AppTextStyles.caption.copyWith(color: AppColors.success),
                             ),
                           ),
                         ],
@@ -2266,7 +2012,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
             child: Text(
               "Aucun bulletin n'a encore été publié pour vous.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              style: AppTextStyles.bodySecondary,
             ),
           ),
         );
@@ -2293,7 +2039,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withOpacity(0.08),
@@ -2315,17 +2061,12 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   children: [
                     Text(
                       bulletin.periodeLabel,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
                     ),
                     if (bulletin.anneeScolaire.isNotEmpty)
                       Text(
                         bulletin.anneeScolaire,
-                        style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12),
+                        style: AppTextStyles.caption,
                       ),
                   ],
                 ),
@@ -2335,16 +2076,11 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 children: [
                   Text(
                     bulletin.moyenneGenerale.toStringAsFixed(2),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
+                    style: AppTextStyles.h2.copyWith(color: AppColors.primary),
                   ),
                   if (bulletin.rang != null)
                     Text('Rang: ${bulletin.rang}',
-                        style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12)),
+                        style: AppTextStyles.caption),
                 ],
               ),
             ],
@@ -2357,10 +2093,9 @@ class StudentHomeView extends GetView<StudentHomeController> {
                   children: [
                     Expanded(
                         child: Text(ligne.matiere,
-                            style: const TextStyle(fontSize: 13))),
+                            style: AppTextStyles.bodyMedium)),
                     Text(ligne.moyenneMatiere.toStringAsFixed(2),
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w600)),
+                        style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
                   ],
                 ),
               )),
@@ -2369,10 +2104,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
             const SizedBox(height: 8),
             Text(
               bulletin.appreciation!,
-              style: const TextStyle(
-                  fontStyle: FontStyle.italic,
-                  color: AppColors.textSecondary,
-                  fontSize: 13),
+              style: AppTextStyles.bodySecondary.copyWith(fontStyle: FontStyle.italic),
             ),
           ],
           const SizedBox(height: 12),
@@ -2388,7 +2120,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.picture_as_pdf, size: 18),
+                      : const Icon(Icons.picture_as_pdf, size: AppIconSize.s),
                   label: const Text('Télécharger le PDF'),
                 )),
           ),
@@ -2492,7 +2224,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
           end: Alignment.bottomRight,
           colors: [AppColors.primary, AppColors.primaryDark],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.22),
@@ -2520,11 +2252,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 child: Center(
                   child: Text(
                     _profileInitials(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.h2.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -2533,34 +2261,23 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Profil étudiant',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       _profileName(),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      style: AppTextStyles.h2.copyWith(color: Colors.white),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _profileValue(controller.studentEmail.value),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withValues(alpha: 0.86),
-                      ),
+                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.86)),
                     ),
                   ],
                 ),
@@ -2589,21 +2306,17 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 16),
+          Icon(icon, color: Colors.white, size: AppIconSize.s),
           const SizedBox(width: 7),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyles.label.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -2620,7 +2333,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -2637,31 +2350,23 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 34,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
-            child: Icon(icon, color: accent, size: 18),
+            child: Icon(icon, color: accent, size: AppIconSize.s),
           ),
           const SizedBox(height: 12),
           Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.bold,
-              color: accent,
-            ),
+            style: AppTextStyles.h2.copyWith(color: accent),
           ),
           const SizedBox(height: 3),
           Text(
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label,
           ),
         ],
       ),
@@ -2762,7 +2467,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -2781,19 +2486,15 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 height: 36,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(11),
+                  borderRadius: BorderRadius.circular(AppRadius.m),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 19),
+                child: Icon(icon, color: AppColors.primary, size: AppIconSize.s),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -2815,9 +2516,9 @@ class StudentHomeView extends GetView<StudentHomeController> {
             height: 40,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.09),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
+            child: Icon(icon, color: AppColors.primary, size: AppIconSize.m),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -2826,22 +2527,14 @@ class StudentHomeView extends GetView<StudentHomeController> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.label,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -2874,7 +2567,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
                 ),
                 TextButton(
                   onPressed: () => Get.back(result: true),
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.error),
                   child: const Text('Déconnecter'),
                 ),
               ],
@@ -2882,13 +2575,10 @@ class StudentHomeView extends GetView<StudentHomeController> {
           );
           if (confirmed == true) controller.logout();
         },
-        icon: const Icon(Icons.logout, size: 20),
-        label: const Text(
+        icon: const Icon(Icons.logout, size: AppIconSize.m),
+        label: Text(
           'Déconnexion',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.error,
@@ -2896,7 +2586,7 @@ class StudentHomeView extends GetView<StudentHomeController> {
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(AppRadius.m),
           ),
         ),
       ),

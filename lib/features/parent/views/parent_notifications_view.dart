@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/parent_notifications_controller.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_dimens.dart';
 import '../../../models/notification_model.dart';
+import '../../../widgets/common/state_widgets.dart';
 
 class ParentNotificationsView extends GetView<ParentNotificationsController> {
   const ParentNotificationsView({super.key});
@@ -14,7 +17,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingWidget();
           }
 
           return RefreshIndicator(
@@ -68,21 +71,14 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
                   children: [
                     const Text(
                       'Notifications',
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.h1,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       controller.unreadCount == 0
                           ? 'Tout est à jour'
                           : '${controller.unreadCount} notification${controller.unreadCount > 1 ? 's' : ''} non lue${controller.unreadCount > 1 ? 's' : ''}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTextStyles.bodySecondary,
                     ),
                   ],
                 ),
@@ -106,12 +102,12 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
           height: 48,
           decoration: BoxDecoration(
             color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(AppRadius.s + 6),
           ),
           child: const Icon(
             Icons.notifications,
             color: AppColors.primary,
-            size: 26,
+            size: AppIconSize.m + 2,
           ),
         ),
         if (controller.unreadCount > 0)
@@ -122,12 +118,12 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.error,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.s + 2),
                 border: Border.all(color: Colors.white, width: 2),
               ),
               child: Text(
                 controller.unreadCount.toString(),
-                style: const TextStyle(
+                style: AppTextStyles.caption.copyWith(
                   color: Colors.white,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
@@ -152,7 +148,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
             AppColors.primaryDark,
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withOpacity(0.22),
@@ -178,7 +174,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
               onPressed: controller.isSyncingReadState.value
                   ? null
                   : () => controller.markAllAsRead(),
-              icon: const Icon(Icons.done_all, size: 18),
+              icon: const Icon(Icons.done_all, size: AppIconSize.s + 2),
               label: const Text('Tout lire'),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
@@ -186,7 +182,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.m),
                 ),
               ),
             ),
@@ -201,18 +197,13 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.h2.copyWith(color: Colors.white),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(
+          style: AppTextStyles.label.copyWith(
             color: Colors.white70,
-            fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -248,14 +239,14 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
               children: [
                 Icon(
                   filter.icon,
-                  size: 16,
+                  size: AppIconSize.s,
                   color: selected ? Colors.white : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 6),
                 Text(filter.label),
               ],
             ),
-            labelStyle: TextStyle(
+            labelStyle: AppTextStyles.bodySecondary.copyWith(
               color: selected ? Colors.white : AppColors.textSecondary,
               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
             ),
@@ -281,7 +272,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.error.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.m),
           border: Border.all(color: AppColors.error.withOpacity(0.18)),
         ),
         child: Row(
@@ -289,14 +280,13 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
             const Icon(
               Icons.error_outline,
               color: AppColors.error,
-              size: 20,
+              size: AppIconSize.s + 4,
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 controller.error!,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
+                style: AppTextStyles.bodySecondary.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -313,47 +303,11 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 96,
-              height: 96,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.08),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.notifications_none,
-                size: 48,
-                color: AppColors.primary,
-              ),
-            ),
-            const SizedBox(height: 18),
-            const Text(
-              'Aucune notification ici',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Les nouvelles alertes liées à vos enfants apparaîtront dans cette liste.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return const EmptyWidget(
+      icon: Icons.notifications_none,
+      title: 'Aucune notification ici',
+      message:
+          'Les nouvelles alertes liées à vos enfants apparaîtront dans cette liste.',
     );
   }
 
@@ -363,7 +317,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.l - 2),
         onTap: notification.isRead
             ? null
             : () => controller.markAsRead(notification.id),
@@ -371,7 +325,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(AppRadius.l - 2),
             border: Border.all(
               color: notification.isRead
                   ? AppColors.divider.withOpacity(0.7)
@@ -398,7 +352,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
                     height: 44,
                     decoration: BoxDecoration(
                       color: typeColor.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.m),
                     ),
                     child: Icon(
                       _getTypeIcon(notification.type),
@@ -418,12 +372,11 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
                                 notification.title,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                style: AppTextStyles.titleMedium.copyWith(
                                   fontSize: 15,
                                   fontWeight: notification.isRead
                                       ? FontWeight.w600
                                       : FontWeight.bold,
-                                  color: AppColors.textPrimary,
                                 ),
                               ),
                             ),
@@ -442,10 +395,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
                         const SizedBox(height: 4),
                         Text(
                           notification.formattedTime,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textHint,
-                          ),
+                          style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
                         ),
                       ],
                     ),
@@ -455,11 +405,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
               const SizedBox(height: 12),
               Text(
                 notification.message,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                  height: 1.35,
-                ),
+                style: AppTextStyles.bodySecondary.copyWith(height: 1.35),
               ),
               const SizedBox(height: 12),
               Row(
@@ -476,7 +422,7 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
                   if (!notification.isRead)
                     TextButton.icon(
                       onPressed: () => controller.markAsRead(notification.id),
-                      icon: const Icon(Icons.check, size: 16),
+                      icon: const Icon(Icons.check, size: AppIconSize.s),
                       label: const Text('Lu'),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.primary,
@@ -500,23 +446,19 @@ class ParentNotificationsView extends GetView<ParentNotificationsController> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.09),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppRadius.s + 2),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
+          Icon(icon, size: AppIconSize.s - 2, color: color),
           const SizedBox(width: 5),
           Flexible(
             child: Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-                color: color,
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTextStyles.label.copyWith(color: color, fontWeight: FontWeight.w700),
             ),
           ),
         ],

@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:get/get.dart';
 import '../controllers/parent_home_controller.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_dimens.dart';
 import '../../../models/child_model.dart';
+import '../../../widgets/common/state_widgets.dart';
 
 class ParentHomeView extends GetView<ParentHomeController> {
   const ParentHomeView({super.key});
@@ -20,11 +23,7 @@ class ParentHomeView extends GetView<ParentHomeController> {
               children: [
                 _buildHeader(),
                 const Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary,
-                    ),
-                  ),
+                  child: LoadingWidget(),
                 ),
               ],
             );
@@ -116,22 +115,14 @@ class ParentHomeView extends GetView<ParentHomeController> {
                 children: [
                   Text(
                     _greeting(),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: AppTextStyles.label,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     name.isNotEmpty ? name : 'Parent',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: AppTextStyles.h3,
                   ),
                 ],
               );
@@ -144,7 +135,7 @@ class ParentHomeView extends GetView<ParentHomeController> {
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               foregroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.m),
               ),
             ),
             icon: const Icon(Icons.refresh),
@@ -170,7 +161,7 @@ class ParentHomeView extends GetView<ParentHomeController> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppColors.primary,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.l),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.25),
@@ -186,33 +177,29 @@ class ParentHomeView extends GetView<ParentHomeController> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.s + 2),
               ),
-              child: const Text(
+              child: Text(
                 'Suivi scolaire',
-                style: TextStyle(
+                style: AppTextStyles.label.copyWith(
                   color: Colors.white,
-                  fontSize: 12,
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ),
             const SizedBox(height: 14),
-            const Text(
+            Text(
               'Gardez une vue claire sur la progression de vos enfants.',
-              style: TextStyle(
+              style: AppTextStyles.h2.copyWith(
                 color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
                 height: 1.18,
               ),
             ),
             const SizedBox(height: 10),
             Text(
               _watchMessage(),
-              style: TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: Colors.white.withValues(alpha: 0.82),
-                fontSize: 14,
                 height: 1.45,
               ),
             ),
@@ -256,35 +243,27 @@ class ParentHomeView extends GetView<ParentHomeController> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.l - 2),
         border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 22),
+          Icon(icon, color: color, size: AppIconSize.m - 2),
           const Spacer(),
           Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-            ),
+            style: AppTextStyles.h2.copyWith(fontSize: 22),
           ),
           const SizedBox(height: 2),
           Text(
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label,
           ),
         ],
       ),
@@ -297,18 +276,13 @@ class ParentHomeView extends GetView<ParentHomeController> {
         const Expanded(
           child: Text(
             'Mes enfants',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-            ),
+            style: AppTextStyles.h2,
           ),
         ),
         if (controller.children.isNotEmpty)
           Text(
             '${controller.children.length} profil${controller.children.length > 1 ? 's' : ''}',
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: AppTextStyles.bodySecondary.copyWith(
               fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
@@ -324,7 +298,7 @@ class ParentHomeView extends GetView<ParentHomeController> {
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
@@ -336,7 +310,7 @@ class ParentHomeView extends GetView<ParentHomeController> {
       ),
       child: InkWell(
         onTap: () => controller.viewChildDetails(child),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -356,11 +330,7 @@ class ParentHomeView extends GetView<ParentHomeController> {
                               : child.fullName,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
+                          style: AppTextStyles.h3,
                         ),
                         const SizedBox(height: 6),
                         Wrap(
@@ -449,7 +419,7 @@ class ParentHomeView extends GetView<ParentHomeController> {
     return Center(
       child: Text(
         initials.isEmpty ? '?' : initials,
-        style: const TextStyle(
+        style: AppTextStyles.titleMedium.copyWith(
           color: Colors.white,
           fontWeight: FontWeight.w800,
           fontSize: 18,
@@ -463,23 +433,19 @@ class ParentHomeView extends GetView<ParentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(9),
+        borderRadius: BorderRadius.circular(AppRadius.s + 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
+          Icon(icon, size: AppIconSize.s - 2, color: color),
           const SizedBox(width: 5),
           Flexible(
             child: Text(
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTextStyles.label.copyWith(color: color),
             ),
           ),
         ],
@@ -492,29 +458,21 @@ class ParentHomeView extends GetView<ParentHomeController> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label,
           ),
           const SizedBox(height: 4),
           Text(
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: color,
-              fontSize: 19,
-              fontWeight: FontWeight.w800,
-            ),
+            style: AppTextStyles.h3.copyWith(color: color, fontSize: 19),
           ),
         ],
       ),
@@ -522,91 +480,19 @@ class ParentHomeView extends GetView<ParentHomeController> {
   }
 
   Widget _buildEmptyState() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 58,
-            width: 58,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.person_search_rounded,
-              color: AppColors.primary,
-              size: 30,
-            ),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            'Aucun enfant associe',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Contactez l\'administration pour rattacher vos enfants a votre compte.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyWidget(
+      icon: Icons.person_search_rounded,
+      title: 'Aucun enfant associe',
+      message: 'Contactez l\'administration pour rattacher vos enfants a votre compte.',
     );
   }
 
   Widget _buildErrorState() {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.cloud_off_rounded,
-            color: AppColors.error,
-            size: 54,
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            'Impossible de charger l\'accueil',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            controller.error ?? 'Veuillez verifier votre connexion.',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 18),
-          ElevatedButton.icon(
-            onPressed: controller.loadChildren,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Reessayer'),
-          ),
-        ],
-      ),
+    return ErrorWidget(
+      icon: Icons.cloud_off_rounded,
+      title: 'Impossible de charger l\'accueil',
+      message: controller.error ?? 'Veuillez verifier votre connexion.',
+      onRetry: controller.loadChildren,
     );
   }
 

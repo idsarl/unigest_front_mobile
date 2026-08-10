@@ -136,20 +136,6 @@ class TeacherHomeController extends GetxController {
 
     final now = DateTime.now();
 
-    // Si le jour est passé
-    final startOfDay = DateTime(date.year, date.month, date.day);
-    final todayStartOfDay = DateTime(now.year, now.month, now.day);
-
-    if (startOfDay.isBefore(todayStartOfDay)) {
-      return 'NON_EFFECTUEE';
-    }
-
-    // Si le jour est à venir
-    if (startOfDay.isAfter(todayStartOfDay)) {
-      return 'PLANIFIEE';
-    }
-
-    // C'est aujourd'hui, on vérifie l'heure
     try {
       final p1 = startStr.split(':');
       final p2 = endStr.split(':');
@@ -158,12 +144,15 @@ class TeacherHomeController extends GetxController {
       final h2 = int.parse(p2[0]);
       final m2 = int.parse(p2[1]);
 
-      final currentMins = now.hour * 60 + now.minute;
-      final startMins = h1 * 60 + m1;
-      final endMins = h2 * 60 + m2;
+      final sessionStart = DateTime(date.year, date.month, date.day, h1, m1);
+      var sessionEnd = DateTime(date.year, date.month, date.day, h2, m2);
+      if (!sessionEnd.isAfter(sessionStart)) {
+        // La séance traverse minuit (ex: 23h30 -> 01h30)
+        sessionEnd = sessionEnd.add(const Duration(days: 1));
+      }
 
-      if (currentMins > endMins) return 'NON_EFFECTUEE';
-      if (currentMins >= startMins && currentMins <= endMins) return 'EN_COURS';
+      if (now.isAfter(sessionEnd)) return 'NON_EFFECTUEE';
+      if (!now.isBefore(sessionStart)) return 'EN_COURS';
       return 'PLANIFIEE';
     } catch (_) {
       return 'PLANIFIEE';

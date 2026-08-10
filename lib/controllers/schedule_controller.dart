@@ -143,20 +143,6 @@ class ScheduleController extends GetxController {
 
     final now = DateTime.now();
 
-    // Si le jour est passé
-    final startOfDay = DateTime(date.year, date.month, date.day);
-    final todayStartOfDay = DateTime(now.year, now.month, now.day);
-
-    if (startOfDay.isBefore(todayStartOfDay)) {
-      return 'TERMINEE';
-    }
-
-    // Si le jour est à venir
-    if (startOfDay.isAfter(todayStartOfDay)) {
-      return 'PLANIFIEE';
-    }
-
-    // C'est aujourd'hui, on vérifie l'heure
     try {
       final p1 = startStr.split(':');
       final p2 = endStr.split(':');
@@ -165,12 +151,15 @@ class ScheduleController extends GetxController {
       final h2 = int.parse(p2[0]);
       final m2 = int.parse(p2[1]);
 
-      final currentMins = now.hour * 60 + now.minute;
-      final startMins = h1 * 60 + m1;
-      final endMins = h2 * 60 + m2;
+      final sessionStart = DateTime(date.year, date.month, date.day, h1, m1);
+      var sessionEnd = DateTime(date.year, date.month, date.day, h2, m2);
+      if (!sessionEnd.isAfter(sessionStart)) {
+        // La séance traverse minuit (ex: 23h30 -> 01h30)
+        sessionEnd = sessionEnd.add(const Duration(days: 1));
+      }
 
-      if (currentMins > endMins) return 'TERMINEE';
-      if (currentMins >= startMins && currentMins <= endMins) return 'EN_COURS';
+      if (now.isAfter(sessionEnd)) return 'TERMINEE';
+      if (!now.isBefore(sessionStart)) return 'EN_COURS';
       return 'PLANIFIEE';
     } catch (_) {
       return 'PLANIFIEE';
@@ -244,7 +233,9 @@ class ScheduleController extends GetxController {
           final m1 = int.parse(p1[1]);
           final h2 = int.parse(p2[0]);
           final m2 = int.parse(p2[1]);
-          total += (h2 * 60 + m2) - (h1 * 60 + m1);
+          var diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+          if (diff < 0) diff += 24 * 60;
+          total += diff;
         } catch (_) {}
       }
     }
@@ -268,7 +259,9 @@ class ScheduleController extends GetxController {
           final m1 = int.parse(p1[1]);
           final h2 = int.parse(p2[0]);
           final m2 = int.parse(p2[1]);
-          total += (h2 * 60 + m2) - (h1 * 60 + m1);
+          var diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+          if (diff < 0) diff += 24 * 60;
+          total += diff;
         } catch (_) {}
       }
     }
@@ -284,7 +277,9 @@ class ScheduleController extends GetxController {
             final m1 = int.parse(p1[1]);
             final h2 = int.parse(p2[0]);
             final m2 = int.parse(p2[1]);
-            total += (h2 * 60 + m2) - (h1 * 60 + m1);
+            var diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+            if (diff < 0) diff += 24 * 60;
+            total += diff;
           } catch (_) {}
         }
       }

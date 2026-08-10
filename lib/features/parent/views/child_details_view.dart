@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/child_details_controller.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../models/note_model.dart';
-import '../../../models/absence_model.dart';
-import '../../../models/emploi_model.dart';
-import '../../../models/message_model.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/theme/app_dimens.dart';
 import '../../../models/bulletin_model.dart';
 import '../../../models/paiement_model.dart';
+import '../../../models/message_model.dart';
+import '../../../widgets/common/state_widgets.dart';
+import '../../../widgets/parent/note_card.dart';
+import '../../../widgets/parent/absence_card.dart';
+import '../../../widgets/parent/emploi_card.dart';
 
 class ChildDetailsView extends GetView<ChildDetailsController> {
   const ChildDetailsView({super.key});
@@ -19,7 +22,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       appBar: AppBar(
         title: Obx(() => Text(
               controller.child.value?.fullName ?? 'Détails',
-              style: const TextStyle(color: Colors.white),
+              style: AppTextStyles.h3.copyWith(color: Colors.white),
             )),
         centerTitle: true,
         backgroundColor: AppColors.primary,
@@ -28,7 +31,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       ),
       body: Obx(() {
         if (controller.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const LoadingWidget();
         }
         return Column(
           children: [
@@ -50,7 +53,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
         controller.absences.where((absence) => absence.justified).length;
 
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppSpacing.m),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -61,7 +64,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             AppColors.primaryDark,
           ],
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withOpacity(0.20),
@@ -86,11 +89,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                 child: Center(
                   child: Text(
                     _getInitials(child?.firstName ?? '', child?.lastName ?? ''),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.h2.copyWith(color: Colors.white),
                   ),
                 ),
               ),
@@ -103,11 +102,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                       child?.fullName ?? 'Enfant',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      style: AppTextStyles.h3.copyWith(color: Colors.white),
                     ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -179,15 +174,11 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white.withOpacity(0.90), size: 15),
+          Icon(icon, color: Colors.white.withOpacity(0.90), size: AppIconSize.s),
           const SizedBox(width: 6),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label.copyWith(color: Colors.white),
           ),
         ],
       ),
@@ -200,7 +191,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.l),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,11 +200,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: AppTextStyles.label,
           ),
           const SizedBox(height: 8),
           Row(
@@ -224,11 +211,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: accent,
-                  ),
+                  style: AppTextStyles.h2.copyWith(color: accent),
                 ),
               ),
               const SizedBox(width: 4),
@@ -238,10 +221,9 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                   hint,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 10,
+                  style: AppTextStyles.caption.copyWith(
                     color: AppColors.textHint,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 10,
                   ),
                 ),
               ),
@@ -260,62 +242,24 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
           height: 34,
           decoration: BoxDecoration(
             color: AppColors.primary.withOpacity(0.10),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadius.s),
           ),
-          child: Icon(icon, size: 18, color: AppColors.primary),
+          child: Icon(icon, size: AppIconSize.m, color: AppColors.primary),
         ),
         const SizedBox(width: 10),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+          style: AppTextStyles.h3,
         ),
       ],
     );
   }
 
   Widget _buildEmptyState(IconData icon, String title, String subtitle) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: AppColors.primary, size: 34),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EmptyWidget(
+      icon: icon,
+      title: title,
+      message: subtitle,
     );
   }
 
@@ -325,7 +269,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -340,31 +284,33 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
         isScrollable: true,
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-        unselectedLabelStyle:
-            const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        labelStyle: AppTextStyles.caption.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+        ),
+        unselectedLabelStyle: AppTextStyles.label,
         indicator: BoxDecoration(
           color: AppColors.primary.withOpacity(0.10),
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(AppRadius.s + 3),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         dividerColor: Colors.transparent,
         tabs: const [
-          Tab(icon: Icon(Icons.grade_outlined, size: 18), text: 'Notes'),
+          Tab(icon: Icon(Icons.grade_outlined, size: AppIconSize.s + 2), text: 'Notes'),
           Tab(
-              icon: Icon(Icons.event_busy_outlined, size: 18),
+              icon: Icon(Icons.event_busy_outlined, size: AppIconSize.s + 2),
               text: 'Absences'),
           Tab(
-              icon: Icon(Icons.calendar_month_outlined, size: 18),
+              icon: Icon(Icons.calendar_month_outlined, size: AppIconSize.s + 2),
               text: 'Emploi'),
           Tab(
-              icon: Icon(Icons.chat_bubble_outline, size: 18),
+              icon: Icon(Icons.chat_bubble_outline, size: AppIconSize.s + 2),
               text: 'Messages'),
           Tab(
-              icon: Icon(Icons.description_outlined, size: 18),
+              icon: Icon(Icons.description_outlined, size: AppIconSize.s + 2),
               text: 'Bulletin'),
           Tab(
-              icon: Icon(Icons.payments_outlined, size: 18),
+              icon: Icon(Icons.payments_outlined, size: AppIconSize.s + 2),
               text: 'Paiements'),
         ],
       ),
@@ -411,7 +357,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.l),
         border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
@@ -430,20 +376,12 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               children: [
                 Text(
                   'Premier trimestre',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: AppTextStyles.label,
                 ),
                 SizedBox(height: 6),
                 Text(
                   'Moyenne générale',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: AppTextStyles.h3,
                 ),
               ],
             ),
@@ -454,13 +392,11 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             decoration: BoxDecoration(
               color: _getAverageColor(controller.generalAverage.value)
                   .withOpacity(0.12),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.l - 2),
             ),
             child: Obx(() => Text(
                   controller.generalAverage.value.toStringAsFixed(2),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.h3.copyWith(
                     color: _getAverageColor(controller.generalAverage.value),
                   ),
                 )),
@@ -496,7 +432,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         border: Border.all(color: AppColors.divider),
       ),
       child: Row(
@@ -507,11 +443,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               subject,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
+              style: AppTextStyles.titleMedium.copyWith(fontSize: 14),
             ),
           ),
           const SizedBox(width: 12),
@@ -519,12 +451,11 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.m),
             ),
             child: Text(
               average.toStringAsFixed(2),
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTextStyles.bodyMedium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
@@ -547,16 +478,13 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         border: Border.all(color: AppColors.divider),
       ),
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 14,
-          color: AppColors.textSecondary,
-        ),
+        style: AppTextStyles.bodySecondary,
       ),
     );
   }
@@ -570,118 +498,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
         if (controller.notes.isEmpty)
           _buildCompactEmptyState('Aucune note enregistrée pour cet enfant')
         else
-          ...controller.notes.map((note) => _buildNoteCard(note)).toList(),
-      ],
-    );
-  }
-
-  Widget _buildNoteCard(NoteModel note) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                note.subject,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  note.formattedValue,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _buildNoteDetail('Date:', note.date),
-              const SizedBox(width: 16),
-              _buildNoteDetail('Coeff:', note.coefficient),
-              const SizedBox(width: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.textHint.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  note.type,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (note.comment != null && note.comment!.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(
-              note.comment!,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNoteDetail(String label, String value) {
-    return Row(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
-        ),
+          ...controller.notes.map((note) => NoteCard(note: note)).toList(),
       ],
     );
   }
@@ -689,7 +506,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
   Widget _buildAbsencesTab() {
     return Obx(() {
       if (controller.isLoading) {
-        return const Center(child: CircularProgressIndicator());
+        return const LoadingWidget();
       }
       if (controller.absences.isEmpty) {
         return _buildEmptyState(
@@ -707,7 +524,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                 'Historique des absences', Icons.event_busy_outlined),
             const SizedBox(height: 12),
             ...controller.absences
-                .map((absence) => _buildAbsenceCard(absence))
+                .map((absence) => AbsenceCard(absence: absence))
                 .toList(),
           ],
         ),
@@ -715,96 +532,10 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
     });
   }
 
-  Widget _buildAbsenceCard(AbsenceModel absence) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                absence.displayType,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color:
-                      absence.justified ? AppColors.success : AppColors.error,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  absence.status,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildAbsenceDetail(Icons.calendar_today, absence.date),
-          const SizedBox(height: 8),
-          _buildAbsenceDetail(Icons.school, absence.subject),
-          const SizedBox(height: 8),
-          _buildAbsenceDetail(Icons.info_outline, absence.reason),
-          if (absence.justification != null &&
-              absence.justification!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            _buildAbsenceDetail(Icons.description, absence.justification!),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAbsenceDetail(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 18,
-          color: AppColors.textSecondary,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildEmploiTab() {
     return Obx(() {
       if (controller.isLoading) {
-        return const Center(child: CircularProgressIndicator());
+        return const LoadingWidget();
       }
       if (controller.emploiDuTemps.isEmpty) {
         return _buildEmptyState(
@@ -822,116 +553,12 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                 'Emploi du temps', Icons.calendar_month_outlined),
             const SizedBox(height: 12),
             ...controller.emploiDuTemps
-                .map((emploi) => _buildEmploiCard(emploi))
+                .map((emploi) => EmploiCard(emploi: emploi))
                 .toList(),
           ],
         ),
       );
     });
-  }
-
-  Widget _buildEmploiCard(EmploiModel emploi) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  emploi.subject,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.access_time,
-                        size: 16, color: AppColors.textHint),
-                    const SizedBox(width: 4),
-                    Text(
-                      emploi.formattedTime,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(Icons.calendar_today,
-                        size: 16, color: AppColors.textHint),
-                    const SizedBox(width: 4),
-                    Text(
-                      emploi.dayOfWeek,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.person, size: 16, color: AppColors.textHint),
-                    const SizedBox(width: 4),
-                    Text(
-                      emploi.teacher,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(Icons.location_on,
-                        size: 16, color: AppColors.textHint),
-                    const SizedBox(width: 4),
-                    Text(
-                      emploi.classroom,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              emploi.displayType,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildMessagesTab() {
@@ -941,23 +568,23 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
         Expanded(
           child: Obx(() {
             if (controller.isLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const LoadingWidget();
             }
             if (controller.selectedTeacher.value == null) {
-              return const Center(
+              return Center(
                 child: Text(
                   'Sélectionnez un enseignant pour commencer',
-                  style:
-                      TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                  style: AppTextStyles.bodyLarge
+                      .copyWith(color: AppColors.textSecondary),
                 ),
               );
             }
             if (controller.messages.isEmpty) {
-              return const Center(
+              return Center(
                 child: Text(
                   'Aucun message',
-                  style:
-                      TextStyle(fontSize: 18, color: AppColors.textSecondary),
+                  style: AppTextStyles.h3
+                      .copyWith(color: AppColors.textSecondary),
                 ),
               );
             }
@@ -991,11 +618,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
         children: [
           const Text(
             'Enseignants',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+            style: AppTextStyles.titleMedium,
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -1034,13 +657,13 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                                 color: isSelected
                                     ? Colors.white
                                     : AppColors.primary,
-                                size: 24,
+                                size: AppIconSize.m,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               teacher.firstName,
-                              style: TextStyle(
+                              style: AppTextStyles.caption.copyWith(
                                 fontSize: 11,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
@@ -1080,12 +703,12 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isFromUser ? AppColors.primary : Colors.grey[200],
+                color: isFromUser ? AppColors.primary : AppColors.accentLight,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(isFromUser ? 16 : 4),
-                  bottomRight: Radius.circular(isFromUser ? 4 : 16),
+                  topLeft: const Radius.circular(AppRadius.l),
+                  topRight: const Radius.circular(AppRadius.l),
+                  bottomLeft: Radius.circular(isFromUser ? AppRadius.l : 4),
+                  bottomRight: Radius.circular(isFromUser ? 4 : AppRadius.l),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -1097,9 +720,9 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               ),
               child: Text(
                 message.content,
-                style: TextStyle(
+                style: AppTextStyles.bodyLarge.copyWith(
                   fontSize: 15,
-                  color: isFromUser ? Colors.white : Colors.black87,
+                  color: isFromUser ? Colors.white : AppColors.textPrimary,
                   height: 1.4,
                 ),
               ),
@@ -1110,7 +733,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               children: [
                 Text(
                   message.formattedTime,
-                  style: const TextStyle(
+                  style: AppTextStyles.caption.copyWith(
                     fontSize: 11,
                     color: AppColors.textHint,
                   ),
@@ -1118,11 +741,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                 const SizedBox(width: 8),
                 Text(
                   isFromUser ? message.senderName : message.senderName,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTextStyles.caption.copyWith(fontSize: 11),
                 ),
               ],
             ),
@@ -1153,7 +772,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: IconButton(
-              icon: const Icon(Icons.attach_file, size: 20),
+              icon: const Icon(Icons.attach_file, size: AppIconSize.m - 4),
               onPressed: () {},
               color: AppColors.primary,
             ),
@@ -1163,14 +782,14 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             child: Container(
               decoration: BoxDecoration(
                 color: AppColors.background,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(AppRadius.l + 8),
                 border: Border.all(color: AppColors.divider, width: 1),
               ),
               child: TextField(
                 onChanged: (value) => controller.messageText.value = value,
                 decoration: InputDecoration(
                   hintText: 'Écrire un message...',
-                  hintStyle: TextStyle(color: AppColors.textHint),
+                  hintStyle: const TextStyle(color: AppColors.textHint),
                   border: InputBorder.none,
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1185,7 +804,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: IconButton(
-              icon: const Icon(Icons.mic, size: 20),
+              icon: const Icon(Icons.mic, size: AppIconSize.m - 4),
               onPressed: () {},
               color: AppColors.primary,
             ),
@@ -1204,7 +823,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
               ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
+              icon: const Icon(Icons.send, color: Colors.white, size: AppIconSize.m - 4),
               onPressed: controller.sendMessage,
             ),
           ),
@@ -1216,7 +835,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
   Widget _buildBulletinTab() {
     return Obx(() {
       if (controller.isLoading) {
-        return const Center(child: CircularProgressIndicator());
+        return const LoadingWidget();
       }
       if (controller.bulletins.isEmpty) {
         return _buildEmptyState(
@@ -1247,7 +866,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -1268,17 +887,12 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                   children: [
                     Text(
                       bulletin.periodeLabel,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.titleMedium,
                     ),
                     if (bulletin.anneeScolaire.isNotEmpty)
                       Text(
                         bulletin.anneeScolaire,
-                        style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12),
+                        style: AppTextStyles.caption,
                       ),
                   ],
                 ),
@@ -1288,16 +902,11 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                 children: [
                   Text(
                     bulletin.moyenneGenerale.toStringAsFixed(2),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
+                    style: AppTextStyles.h3.copyWith(color: AppColors.primary),
                   ),
                   if (bulletin.rang != null)
                     Text('Rang: ${bulletin.rang}',
-                        style: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12)),
+                        style: AppTextStyles.caption),
                 ],
               ),
             ],
@@ -1310,10 +919,16 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                   children: [
                     Expanded(
                         child: Text(ligne.matiere,
-                            style: const TextStyle(fontSize: 13))),
+                            style: AppTextStyles.bodySecondary.copyWith(
+                              fontSize: 13,
+                              color: AppColors.textPrimary,
+                            ))),
                     Text(ligne.moyenneMatiere.toStringAsFixed(2),
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w600)),
+                        style: AppTextStyles.bodySecondary.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        )),
                   ],
                 ),
               )),
@@ -1322,10 +937,10 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             const SizedBox(height: 8),
             Text(
               bulletin.appreciation!,
-              style: const TextStyle(
-                  fontStyle: FontStyle.italic,
-                  color: AppColors.textSecondary,
-                  fontSize: 13),
+              style: AppTextStyles.bodySecondary.copyWith(
+                fontStyle: FontStyle.italic,
+                fontSize: 13,
+              ),
             ),
           ],
           const SizedBox(height: 12),
@@ -1341,7 +956,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Icon(Icons.picture_as_pdf, size: 18),
+                      : const Icon(Icons.picture_as_pdf, size: AppIconSize.s + 2),
                   label: const Text('Télécharger le PDF'),
                 )),
           ),
@@ -1353,7 +968,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
   Widget _buildPaiementsTab() {
     return Obx(() {
       if (controller.isLoading) {
-        return const Center(child: CircularProgressIndicator());
+        return const LoadingWidget();
       }
       final resume = controller.paiementResume.value;
       final paiements = controller.paiements;
@@ -1396,7 +1011,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
     final Color statutColor = resume.statutPaiement == 'COMPLET'
         ? AppColors.success
         : resume.statutPaiement == 'PARTIEL'
-            ? Colors.orange
+            ? AppColors.warning
             : AppColors.error;
     final String statutLabel = resume.statutPaiement == 'COMPLET'
         ? 'Complet'
@@ -1408,7 +1023,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -1423,9 +1038,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Statut',
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w600)),
+              const Text('Statut', style: AppTextStyles.titleMedium),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1435,10 +1048,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
                 ),
                 child: Text(
                   statutLabel,
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                  style: AppTextStyles.label.copyWith(color: Colors.white),
                 ),
               ),
             ],
@@ -1465,13 +1075,13 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(
+              style: AppTextStyles.bodySecondary.copyWith(
                   fontSize: emphasize ? 15 : 13,
                   fontWeight: emphasize ? FontWeight.bold : FontWeight.normal,
                   color: AppColors.textPrimary)),
           Text(
             '${value.toStringAsFixed(0)} FCFA',
-            style: TextStyle(
+            style: AppTextStyles.bodySecondary.copyWith(
               fontSize: emphasize ? 16 : 13,
               fontWeight: emphasize ? FontWeight.bold : FontWeight.w600,
               color: emphasize ? AppColors.primary : AppColors.textPrimary,
@@ -1488,7 +1098,7 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -1505,28 +1115,21 @@ class ChildDetailsView extends GetView<ChildDetailsController> {
             children: [
               Text(
                 '${paiement.montant.toStringAsFixed(0)} FCFA',
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary),
+                style: AppTextStyles.titleMedium.copyWith(color: AppColors.primary),
               ),
               const SizedBox(height: 4),
-              Text(paiement.datePaiement,
-                  style: const TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary)),
+              Text(paiement.datePaiement, style: AppTextStyles.caption),
             ],
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(paiement.modePaiement,
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w600)),
+                  style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w600)),
               if (paiement.reference != null &&
                   paiement.reference!.isNotEmpty)
                 Text('Réf: ${paiement.reference}',
-                    style: const TextStyle(
-                        fontSize: 11, color: AppColors.textSecondary)),
+                    style: AppTextStyles.caption.copyWith(fontSize: 11)),
             ],
           ),
         ],

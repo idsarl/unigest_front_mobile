@@ -4,6 +4,8 @@ import '../controllers/auth_controller.dart';
 import 'login_view.dart';
 import '../../../views/MainLayout.dart';
 import '../../../core/session/app_session.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../parent/views/parent_main_view.dart';
 import '../../student/views/student_home_view.dart';
 import '../../student/controllers/student_home_controller.dart';
@@ -19,16 +21,16 @@ class AuthWrapper extends StatelessWidget {
     return Obx(() {
       if (auth.isCheckingSession.value) {
         return const Scaffold(
-          backgroundColor: Color(0xFFF8F9FA),
+          backgroundColor: AppColors.background,
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6C5CE7)),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
                 SizedBox(height: 16),
-                Text('Chargement...', style: TextStyle(color: Colors.black54)),
+                Text('Chargement...', style: AppTextStyles.bodySecondary),
               ],
             ),
           ),

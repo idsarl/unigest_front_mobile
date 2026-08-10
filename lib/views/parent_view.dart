@@ -7,6 +7,10 @@ import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../controllers/parent_controller.dart';
 import '../core/session/app_session.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/theme/app_dimens.dart';
+import '../widgets/common/state_widgets.dart';
 
 class ParentView extends StatefulWidget {
   const ParentView({super.key});
@@ -59,14 +63,14 @@ class _ParentViewState extends State<ParentView>
       if (_isViewingStudents) return _buildStudentListView();
 
       return Scaffold(
-        backgroundColor: const Color(0xFFF5F5F5),
+        backgroundColor: AppColors.background,
         appBar: _buildSimpleAppBar('Communication', showBack: false),
         body: SafeArea(
           top: false,
           child: Obx(() {
             if (_apiController.isLoading.value &&
                 _apiController.conversations.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
+              return const LoadingWidget();
             }
             final isTeacher = AppSession.instance.role == 'ENSEIGNANT';
             return Stack(
@@ -84,23 +88,23 @@ class _ParentViewState extends State<ParentView>
                             hintText: isTeacher
                                 ? 'Rechercher un parent...'
                                 : 'Rechercher un enseignant...',
-                            hintStyle: TextStyle(
-                                color: Colors.grey.shade400, fontSize: 14),
+                            hintStyle: AppTextStyles.bodyMedium
+                                .copyWith(color: AppColors.textHint),
                             suffixIcon: Icon(Icons.search,
-                                color: Colors.grey.shade700, size: 24),
+                                color: AppColors.textSecondary, size: AppIconSize.m),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: AppColors.surface,
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 14),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.m),
                               borderSide:
-                                  BorderSide(color: Colors.grey.shade300),
+                                  BorderSide(color: AppColors.divider),
                             ),
                             focusedBorder: const OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(12)),
-                              borderSide: BorderSide(color: Color(0xFF6366F1)),
+                                  BorderRadius.all(Radius.circular(AppRadius.m)),
+                              borderSide: BorderSide(color: AppColors.primary),
                             ),
                           ),
                         ),
@@ -125,7 +129,7 @@ class _ParentViewState extends State<ParentView>
   // ÉTAPE 2 : LISTE DES ÉTUDIANTS
   Widget _buildStudentListView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       appBar: _buildSimpleAppBar('Liste des Etudiants', onBack: () {
         setState(() => _isViewingStudents = false);
       }),
@@ -134,7 +138,7 @@ class _ParentViewState extends State<ParentView>
         child: Obx(() {
           if (_apiController.isLoading.value &&
               _apiController.students.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingWidget();
           }
           final students = _apiController.filteredStudents;
           final classList = _apiController.classList;
@@ -181,33 +185,32 @@ class _ParentViewState extends State<ParentView>
                   onChanged: (v) => _apiController.searchQuery.value = v,
                   decoration: InputDecoration(
                     hintText: 'Rechercher un étudiant ou parent...',
-                    hintStyle:
-                        TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                    hintStyle: AppTextStyles.bodyMedium
+                        .copyWith(color: AppColors.textHint),
                     suffixIcon: Icon(Icons.search,
-                        color: Colors.grey.shade700, size: 24),
+                        color: AppColors.textSecondary, size: AppIconSize.m),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: AppColors.surface,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 14),
                     enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300)),
+                        borderRadius: BorderRadius.circular(AppRadius.m),
+                        borderSide: BorderSide(color: AppColors.divider)),
                     focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF6366F1))),
+                        borderRadius: BorderRadius.circular(AppRadius.m),
+                        borderSide: const BorderSide(color: AppColors.primary)),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppRadius.m),
+                    border: Border.all(color: AppColors.divider),
                   ),
                   child: students.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: Text('Aucun étudiant trouvé'),
+                      ? const EmptyWidget(
+                          title: 'Aucun étudiant trouvé',
                         )
                       : ListView.separated(
                           shrinkWrap: true,
@@ -215,7 +218,7 @@ class _ParentViewState extends State<ParentView>
                           itemCount: students.length,
                           separatorBuilder: (context, index) => Divider(
                               height: 1,
-                              color: Colors.grey.shade100,
+                              color: AppColors.divider,
                               indent: 70),
                           itemBuilder: (context, index) {
                             final student = students[index];
@@ -226,16 +229,11 @@ class _ParentViewState extends State<ParentView>
                                 radius: 24,
                                 backgroundColor: student['bg'] as Color,
                                 child: Text(student['initial'],
-                                    style: TextStyle(
-                                        color: student['txt'] as Color,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15)),
+                                    style: AppTextStyles.titleMedium
+                                        .copyWith(color: student['txt'] as Color)),
                               ),
                               title: Text(student['name'],
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15,
-                                      color: Colors.black87)),
+                                  style: AppTextStyles.titleMedium),
                               onTap: () =>
                                   setState(() => _selectedStudent = student),
                             );
@@ -255,9 +253,9 @@ class _ParentViewState extends State<ParentView>
     final contact = _apiController.activeContact.value!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         toolbarHeight: 85,
         automaticallyImplyLeading: false,
@@ -270,7 +268,7 @@ class _ParentViewState extends State<ParentView>
                   _messageController.clear();
                 },
                 icon: const Icon(Icons.arrow_back_ios,
-                    size: 18, color: Colors.black),
+                    size: AppIconSize.s, color: AppColors.textPrimary),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
@@ -278,30 +276,24 @@ class _ParentViewState extends State<ParentView>
               CircleAvatar(
                 radius: 18,
                 backgroundColor:
-                    contact['bg'] as Color? ?? const Color(0xFFE8F5E9),
+                    contact['bg'] as Color? ?? AppColors.success.withOpacity(0.12),
                 child: Text(
                   contact['initial']?.toString() ?? '?',
-                  style: TextStyle(
-                    color: contact['txt'] as Color? ?? const Color(0xFF2E7D32),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
+                  style: AppTextStyles.label
+                      .copyWith(color: contact['txt'] as Color? ?? AppColors.success),
                 ),
               ),
               const SizedBox(width: 12),
               Text(
                 contact['name']?.toString() ?? 'Contact',
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
+                style: AppTextStyles.titleMedium.copyWith(fontSize: 16),
               ),
             ],
           ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: Colors.grey.shade200, height: 1),
+          child: Container(color: AppColors.divider, height: 1),
         ),
       ),
       body: SafeArea(
@@ -312,12 +304,12 @@ class _ParentViewState extends State<ParentView>
               child: Obx(() {
                 final msgs = _apiController.messages;
                 if (_apiController.isLoading.value && msgs.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const LoadingWidget();
                 }
                 if (msgs.isEmpty) {
-                  return const Center(
-                    child: Text('Aucun message. Envoyez le premier !',
-                        style: TextStyle(color: Colors.black54)),
+                  return const EmptyWidget(
+                    title: 'Aucun message',
+                    message: 'Envoyez le premier !',
                   );
                 }
 
@@ -343,12 +335,12 @@ class _ParentViewState extends State<ParentView>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: mine ? const Color(0xFFB4B7FA) : Colors.white,
+                          color: mine ? AppColors.primaryLight : AppColors.surface,
                           borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(16),
-                            topRight: const Radius.circular(16),
-                            bottomLeft: Radius.circular(mine ? 16 : 0),
-                            bottomRight: Radius.circular(mine ? 0 : 16),
+                            topLeft: const Radius.circular(AppRadius.l),
+                            topRight: const Radius.circular(AppRadius.l),
+                            bottomLeft: Radius.circular(mine ? AppRadius.l : 0),
+                            bottomRight: Radius.circular(mine ? 0 : AppRadius.l),
                           ),
                         ),
                         child: Column(
@@ -357,11 +349,8 @@ class _ParentViewState extends State<ParentView>
                             if ((m['contenu']?.toString() ?? '').isNotEmpty)
                               Text(
                                 m['contenu']?.toString() ?? '',
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 13,
-                                  height: 1.4,
-                                ),
+                                style: AppTextStyles.bodySecondary
+                                    .copyWith(color: AppColors.textPrimary, height: 1.4),
                               ),
                             if (fichiers.isNotEmpty) ...[
                               if ((m['contenu']?.toString() ?? '').isNotEmpty)
@@ -397,12 +386,12 @@ class _ParentViewState extends State<ParentView>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: Colors.grey.shade300),
+                          border: Border.all(color: AppColors.divider),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: AppColors.textPrimary.withOpacity(0.05),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             )
@@ -412,16 +401,14 @@ class _ParentViewState extends State<ParentView>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(_getFileIcon(file.extension),
-                                color: _getFileColor(file.extension), size: 20),
+                                color: _getFileColor(file.extension), size: AppIconSize.m),
                             const SizedBox(width: 8),
                             Text(
                               file.name.length > 15
                                   ? '${file.name.substring(0, 12)}...'
                                   : file.name,
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey.shade800,
-                                  fontWeight: FontWeight.w500),
+                              style: AppTextStyles.bodySecondary
+                                  .copyWith(fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(width: 8),
                             InkWell(
@@ -429,11 +416,11 @@ class _ParentViewState extends State<ParentView>
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
+                                  color: AppColors.divider,
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.close,
-                                    color: Colors.black54, size: 14),
+                                    color: AppColors.textSecondary, size: AppIconSize.s),
                               ),
                             ),
                           ],
@@ -454,9 +441,9 @@ class _ParentViewState extends State<ParentView>
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: Colors.grey.shade200),
+                        border: Border.all(color: AppColors.divider),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,20 +454,20 @@ class _ParentViewState extends State<ParentView>
                               const SizedBox(width: 8),
                               IconButton(
                                 icon: const Icon(Icons.attach_file,
-                                    color: Colors.black87, size: 22),
+                                    color: AppColors.textPrimary, size: AppIconSize.m),
                                 onPressed: () => _apiController.pickFiles(),
                               ),
                               Expanded(
                                 child: TextField(
                                   controller: _messageController,
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     hintText: 'Message',
-                                    hintStyle: TextStyle(
-                                        color: Colors.grey, fontSize: 14),
+                                    hintStyle: AppTextStyles.bodyMedium
+                                        .copyWith(color: AppColors.textSecondary),
                                     border: InputBorder.none,
                                     isDense: true,
                                     contentPadding:
-                                        EdgeInsets.symmetric(vertical: 14),
+                                        const EdgeInsets.symmetric(vertical: 14),
                                   ),
                                   onSubmitted: (_) => _sendChatMessage(),
                                 ),
@@ -496,9 +483,9 @@ class _ParentViewState extends State<ParentView>
                     height: 50,
                     width: 50,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: AppColors.divider),
                     ),
                     child: Obx(() => IconButton(
                           icon: _apiController.isSending.value
@@ -509,7 +496,7 @@ class _ParentViewState extends State<ParentView>
                                       CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Icon(Icons.send_outlined,
-                                  color: Color(0xFF6366F1), size: 20),
+                                  color: AppColors.primary, size: AppIconSize.m),
                           onPressed: _apiController.isSending.value
                               ? null
                               : _sendChatMessage,
@@ -536,13 +523,13 @@ class _ParentViewState extends State<ParentView>
         padding: const EdgeInsets.symmetric(horizontal: 12),
         height: 46,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.m),
+          border: Border.all(color: AppColors.divider),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF6366F1), size: 18),
+            Icon(icon, color: AppColors.primary, size: AppIconSize.s),
             const SizedBox(width: 8),
             Expanded(
               child: DropdownButtonHideUnderline(
@@ -550,12 +537,10 @@ class _ParentViewState extends State<ParentView>
                   value: selectedValue,
                   isExpanded: true,
                   icon: const Icon(Icons.keyboard_arrow_down,
-                      color: Colors.grey, size: 20),
-                  dropdownColor: Colors.white,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: Colors.black87),
+                      color: AppColors.textSecondary, size: AppIconSize.m),
+                  dropdownColor: AppColors.surface,
+                  style: AppTextStyles.bodySecondary.copyWith(
+                      fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                   items: items
                       .map((String val) => DropdownMenuItem<String>(
                           value: val, child: Text(val)))
@@ -573,7 +558,7 @@ class _ParentViewState extends State<ParentView>
   PreferredSizeWidget _buildSimpleAppBar(String title,
       {bool showBack = true, VoidCallback? onBack}) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       elevation: 0,
       toolbarHeight: 85,
       automaticallyImplyLeading: false,
@@ -584,7 +569,7 @@ class _ParentViewState extends State<ParentView>
               IconButton(
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back_ios,
-                    size: 18, color: Colors.black),
+                    size: AppIconSize.s, color: AppColors.textPrimary),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
@@ -593,11 +578,7 @@ class _ParentViewState extends State<ParentView>
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.only(right: showBack ? 30 : 0),
-                  child: Text(title,
-                      style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
+                  child: Text(title, style: AppTextStyles.h3),
                 ),
               ),
             ),
@@ -606,7 +587,7 @@ class _ParentViewState extends State<ParentView>
       ),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(color: Colors.grey.shade300, height: 1),
+        child: Container(color: AppColors.divider, height: 1),
       ),
     );
   }
@@ -615,18 +596,18 @@ class _ParentViewState extends State<ParentView>
     return TextField(
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-        suffixIcon: Icon(Icons.search, color: Colors.grey.shade700, size: 24),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
+        suffixIcon: const Icon(Icons.search, color: AppColors.textSecondary, size: AppIconSize.m),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.surface,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300)),
+            borderRadius: BorderRadius.circular(AppRadius.m),
+            borderSide: BorderSide(color: AppColors.divider)),
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF6366F1))),
+            borderRadius: BorderRadius.circular(AppRadius.m),
+            borderSide: const BorderSide(color: AppColors.primary)),
       ),
     );
   }
@@ -709,7 +690,7 @@ class _ParentViewState extends State<ParentView>
         margin: const EdgeInsets.only(top: 4, bottom: 4),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.04),
+          color: AppColors.textPrimary.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -722,13 +703,13 @@ class _ParentViewState extends State<ParentView>
               height: 44,
               decoration: BoxDecoration(
                 color: _getFileColor(extension).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.s),
               ),
               child: Center(
                 child: Icon(
                   _getFileIcon(extension),
                   color: _getFileColor(extension),
-                  size: 24,
+                  size: AppIconSize.m,
                 ),
               ),
             ),
@@ -741,21 +722,15 @@ class _ParentViewState extends State<ParentView>
                 children: [
                   Text(
                     fileName,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.bodyMedium
+                        .copyWith(fontWeight: FontWeight.w600),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     "${extension.toUpperCase()} • $fileSize",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black54,
-                    ),
+                    style: AppTextStyles.caption,
                   ),
                 ],
               ),
@@ -769,23 +744,23 @@ class _ParentViewState extends State<ParentView>
   Color _getFileColor(String? extension) {
     switch (extension?.toLowerCase()) {
       case 'pdf':
-        return const Color(0xFFE53935); // Red for PDF
+        return AppColors.error; // Red for PDF
       case 'doc':
       case 'docx':
-        return const Color(0xFF1976D2); // Blue for Word
+        return AppColors.info; // Blue for Word
       case 'xls':
       case 'xlsx':
-        return const Color(0xFF388E3C); // Green for Excel
+        return AppColors.success; // Green for Excel
       case 'ppt':
       case 'pptx':
-        return const Color(0xFFF57C00); // Orange for PowerPoint
+        return AppColors.warning; // Orange for PowerPoint
       case 'jpg':
       case 'jpeg':
       case 'png':
       case 'gif':
-        return const Color(0xFF8E24AA); // Purple for Images
+        return AppColors.secondary; // Purple for Images
       default:
-        return const Color(0xFF616161); // Gray for others
+        return AppColors.textSecondary; // Gray for others
     }
   }
 
@@ -808,8 +783,8 @@ class _ParentViewState extends State<ParentView>
             'Erreur',
             'Impossible d\'ouvrir le fichier',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
+            backgroundColor: AppColors.error,
+            colorText: AppColors.surface,
           );
         }
       } else {
@@ -838,8 +813,8 @@ class _ParentViewState extends State<ParentView>
     return Obx(() => Container(
           height: 48,
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
+            color: AppColors.surface,
+            border: Border.all(color: AppColors.divider),
           ),
           child: Row(
             children: [
@@ -859,10 +834,10 @@ class _ParentViewState extends State<ParentView>
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFFE0E7FF) : Colors.transparent,
+            color: isActive ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
             border: isActive
                 ? const Border(
-                    bottom: BorderSide(color: Color(0xFF6366F1), width: 2))
+                    bottom: BorderSide(color: AppColors.primary, width: 2))
                 : null,
           ),
           child: Row(
@@ -870,10 +845,9 @@ class _ParentViewState extends State<ParentView>
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: AppTextStyles.bodySecondary.copyWith(
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: isActive ? Colors.black87 : Colors.black54,
-                  fontSize: 13,
+                  color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
                 ),
               ),
               if (showBadge && label == 'Non Lues') ...[
@@ -881,14 +855,11 @@ class _ParentViewState extends State<ParentView>
                 Container(
                   padding: const EdgeInsets.all(5),
                   decoration: const BoxDecoration(
-                      color: Colors.red, shape: BoxShape.circle),
+                      color: AppColors.error, shape: BoxShape.circle),
                   child: Text(
                     '${_apiController.totalUnread}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTextStyles.label
+                        .copyWith(color: AppColors.surface, fontSize: 10),
                   ),
                 ),
               ],
@@ -903,33 +874,23 @@ class _ParentViewState extends State<ParentView>
     return Obx(() {
       final chats = _apiController.filteredConversations;
       if (chats.isEmpty) {
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: const Text(
-            'Aucune conversation. Utilisez + pour contacter un parent.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black54),
-          ),
+        return const EmptyWidget(
+          title: 'Aucune conversation',
+          message: 'Utilisez + pour contacter un parent.',
         );
       }
       return Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.m),
+          border: Border.all(color: AppColors.divider),
         ),
         child: ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: chats.length,
           separatorBuilder: (context, index) =>
-              Divider(height: 1, color: Colors.grey.shade100, indent: 70),
+              Divider(height: 1, color: AppColors.divider, indent: 70),
           itemBuilder: (context, index) {
             final chat = chats[index];
             return ListTile(
@@ -938,43 +899,36 @@ class _ParentViewState extends State<ParentView>
                 backgroundColor: chat['bg'] as Color,
                 child: Text(
                   chat['initial'],
-                  style: TextStyle(
-                    color: chat['txt'] as Color,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
+                  style: AppTextStyles.titleMedium
+                      .copyWith(color: chat['txt'] as Color),
                 ),
               ),
               title: Text(chat['name'],
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 15)),
+                  style: AppTextStyles.titleMedium
+                      .copyWith(fontWeight: FontWeight.bold)),
               subtitle: Text(
                 chat['message'],
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 13),
+                style: AppTextStyles.bodySecondary,
               ),
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(chat['time'],
-                      style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  Text(chat['time'], style: AppTextStyles.caption),
                   if ((chat['unreadCount'] as int) > 0)
                     const SizedBox(height: 4),
                   if ((chat['unreadCount'] as int) > 0)
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF5A67F2),
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
                         '${chat['unreadCount']}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.label
+                            .copyWith(color: AppColors.surface, fontSize: 10),
                       ),
                     ),
                 ],
@@ -999,9 +953,9 @@ class _ParentViewState extends State<ParentView>
           setState(() => _isViewingStudents = true);
           await _apiController.loadStudents();
         },
-        backgroundColor: const Color(0xFF6366F1),
+        backgroundColor: AppColors.primary,
         shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+        child: const Icon(Icons.add, color: AppColors.surface, size: AppIconSize.l),
       ),
     );
   }
@@ -1010,7 +964,7 @@ class _ParentViewState extends State<ParentView>
   Widget _buildStudentInfoView() {
     final student = _selectedStudent!;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.background,
       appBar: _buildSimpleAppBar('Info Etudiant',
           onBack: () => setState(() => _selectedStudent = null)),
       body: SafeArea(
@@ -1020,7 +974,7 @@ class _ParentViewState extends State<ParentView>
             children: [
               Container(
                 width: double.infinity,
-                color: Colors.white,
+                color: AppColors.surface,
                 padding: const EdgeInsets.only(bottom: 24, top: 24),
                 child: Column(
                   children: [
@@ -1028,26 +982,19 @@ class _ParentViewState extends State<ParentView>
                         radius: 43,
                         backgroundColor: student['bg'],
                         child: Text(student['initial'],
-                            style: TextStyle(
-                                color: student['txt'],
-                                fontWeight: FontWeight.bold,
-                                fontSize: 28))),
+                            style: AppTextStyles.h2.copyWith(color: student['txt']))),
                     const SizedBox(height: 14),
-                    Text(student['name'],
-                        style: const TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text(student['name'], style: AppTextStyles.h2.copyWith(fontSize: 22)),
                     const SizedBox(height: 10),
                     Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 5),
                         decoration: BoxDecoration(
-                            color: const Color(0xFFEDF8EE),
+                            color: AppColors.success.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20)),
                         child: Text(student['class'],
-                            style: const TextStyle(
-                                color: Color(0xFF1E863C),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12))),
+                            style: AppTextStyles.label
+                                .copyWith(color: AppColors.success))),
                   ],
                 ),
               ),
@@ -1056,9 +1003,9 @@ class _ParentViewState extends State<ParentView>
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200)),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppRadius.m),
+                      border: Border.all(color: AppColors.divider)),
                   child: Column(
                     children: [
                       _buildInfoRow(
@@ -1091,17 +1038,14 @@ class _ParentViewState extends State<ParentView>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200)),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppRadius.m),
+            border: Border.all(color: AppColors.divider)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('PARENT / TUTEUR',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: Colors.black87)),
+            Text('PARENT / TUTEUR',
+                style: AppTextStyles.label.copyWith(color: AppColors.textPrimary)),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -1109,27 +1053,25 @@ class _ParentViewState extends State<ParentView>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                      color: const Color(0xFFE8EAF6),
+                      color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20)),
                   child: Row(
                     children: [
                       const Icon(Icons.person_outline,
-                          size: 16, color: Color(0xFF3F51B5)),
+                          size: AppIconSize.s, color: AppColors.primary),
                       const SizedBox(width: 8),
                       Text(student['parent'],
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              color: Color(0xFF3F51B5))),
+                          style: AppTextStyles.bodySecondary.copyWith(
+                              fontWeight: FontWeight.bold, color: AppColors.primary)),
                     ],
                   ),
                 ),
                 const Spacer(),
                 _buildCircularAction(Icons.phone_outlined,
-                    const Color(0xFFEDEEFC), const Color(0xFF5A67F2)),
+                    AppColors.primary.withOpacity(0.08), AppColors.primary),
                 const SizedBox(width: 12),
                 _buildCircularAction(Icons.mail_outline,
-                    const Color(0xFFEDF8EE), const Color(0xFF1E863C)),
+                    AppColors.success.withOpacity(0.1), AppColors.success),
               ],
             ),
             const SizedBox(height: 20),
@@ -1149,18 +1091,10 @@ class _ParentViewState extends State<ParentView>
                   });
                   await _apiController.openConversationWithParent(student);
                 },
-                icon: const Icon(Icons.chat_bubble_outline,
-                    size: 18, color: Color(0xFF6366F1)),
-                label: const Text('Envoyer un message',
-                    style: TextStyle(
-                        color: Color(0xFF6366F1),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14)),
+                icon: const Icon(Icons.chat_bubble_outline, size: AppIconSize.s),
+                label: const Text('Envoyer un message'),
                 style: OutlinedButton.styleFrom(
-                    side:
-                        const BorderSide(color: Color(0xFF6366F1), width: 1.2),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10))),
+                    side: const BorderSide(color: AppColors.primary, width: 1.2)),
               ),
             ),
           ],
@@ -1173,13 +1107,11 @@ class _ParentViewState extends State<ParentView>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       child: Row(children: [
-        Icon(icon, size: 18, color: Colors.grey),
+        Icon(icon, size: AppIconSize.s, color: AppColors.textSecondary),
         const SizedBox(width: 12),
-        Text(label,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+        Text(label, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500)),
         const Spacer(),
-        Text(value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))
+        Text(value, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold))
       ]),
     );
   }
@@ -1188,15 +1120,14 @@ class _ParentViewState extends State<ParentView>
     return Container(
         padding: const EdgeInsets.all(7),
         decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-        child: Icon(icon, color: iconColor, size: 16));
+        child: Icon(icon, color: iconColor, size: AppIconSize.s));
   }
 
   Widget _buildContactLine(IconData icon, String text) {
     return Row(children: [
-      Icon(icon, size: 18, color: Colors.grey),
+      Icon(icon, size: AppIconSize.s, color: AppColors.textSecondary),
       const SizedBox(width: 12),
-      Text(text,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))
+      Text(text, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500))
     ]);
   }
 }

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/note_controller.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/theme/app_dimens.dart';
+import '../widgets/common/state_widgets.dart';
 
 class NoteView extends StatefulWidget {
   const NoteView({super.key});
@@ -71,7 +75,7 @@ class _NoteViewState extends State<NoteView> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: const Text('Supprimer',
-                style: TextStyle(color: Colors.redAccent)),
+                style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -102,13 +106,13 @@ class _NoteViewState extends State<NoteView> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF6C5CE7),
-              onPrimary: Colors.white,
-              onSurface: Colors.black87,
+              primary: AppColors.primary,
+              onPrimary: AppColors.surface,
+              onSurface: AppColors.textPrimary,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF6C5CE7)),
+                  foregroundColor: AppColors.primary),
             ),
           ),
           child: child!,
@@ -148,31 +152,24 @@ class _NoteViewState extends State<NoteView> {
 
     // Vue principale : Liste des évaluations
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
 
       // L'EN-TÊTE DE LA LISTE PRINCIPALE
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         toolbarHeight: 85,
         automaticallyImplyLeading: false,
         title: const SafeArea(
           bottom: false,
           child: Center(
-            child: Text(
-              'Évaluations',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+            child: Text('Évaluations', style: AppTextStyles.h3),
           ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
-            color: Colors.grey.shade300,
+            color: AppColors.divider,
             height: 1,
           ),
         ),
@@ -191,7 +188,7 @@ class _NoteViewState extends State<NoteView> {
                         _controller.evaluations.isEmpty) {
                       return const Padding(
                         padding: EdgeInsets.all(40),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: LoadingWidget(),
                       );
                     }
                     return Column(
@@ -206,20 +203,20 @@ class _NoteViewState extends State<NoteView> {
                                 isExpanded: true,
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(Icons.groups_outlined,
-                                      color: Color(0xFF6C5CE7), size: 20),
+                                      color: AppColors.primary, size: AppIconSize.m),
                                   filled: true,
-                                  fillColor: Colors.white,
+                                  fillColor: AppColors.surface,
                                   contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 12),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(AppRadius.m),
                                     borderSide:
-                                        BorderSide(color: Colors.grey.shade200),
+                                        BorderSide(color: AppColors.divider),
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(AppRadius.m),
                                     borderSide:
-                                        BorderSide(color: Colors.grey.shade200),
+                                        BorderSide(color: AppColors.divider),
                                   ),
                                 ),
                                 items: List.generate(
@@ -231,9 +228,9 @@ class _NoteViewState extends State<NoteView> {
                                   return DropdownMenuItem(
                                     value: i,
                                     child: Text(label,
-                                        style: const TextStyle(
+                                        style: AppTextStyles.bodySecondary.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 13)),
+                                            color: AppColors.textPrimary)),
                                   );
                                 }),
                                 onChanged: (v) {
@@ -251,21 +248,21 @@ class _NoteViewState extends State<NoteView> {
                                 decoration: InputDecoration(
                                   prefixIcon: const Icon(
                                       Icons.menu_book_outlined,
-                                      color: Color(0xFF6C5CE7),
-                                      size: 20),
+                                      color: AppColors.primary,
+                                      size: AppIconSize.m),
                                   filled: true,
-                                  fillColor: Colors.white,
+                                  fillColor: AppColors.surface,
                                   contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 12),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(AppRadius.m),
                                     borderSide:
-                                        BorderSide(color: Colors.grey.shade200),
+                                        BorderSide(color: AppColors.divider),
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(AppRadius.m),
                                     borderSide:
-                                        BorderSide(color: Colors.grey.shade200),
+                                        BorderSide(color: AppColors.divider),
                                   ),
                                 ),
                                 items: List.generate(
@@ -276,9 +273,9 @@ class _NoteViewState extends State<NoteView> {
                                   return DropdownMenuItem(
                                     value: i,
                                     child: Text(label,
-                                        style: const TextStyle(
+                                        style: AppTextStyles.bodySecondary.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 13),
+                                            color: AppColors.textPrimary),
                                         overflow: TextOverflow.ellipsis),
                                   );
                                 }),
@@ -303,7 +300,7 @@ class _NoteViewState extends State<NoteView> {
               GestureDetector(
                 onTap: () => setState(() => _isAdding = false),
                 child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: AppColors.textPrimary.withOpacity(0.5),
                   width: double.infinity,
                   height: double.infinity,
                 ),
@@ -328,11 +325,11 @@ class _NoteViewState extends State<NoteView> {
   // INTERFACE 2 : Saisie ou Consultation des notes par étudiant
   Widget _buildStudentNotesView() {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
 
       // L'EN-TÊTE DE LA VUE ÉTUDIANTS (Avec bouton retour à gauche)
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         toolbarHeight: 85,
         automaticallyImplyLeading: false,
@@ -343,7 +340,7 @@ class _NoteViewState extends State<NoteView> {
               IconButton(
                 onPressed: () => setState(() => _isViewingStudents = false),
                 icon: const Icon(Icons.arrow_back_ios,
-                    size: 18, color: Colors.black),
+                    size: AppIconSize.s, color: AppColors.textPrimary),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
@@ -353,21 +350,14 @@ class _NoteViewState extends State<NoteView> {
                     padding: EdgeInsets.only(
                         right:
                             24), // Compense la flèche retour pour centrer le texte
-                    child: Text(
-                      'Évaluations',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
+                    child: Text('Évaluations', style: AppTextStyles.h3),
                   ),
                 ),
               ),
               if (_isReadOnly && _currentEvaluation != null)
                 IconButton(
                   onPressed: () => setState(() => _isReadOnly = false),
-                  icon: const Icon(Icons.edit, size: 20, color: Color(0xFF6C5CE7)),
+                  icon: const Icon(Icons.edit, size: AppIconSize.m, color: AppColors.primary),
                   tooltip: 'Modifier les notes',
                 ),
             ],
@@ -376,7 +366,7 @@ class _NoteViewState extends State<NoteView> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
-            color: Colors.grey.shade300,
+            color: AppColors.divider,
             height: 1,
           ),
         ),
@@ -393,9 +383,9 @@ class _NoteViewState extends State<NoteView> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppRadius.m),
+                      border: Border.all(color: AppColors.divider),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,20 +397,19 @@ class _NoteViewState extends State<NoteView> {
                               _titreController.text.isNotEmpty
                                   ? _titreController.text
                                   : 'Nouvelle évaluation',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
+                              style: AppTextStyles.h3,
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFEDEEFC),
-                                borderRadius: BorderRadius.circular(6),
+                                color: AppColors.primary.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(AppRadius.s),
                               ),
                               child: Text(
                                 '/${_noteMaxController.text.isNotEmpty ? _noteMaxController.text : '20'}',
-                                style: const TextStyle(
-                                    color: Color(0xFF6C5CE7),
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.primary,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -433,18 +422,17 @@ class _NoteViewState extends State<NoteView> {
                             Row(
                               children: [
                                 const Icon(Icons.menu_book_outlined,
-                                    color: Color(0xFF6C5CE7), size: 18),
+                                    color: AppColors.primary, size: AppIconSize.s),
                                 const SizedBox(width: 6),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(_controller.matiereLabel,
-                                        style: const TextStyle(
+                                        style: AppTextStyles.bodySecondary.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 13)),
+                                            color: AppColors.textPrimary)),
                                     Text(_controller.classeLabel,
-                                        style: const TextStyle(
-                                            color: Colors.grey, fontSize: 11)),
+                                        style: AppTextStyles.caption),
                                   ],
                                 )
                               ],
@@ -452,15 +440,14 @@ class _NoteViewState extends State<NoteView> {
                             Row(
                               children: [
                                 Icon(Icons.calendar_today_outlined,
-                                    color: Colors.grey.shade600, size: 18),
+                                    color: AppColors.textSecondary, size: AppIconSize.s),
                                 const SizedBox(width: 6),
                                 Text(
                                   _dateController.text.isNotEmpty
                                       ? _dateController.text
                                       : 'Date non spécifiée',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 13),
+                                  style: AppTextStyles.bodySecondary
+                                      .copyWith(fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
@@ -473,12 +460,12 @@ class _NoteViewState extends State<NoteView> {
                   TextField(
                     decoration: InputDecoration(
                       hintText: 'Rechercher un étudiant...',
-                      hintStyle:
-                          const TextStyle(color: Colors.grey, fontSize: 14),
+                      hintStyle: AppTextStyles.bodyMedium
+                          .copyWith(color: AppColors.textSecondary),
                       suffixIcon: const Icon(Icons.search,
-                          color: Colors.grey, size: 22),
+                          color: AppColors.textSecondary, size: AppIconSize.m),
                       filled: true,
-                      fillColor: const Color(0xFFEFEFEF),
+                      fillColor: AppColors.accentLight,
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 14),
                       border: OutlineInputBorder(
@@ -489,9 +476,9 @@ class _NoteViewState extends State<NoteView> {
                   const SizedBox(height: 16),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade200),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppRadius.m),
+                      border: Border.all(color: AppColors.divider),
                     ),
                     child: Column(
                       children: [
@@ -501,17 +488,13 @@ class _NoteViewState extends State<NoteView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Etudiant',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                      fontSize: 14)),
+                              Text('Etudiant',
+                                  style: AppTextStyles.bodyMedium
+                                      .copyWith(fontWeight: FontWeight.bold)),
                               Text(
                                   'Note /${_noteMaxController.text.isNotEmpty ? _noteMaxController.text : '20'}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                      fontSize: 14)),
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -540,18 +523,15 @@ class _NoteViewState extends State<NoteView> {
                                         CircleAvatar(
                                           radius: 18,
                                           backgroundColor:
-                                              const Color(0xFF536DFE),
+                                              AppColors.primary,
                                           child: Text(student['initial'],
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold)),
+                                              style: AppTextStyles.label
+                                                  .copyWith(color: AppColors.surface)),
                                         ),
                                         const SizedBox(width: 12),
                                         Text(student['name'],
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14)),
+                                            style: AppTextStyles.bodyMedium
+                                                .copyWith(fontWeight: FontWeight.w500)),
                                       ],
                                     ),
                                     SizedBox(
@@ -565,24 +545,24 @@ class _NoteViewState extends State<NoteView> {
                                         decoration: InputDecoration(
                                           contentPadding: EdgeInsets.zero,
                                           fillColor: _isReadOnly
-                                              ? Colors.grey.shade100
-                                              : Colors.white,
+                                              ? AppColors.divider
+                                              : AppColors.surface,
                                           filled: _isReadOnly,
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(8),
+                                                BorderRadius.circular(AppRadius.s),
                                             borderSide: BorderSide(
                                                 color: _isReadOnly
-                                                    ? Colors.grey.shade300
-                                                    : Colors.grey.shade400),
+                                                    ? AppColors.divider
+                                                    : AppColors.textHint),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(8),
+                                                BorderRadius.circular(AppRadius.s),
                                             borderSide: BorderSide(
                                                 color: _isReadOnly
-                                                    ? Colors.grey.shade300
-                                                    : const Color(0xFF6C5CE7)),
+                                                    ? AppColors.divider
+                                                    : AppColors.primary),
                                           ),
                                         ),
                                       ),
@@ -595,7 +575,7 @@ class _NoteViewState extends State<NoteView> {
                                             student['noteId'] as int,
                                             student['name']?.toString() ?? ''),
                                         icon: const Icon(Icons.delete_outline,
-                                            color: Colors.redAccent, size: 20),
+                                            color: AppColors.error, size: AppIconSize.m),
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
                                         tooltip: 'Supprimer cette note',
@@ -682,10 +662,6 @@ class _NoteViewState extends State<NoteView> {
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           vertical: 16, horizontal: 28),
-                      backgroundColor: const Color(0xFF6C5CE7),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
                     ),
                     child: _controller.isSaving.value
                         ? const SizedBox(
@@ -693,17 +669,12 @@ class _NoteViewState extends State<NoteView> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.surface,
                             ),
                           )
-                        : Text(
-                            _currentEvaluation != null
-                                ? 'Enregistrer les modifications'
-                                : 'Publier les notes',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15)),
+                        : Text(_currentEvaluation != null
+                            ? 'Enregistrer les modifications'
+                            : 'Publier les notes'),
                   )),
             ),
         ],
@@ -717,11 +688,11 @@ class _NoteViewState extends State<NoteView> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: AppColors.textPrimary.withOpacity(0.1),
             blurRadius: 10,
             spreadRadius: 5,
           )
@@ -735,15 +706,12 @@ class _NoteViewState extends State<NoteView> {
             children: [
               IconButton(
                 onPressed: () => setState(() => _isAdding = false),
-                icon: const Icon(Icons.arrow_back_ios, size: 18),
+                icon: const Icon(Icons.arrow_back_ios, size: AppIconSize.s),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Nouvelle évaluation',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
+              const Text('Nouvelle évaluation', style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 10),
@@ -775,16 +743,7 @@ class _NoteViewState extends State<NoteView> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => setState(() => _isAdding = false),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: const BorderSide(color: Color(0xFF6C5CE7)),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('Annuler',
-                      style: TextStyle(
-                          color: Color(0xFF6C5CE7),
-                          fontWeight: FontWeight.bold)),
+                  child: const Text('Annuler'),
                 ),
               ),
               const SizedBox(width: 16),
@@ -817,16 +776,7 @@ class _NoteViewState extends State<NoteView> {
                       _isViewingStudents = true;
                     });
                   },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: const Color(0xFF6C5CE7),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('Continuer',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: const Text('Continuer'),
                 ),
               ),
             ],
@@ -839,11 +789,7 @@ class _NoteViewState extends State<NoteView> {
   Widget _buildFieldLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
-      child: Text(label,
-          style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-              color: Colors.black87)),
+      child: Text(label, style: AppTextStyles.titleMedium.copyWith(fontSize: 13)),
     );
   }
 
@@ -862,18 +808,18 @@ class _NoteViewState extends State<NoteView> {
       keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
         suffixIcon: suffixIcon != null
-            ? Icon(suffixIcon, size: 18, color: Colors.grey)
+            ? Icon(suffixIcon, size: AppIconSize.s, color: AppColors.textSecondary)
             : null,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.grey.shade300)),
+            borderRadius: BorderRadius.circular(AppRadius.s),
+            borderSide: BorderSide(color: AppColors.divider)),
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xFF6C5CE7))),
+            borderRadius: BorderRadius.circular(AppRadius.s),
+            borderSide: const BorderSide(color: AppColors.primary)),
       ),
     );
   }
@@ -887,19 +833,18 @@ class _NoteViewState extends State<NoteView> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(AppRadius.s),
+        border: Border.all(color: AppColors.divider),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: items.contains(currentValue) ? currentValue : items.first,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textSecondary),
           isExpanded: true,
           items: items.map((String val) {
             return DropdownMenuItem<String>(
               value: val,
-              child: Text(val,
-                  style: const TextStyle(color: Colors.black87, fontSize: 14)),
+              child: Text(val, style: AppTextStyles.bodyMedium),
             );
           }).toList(),
           onChanged: onChanged,
@@ -926,23 +871,17 @@ class _NoteViewState extends State<NoteView> {
                 _isAdding = true;
               });
             },
-            icon: const Icon(Icons.add, color: Colors.white, size: 18),
-            label: const Text('Nouvelle évaluation',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.add, size: AppIconSize.s),
+            label: const Text('Nouvelle évaluation'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6C5CE7),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              elevation: 0,
             ),
           ),
         ),
         const SizedBox(height: 24),
         if (_controller.evaluations.isEmpty)
           const Text('Aucune évaluation enregistrée pour cette classe.',
-              style: TextStyle(color: Colors.black54))
+              style: AppTextStyles.bodySecondary)
         else
           ..._controller.evaluations.map((eval) => _buildEvaluationCard(
                 eval['title']?.toString() ?? 'Évaluation',
@@ -973,9 +912,9 @@ class _NoteViewState extends State<NoteView> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.m),
+          border: Border.all(color: AppColors.divider),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -984,22 +923,18 @@ class _NoteViewState extends State<NoteView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15)),
+                    style: AppTextStyles.titleMedium.copyWith(fontSize: 15)),
                 const SizedBox(height: 8),
-                Text(date,
-                    style:
-                        TextStyle(color: Colors.grey.shade500, fontSize: 13)),
+                Text(date, style: AppTextStyles.bodySecondary),
               ],
             ),
             Row(
               children: [
                 Text('/$noteMax',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 18)),
+                    style: AppTextStyles.h3),
                 const SizedBox(width: 12),
                 const Icon(Icons.arrow_forward_ios,
-                    color: Colors.grey, size: 14),
+                    color: AppColors.textSecondary, size: AppIconSize.s),
               ],
             ),
           ],

@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:get/get.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/skeleton_loader.dart';
 import '../../../models/seance.dart';
+import '../../../widgets/common/state_widgets.dart';
 import '../controllers/appel_controller.dart';
 
 class AppelView extends StatefulWidget {
@@ -40,8 +43,7 @@ class _AppelViewState extends State<AppelView> {
                     child: Obx(() => Text(
                           '${seance.classe} · ${seance.heureDebut}–${seance.heureFin} · '
                           '${ctrl.etudiants.length} étudiants',
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.grey[600]),
+                          style: AppTextStyles.caption,
                         )),
                   ),
                 ),
@@ -54,21 +56,16 @@ class _AppelViewState extends State<AppelView> {
             );
           }
           if (ctrl.error.value != null) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(ctrl.error.value!),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                      onPressed: () => seance != null ? ctrl.init(seance) : null,
-                      child: const Text('Réessayer')),
-                ],
-              ),
+            return ErrorWidget(
+              message: ctrl.error.value,
+              onRetry: seance != null ? () => ctrl.init(seance) : null,
             );
           }
           if (ctrl.etudiants.isEmpty) {
-            return const Center(child: Text('Aucun étudiant dans cette classe'));
+            return const EmptyWidget(
+              title: 'Aucun étudiant',
+              message: 'Aucun étudiant dans cette classe',
+            );
           }
 
           return Column(
@@ -81,9 +78,9 @@ class _AppelViewState extends State<AppelView> {
                 final total = ctrl.etudiants.length;
                 return LinearProgressIndicator(
                   value: total > 0 ? done / total : 0,
-                  backgroundColor: Colors.grey[200],
+                  backgroundColor: AppColors.divider,
                   valueColor:
-                      const AlwaysStoppedAnimation<Color>(Colors.indigo),
+                      const AlwaysStoppedAnimation<Color>(AppColors.primary),
                 );
               }),
               Expanded(
@@ -105,8 +102,7 @@ class _AppelViewState extends State<AppelView> {
                         ),
                         title: Text(etd.fullName),
                         subtitle: Text(etd.matricule,
-                            style: TextStyle(
-                                fontSize: 11, color: Colors.grey[500])),
+                            style: AppTextStyles.caption),
                         trailing: _StatusToggle(
                           statut: statut,
                           onChanged: (s) => ctrl.setStatut(etd.id, s),
@@ -141,9 +137,9 @@ class _AppelViewState extends State<AppelView> {
 
   Color _statusColor(String statut) {
     return switch (statut) {
-      'ABSENT' => Colors.red,
-      'RETARD' => Colors.orange,
-      _ => Colors.green,
+      'ABSENT' => AppColors.error,
+      'RETARD' => AppColors.warning,
+      _ => AppColors.success,
     };
   }
 }
@@ -167,7 +163,7 @@ class _StatusToggle extends StatelessWidget {
       style: ButtonStyle(
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         visualDensity: VisualDensity.compact,
-        textStyle: WidgetStateProperty.all(const TextStyle(fontSize: 11)),
+        textStyle: WidgetStateProperty.all(AppTextStyles.caption),
       ),
     );
   }
