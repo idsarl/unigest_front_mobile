@@ -7,7 +7,8 @@ class AppConstants {
     if (kIsWeb) {
       return 'http://localhost:5400';
     } else if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://192.168.1.29:5400';
+      return 'https://api.unigest.com/api';
+      // return 'http://192.168.1.29:5400';
     } else {
       return 'http://localhost:5400';
     }
