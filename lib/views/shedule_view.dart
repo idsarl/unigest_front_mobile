@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/schedule_controller.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/theme/app_dimens.dart';
+import '../widgets/common/state_widgets.dart';
 
 class ScheduleView extends StatelessWidget {
   const ScheduleView({super.key});
@@ -10,29 +14,22 @@ class ScheduleView extends StatelessWidget {
     final controller = Get.put(ScheduleController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         toolbarHeight: 85,
         automaticallyImplyLeading: false,
         title: const SafeArea(
           bottom: false,
           child: Center(
-            child: Text(
-              'Emploi du temps',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+            child: Text('Emploi du temps', style: AppTextStyles.h3),
           ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
-            color: Colors.grey.shade300,
+            color: AppColors.divider,
             height: 1,
           ),
         ),
@@ -41,11 +38,7 @@ class ScheduleView extends StatelessWidget {
         top: false,
         child: Obx(() {
           if (controller.isLoading.value && controller.seances.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6C5CE7)),
-              ),
-            );
+            return const LoadingWidget();
           }
 
           return RefreshIndicator(
@@ -62,7 +55,7 @@ class ScheduleView extends StatelessWidget {
                       _buildIconButton(Icons.arrow_back_ios, controller.previousWeek),
                       Obx(() => Text(
                             controller.weekLabel,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: AppTextStyles.titleMedium,
                           )),
                       _buildIconButton(Icons.arrow_forward_ios, controller.nextWeek),
                     ],
@@ -73,44 +66,35 @@ class ScheduleView extends StatelessWidget {
                   Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(AppRadius.l),
+                        border: Border.all(color: AppColors.divider),
                       ),
                       child: Obx(() => Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildStat('${controller.dayTotalSeances}', 'Séances', const Color(0xFF536DFE)),
-                              _buildStat('${controller.dayTotalStudents}', 'Elèves', Colors.green),
-                              _buildStat(_dayTotalDuration(controller), 'Durée', Colors.red),
+                              _buildStat('${controller.dayTotalSeances}', 'Séances', AppColors.primary),
+                              _buildStat('${controller.dayTotalStudents}', 'Elèves', AppColors.success),
+                              _buildStat(_dayTotalDuration(controller), 'Durée', AppColors.error),
                             ],
                           )),
                     ),
                   const SizedBox(height: 24),
                   Obx(() => Text(
                         '${controller.dayProgramLabel} - PROGRAMME',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 0.5),
+                        style: AppTextStyles.titleMedium.copyWith(letterSpacing: 0.5),
                       )),
                   const SizedBox(height: 16),
                   if (controller.error.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(controller.error.value, style: const TextStyle(color: Colors.red)),
+                      child: Text(controller.error.value, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error)),
                     ),
                   if (controller.seances.isEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: const Text(
-                        'Aucune séance pour cette date.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black54),
-                      ),
+                    const EmptyWidget(
+                      title: 'Aucune séance',
+                      message: 'Aucune séance pour cette date.',
+                      icon: Icons.event_busy_outlined,
                     )
                   else
                     ...controller.seances.asMap().entries.map((entry) {
@@ -161,7 +145,9 @@ class ScheduleView extends StatelessWidget {
       final m1 = int.parse(p1[1]);
       final h2 = int.parse(p2[0]);
       final m2 = int.parse(p2[1]);
-      return (h2 * 60 + m2) - (h1 * 60 + m1);
+      var diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+      if (diff < 0) diff += 24 * 60;
+      return diff;
     } catch (_) {
       return 60;
     }
@@ -183,11 +169,11 @@ class ScheduleView extends StatelessWidget {
   Color _colorFromKey(String key) {
     switch (key) {
       case 'green':
-        return Colors.green;
+        return AppColors.success;
       case 'blue':
-        return const Color(0xFF536DFE);
+        return AppColors.primary;
       default:
-        return Colors.orange;
+        return AppColors.warning;
     }
   }
 
@@ -218,9 +204,9 @@ class ScheduleView extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.divider),
         ),
-        child: Icon(icon, size: 16, color: Colors.grey),
+        child: Icon(icon, size: AppIconSize.s, color: AppColors.textSecondary),
       ),
     );
   }
@@ -228,18 +214,24 @@ class ScheduleView extends StatelessWidget {
   Widget _buildDayItem(String day, String date, bool isSelected) {
     return Column(
       children: [
-        Text(day, style: TextStyle(color: isSelected ? const Color(0xFF6C5CE7) : Colors.grey, fontWeight: FontWeight.bold, fontSize: 13)),
+        Text(day,
+            style: AppTextStyles.bodySecondary.copyWith(
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF6C5CE7) : Colors.transparent,
+            color: isSelected ? AppColors.primary : Colors.transparent,
             shape: BoxShape.circle,
           ),
-          child: Text(date, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
+          child: Text(date,
+              style: AppTextStyles.bodyMedium.copyWith(
+                  color: isSelected ? AppColors.surface : AppColors.textPrimary,
+                  fontWeight: FontWeight.bold)),
         ),
         const SizedBox(height: 4),
-        if (isSelected) Container(width: 4, height: 4, decoration: const BoxDecoration(color: Color(0xFF6C5CE7), shape: BoxShape.circle)),
+        if (isSelected) Container(width: 4, height: 4, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)),
       ],
     );
   }
@@ -247,9 +239,9 @@ class ScheduleView extends StatelessWidget {
   Widget _buildStat(String value, String label, Color color) {
     return Column(
       children: [
-        Text(value, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 20)),
+        Text(value, style: AppTextStyles.h3.copyWith(color: color)),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w500)),
+        Text(label, style: AppTextStyles.label),
       ],
     );
   }
@@ -264,21 +256,21 @@ class ScheduleView extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.m),
+        border: Border.all(color: AppColors.divider),
       ),
       child: IntrinsicHeight(
         child: Row(
           children: [
-            Container(width: 5, decoration: const BoxDecoration(color: Color(0xFF6C5CE7), borderRadius: BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)))),
+            Container(width: 5, decoration: const BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.only(topLeft: Radius.circular(AppRadius.m), bottomLeft: Radius.circular(AppRadius.m)))),
             const SizedBox(width: 12),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
                 children: [
-                  Text(startTime, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  Text(endTime, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                  Text(startTime, style: AppTextStyles.bodySecondary.copyWith(fontWeight: FontWeight.bold)),
+                  Text(endTime, style: AppTextStyles.bodySecondary),
                 ],
               ),
             ),
@@ -288,13 +280,13 @@ class ScheduleView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(subject, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.people_outline, size: 14, color: Colors.grey),
+                      const Icon(Icons.people_outline, size: AppIconSize.s, color: AppColors.textSecondary),
                       const SizedBox(width: 4),
-                      Text(className, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(className, style: AppTextStyles.label),
                     ],
                   ),
                 ],
@@ -306,7 +298,7 @@ class ScheduleView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(duration, style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text(duration, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

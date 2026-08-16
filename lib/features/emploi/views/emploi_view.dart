@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:get/get.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimens.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/skeleton_loader.dart';
+import '../../../widgets/common/state_widgets.dart';
 import '../controllers/emploi_controller.dart';
 import '../../../services/emploi_service.dart';
 
@@ -43,30 +47,15 @@ class EmploiView extends StatelessWidget {
                 );
               }
               if (ctrl.error.value != null) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(ctrl.error.value!),
-                      const SizedBox(height: 12),
-                      FilledButton(
-                          onPressed: () =>
-                              ctrl.chargerJour(ctrl.selectedDate.value),
-                          child: const Text('Réessayer')),
-                    ],
-                  ),
+                return ErrorWidget(
+                  message: ctrl.error.value,
+                  onRetry: () => ctrl.chargerJour(ctrl.selectedDate.value),
                 );
               }
               if (ctrl.emplois.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.event_busy, size: 48, color: Colors.grey[400]),
-                      const SizedBox(height: 8),
-                      const Text('Aucun cours ce jour'),
-                    ],
-                  ),
+                return const EmptyWidget(
+                  icon: Icons.event_busy,
+                  title: 'Aucun cours ce jour',
                 );
               }
 
@@ -112,7 +101,7 @@ class _DateSelector extends StatelessWidget {
         Expanded(
           child: Text(label,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w600)),
+              style: AppTextStyles.titleMedium),
         ),
         IconButton(icon: const Icon(Icons.chevron_right), onPressed: onNext),
       ],
@@ -130,7 +119,7 @@ class _EmploiCard extends StatelessWidget {
       final c = hex.replaceAll('#', '');
       return Color(int.parse('FF$c', radix: 16));
     } catch (_) {
-      return Colors.indigo;
+      return AppColors.primary;
     }
   }
 
@@ -147,7 +136,7 @@ class _EmploiCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(12)),
+                    left: Radius.circular(AppRadius.m)),
               ),
             ),
             Expanded(
@@ -156,13 +145,9 @@ class _EmploiCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(emploi.matiereNom,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(emploi.matiereNom, style: AppTextStyles.titleMedium),
                     const SizedBox(height: 4),
-                    Text(emploi.classeNom,
-                        style:
-                            TextStyle(fontSize: 13, color: Colors.grey[600])),
+                    Text(emploi.classeNom, style: AppTextStyles.bodySecondary),
                   ],
                 ),
               ),
@@ -174,11 +159,9 @@ class _EmploiCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(emploi.heureDebut,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 13)),
-                  Text(emploi.heureFin,
-                      style:
-                          TextStyle(fontSize: 12, color: Colors.grey[500])),
+                      style: AppTextStyles.bodyMedium
+                          .copyWith(fontWeight: FontWeight.w600)),
+                  Text(emploi.heureFin, style: AppTextStyles.caption),
                 ],
               ),
             ),

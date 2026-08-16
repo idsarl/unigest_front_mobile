@@ -91,7 +91,11 @@ class AppelController extends GetxController {
               final p2 = endStr.split(':');
               final startMins = int.parse(p1[0]) * 60 + int.parse(p1[1]);
               final endMins = int.parse(p2[0]) * 60 + int.parse(p2[1]);
-              if (currentMins >= startMins && currentMins <= endMins) {
+              final crossesMidnight = endMins < startMins;
+              final isCurrent = crossesMidnight
+                  ? (currentMins >= startMins || currentMins <= endMins)
+                  : (currentMins >= startMins && currentMins <= endMins);
+              if (isCurrent) {
                 currentEmploi = map;
                 break;
               } else if (currentMins < startMins) {

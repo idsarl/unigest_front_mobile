@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:get/get.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/skeleton_loader.dart';
 import '../../../models/affectation.dart';
+import '../../../widgets/common/state_widgets.dart';
 import '../controllers/note_controller.dart';
 
 class NoteListView extends StatefulWidget {
@@ -39,8 +42,7 @@ class _NoteListViewState extends State<NoteListView> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
                         '${aff.classeNom} · ${aff.filiereNom}',
-                        style:
-                            TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        style: AppTextStyles.caption),
                   ),
                 ),
           actions: [
@@ -48,9 +50,10 @@ class _NoteListViewState extends State<NoteListView> {
                 ? Padding(
                     padding: const EdgeInsets.only(right: 4),
                     child: Chip(
-                        label: const Text('Non enregistré',
-                            style: TextStyle(fontSize: 11)),
-                        backgroundColor: Colors.orange[100]),
+                        label: Text('Non enregistré',
+                            style: AppTextStyles.label
+                                .copyWith(color: AppColors.warning)),
+                        backgroundColor: AppColors.warning.withAlpha(30)),
                   )
                 : const SizedBox.shrink()),
           ],
@@ -63,10 +66,10 @@ class _NoteListViewState extends State<NoteListView> {
             );
           }
           if (ctrl.error.value != null) {
-            return Center(child: Text(ctrl.error.value!));
+            return ErrorWidget(message: ctrl.error.value);
           }
           if (ctrl.entries.isEmpty) {
-            return const Center(child: Text('Aucun étudiant'));
+            return const EmptyWidget(title: 'Aucun étudiant');
           }
 
           return ListView.separated(
@@ -78,8 +81,7 @@ class _NoteListViewState extends State<NoteListView> {
               return Obx(() {
                 return ListTile(
                   leading: CircleAvatar(
-                    child: Text('${i + 1}',
-                        style: const TextStyle(fontSize: 12)),
+                    child: Text('${i + 1}', style: AppTextStyles.caption),
                   ),
                   title: Text(entry.etudiantNom),
                   trailing: SizedBox(

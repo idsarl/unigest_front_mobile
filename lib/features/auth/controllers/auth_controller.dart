@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/utils/error_handler.dart';
 import '../../../models/user.dart';
 import '../../../services/auth_service.dart';
 import '../../../core/session/app_session.dart';
@@ -121,7 +122,7 @@ class AuthController extends GetxController {
         msg.contains('Connection refused')) {
       return 'Impossible de joindre le serveur (${AppConstants.baseUrl}).';
     }
-    if (msg.contains('401') || msg.contains('403')) {
+    if (e is UnauthorizedException || e is ForbiddenException) {
       return 'Email ou mot de passe incorrect';
     }
     return 'Connexion impossible : $msg';

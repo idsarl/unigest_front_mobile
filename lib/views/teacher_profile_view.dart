@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/teacher_profile_controller.dart';
-import '../core/session/app_session.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/theme/app_dimens.dart';
 
 class TeacherProfileView extends StatelessWidget {
   const TeacherProfileView({super.key});
@@ -11,34 +13,31 @@ class TeacherProfileView extends StatelessWidget {
     final controller = Get.put(TeacherProfileController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
+        title: Text(
           'Mon Profil',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+          style: AppTextStyles.h2,
         ),
         centerTitle: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
-            color: Colors.grey.shade300,
+            color: AppColors.divider,
             height: 1,
           ),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.m, vertical: AppSpacing.m),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,11 +47,11 @@ class TeacherProfileView extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppRadius.l),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                      color: AppColors.primary.withOpacity(0.1),
                       spreadRadius: 5,
                       blurRadius: 20,
                       offset: const Offset(0, 5),
@@ -66,12 +65,12 @@ class TeacherProfileView extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                            color: const Color(0xFF6C5CE7).withOpacity(0.3),
+                            color: AppColors.primary.withOpacity(0.3),
                             width: 3),
                       ),
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundColor: const Color(0xFF6C5CE7),
+                        backgroundColor: AppColors.primary,
                         child: Obx(() => Text(
                               _initials(controller.teacherName.value),
                               style: const TextStyle(
@@ -85,26 +84,21 @@ class TeacherProfileView extends StatelessWidget {
                     const SizedBox(height: 20),
                     Obx(() => Text(
                           controller.teacherName.value,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF2D3436),
-                          ),
+                          style: AppTextStyles.h2
+                              .copyWith(fontWeight: FontWeight.w800),
                         )),
                     const SizedBox(height: 8),
                     Obx(() => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Icon(Icons.email_outlined,
-                                size: 16, color: Colors.grey),
+                                size: AppIconSize.s,
+                                color: AppColors.textSecondary),
                             const SizedBox(width: 5),
                             Text(
                               controller.teacherEmail.value,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                           ],
                         )),
@@ -113,19 +107,19 @@ class TeacherProfileView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                        color: AppColors.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: const [
                           Icon(Icons.school,
-                              size: 16, color: Color(0xFF6C5CE7)),
+                              size: AppIconSize.s, color: AppColors.primary),
                           SizedBox(width: 8),
                           Text(
                             'Enseignant',
                             style: TextStyle(
-                              color: Color(0xFF6C5CE7),
+                              color: AppColors.primary,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
@@ -144,20 +138,16 @@ class TeacherProfileView extends StatelessWidget {
                   ? Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey.shade200),
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(AppRadius.l),
+                        border: Border.all(color: AppColors.divider),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Modifier mon profil',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                            style: AppTextStyles.titleMedium,
                           ),
                           const SizedBox(height: 15),
 
@@ -206,15 +196,13 @@ class TeacherProfileView extends StatelessWidget {
                               padding: const EdgeInsets.all(12),
                               margin: const EdgeInsets.only(bottom: 15),
                               decoration: BoxDecoration(
-                                color: Colors.red.shade100,
-                                borderRadius: BorderRadius.circular(8),
+                                color: AppColors.error.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(AppRadius.s),
                               ),
                               child: Text(
                                 controller.error.value,
-                                style: TextStyle(
-                                  color: Colors.red.shade700,
-                                  fontSize: 13,
-                                ),
+                                style: AppTextStyles.bodySecondary
+                                    .copyWith(color: AppColors.error),
                               ),
                             ),
 
@@ -226,12 +214,7 @@ class TeacherProfileView extends StatelessWidget {
                                   onPressed: controller.isLoading.value
                                       ? null
                                       : controller.toggleEditMode,
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 14),
-                                  ),
-                                  child: const Text('Annuler',
-                                      style: TextStyle(color: Colors.grey)),
+                                  child: const Text('Annuler'),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -249,22 +232,6 @@ class TeacherProfileView extends StatelessWidget {
                                                 controller.emailController.text,
                                           );
                                         },
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                      controller.isLoading.value
-                                          ? Colors.grey
-                                          : const Color(0xFF6C5CE7),
-                                    ),
-                                    foregroundColor:
-                                        WidgetStateProperty.all(Colors.white),
-                                    padding: WidgetStateProperty.all(
-                                        const EdgeInsets.symmetric(
-                                            vertical: 14)),
-                                    shape: WidgetStateProperty.all(
-                                        RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10))),
-                                  ),
                                   child: controller.isLoading.value
                                       ? const SizedBox(
                                           height: 20,
@@ -275,10 +242,7 @@ class TeacherProfileView extends StatelessWidget {
                                                   AlwaysStoppedAnimation<Color>(
                                                       Colors.white)),
                                         )
-                                      : const Text('Enregistrer',
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600)),
+                                      : const Text('Enregistrer'),
                                 ),
                               ),
                             ],
@@ -289,20 +253,16 @@ class TeacherProfileView extends StatelessWidget {
                   : Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey.shade200),
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(AppRadius.l),
+                        border: Border.all(color: AppColors.divider),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Actions',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                            style: AppTextStyles.titleMedium,
                           ),
                           const SizedBox(height: 15),
 
@@ -312,15 +272,15 @@ class TeacherProfileView extends StatelessWidget {
                             child: ElevatedButton.icon(
                               onPressed: controller.toggleEditMode,
                               icon: const Icon(Icons.edit,
-                                  color: Color(0xFF6C5CE7)),
-                              label: const Text(
+                                  color: AppColors.primary),
+                              label: Text(
                                 'Modifier mon profil',
-                                style: TextStyle(
-                                    color: Color(0xFF6C5CE7), fontSize: 15),
+                                style: AppTextStyles.bodyMedium
+                                    .copyWith(color: AppColors.primary),
                               ),
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(
-                                    const Color(0xFFE8E6FF)),
+                                    AppColors.primary.withOpacity(0.1)),
                                 alignment: Alignment.centerLeft,
                                 padding: WidgetStateProperty.all(
                                     const EdgeInsets.symmetric(
@@ -328,7 +288,7 @@ class TeacherProfileView extends StatelessWidget {
                                 shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                         borderRadius:
-                                            BorderRadius.circular(10))),
+                                            BorderRadius.circular(AppRadius.s))),
                               ),
                             ),
                           ),
@@ -352,11 +312,7 @@ class TeacherProfileView extends StatelessWidget {
   Widget _buildTextFieldLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        color: Colors.black87,
-      ),
+      style: AppTextStyles.label.copyWith(color: AppColors.textPrimary),
     );
   }
 
@@ -370,18 +326,6 @@ class TeacherProfileView extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF6C5CE7)),
-        ),
       ),
     );
   }

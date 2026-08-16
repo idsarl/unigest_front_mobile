@@ -164,13 +164,13 @@ class ApiService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return response;
     } else if (response.statusCode == 401) {
-      throw ErrorHandler.createUnauthorizedException();
+      throw ErrorHandler.createUnauthorizedException(body: decodeBody(response));
     } else if (response.statusCode == 403) {
-      throw ErrorHandler.createForbiddenException();
+      throw ErrorHandler.createForbiddenException(body: decodeBody(response));
     } else if (response.statusCode == 404) {
-      throw ErrorHandler.createNotFoundException();
+      throw ErrorHandler.createNotFoundException(body: decodeBody(response));
     } else if (response.statusCode >= 500) {
-      throw ErrorHandler.createServerException();
+      throw ErrorHandler.createServerException(body: decodeBody(response));
     } else {
       throw ErrorHandler.createHttpException(
           response.statusCode, decodeBody(response));

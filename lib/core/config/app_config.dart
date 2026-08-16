@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 /// Permet de gérer les environnements (dev/prod) facilement
 class AppConfig {
   // Environnement
-  static const Environment environment = Environment.development;
+  static const Environment environment = Environment.production;
   static const int _devApiPort = 5400;
 
   // Configuration API selon l'environnement
@@ -13,7 +13,7 @@ class AppConfig {
       case Environment.development:
         return 'http://$_devApiHost:$_devApiPort/api';
       case Environment.production:
-        return 'https://api.unigest.com/api';
+        return 'https://api.lyuni-gest.com/api';
     }
   }
 
@@ -22,7 +22,8 @@ class AppConfig {
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 'https://api.unigest.com/api';
+        return 'https://192.168.100.79/api';
+        // return 'https://api.unigest.com/api';
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:
       case TargetPlatform.linux:
@@ -32,6 +33,8 @@ class AppConfig {
         return 'localhost';
     }
   }
+
+  // static String get _devApiHost => '10.0.2.2';
 
   // Timeouts
   static const Duration connectionTimeout = Duration(seconds: 30);

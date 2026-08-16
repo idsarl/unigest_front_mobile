@@ -7,6 +7,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import '../core/constants/app_constants.dart';
 import '../core/session/app_session.dart';
 import '../core/storage/hive_service.dart';
+import '../core/utils/error_handler.dart';
 
 /// Service HTTP centralisé avec support hors ligne.
 class ApiService {
@@ -261,9 +262,8 @@ class ApiService {
         // Supprime la requête de la file une fois traitée
         await _hive.removeQueuedRequest(req['id'] as String);
       } catch (e) {
-        final msg = e.toString();
         // 401/403 = jamais autorisé pour cet utilisateur : supprimer définitivement
-        if (msg.contains('401') || msg.contains('403')) {
+        if (e is UnauthorizedException || e is ForbiddenException) {
           await _hive.removeQueuedRequest(req['id'] as String);
         }
         // autre erreur réseau : garder pour la prochaine tentative
@@ -280,7 +280,20 @@ class ApiService {
       if (response.body.isEmpty) return {};
       return json.decode(utf8.decode(response.bodyBytes));
     }
-    throw Exception('HTTP ${response.statusCode}: ${response.body}');
+    final body = utf8.decode(response.bodyBytes);
+    switch (response.statusCode) {
+      case 401:
+        throw ErrorHandler.createUnauthorizedException(body: body);
+      case 403:
+        throw ErrorHandler.createForbiddenException(body: body);
+      case 404:
+        throw ErrorHandler.createNotFoundException(body: body);
+      default:
+        if (response.statusCode >= 500) {
+          throw ErrorHandler.createServerException(body: body);
+        }
+        throw ErrorHandler.createHttpException(response.statusCode, body);
+    }
   }
 
   Future<Map<String, dynamic>> sendMessageWithFiles(

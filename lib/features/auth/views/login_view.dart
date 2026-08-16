@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimens.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -31,11 +34,11 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppSpacing.l),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Form(
@@ -43,49 +46,40 @@ class _LoginViewState extends State<LoginView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF6C5CE7),
-                        borderRadius: BorderRadius.circular(20),
+                    const SizedBox(height: AppSpacing.l),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.l),
+                      child: Image.asset(
+                        'assets/images/logo.jpeg',
+                        width: 100,
+                        fit: BoxFit.contain,
                       ),
-                      child: const Icon(Icons.school, size: 48, color: Colors.white),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.l),
                     const Text(
                       'UniGest',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+                      style: AppTextStyles.h1,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.xs),
                     const Text(
                       'Connexion',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 15, color: Colors.black54),
+                      style: AppTextStyles.bodySecondary,
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: AppSpacing.xl + AppSpacing.s),
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Email ou téléphone',
-                        prefixIcon: const Icon(Icons.email_outlined),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
+                        prefixIcon: Icon(Icons.email_outlined),
                       ),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Champ requis'
+                          : null,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.m),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -94,47 +88,36 @@ class _LoginViewState extends State<LoginView> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
-                          onPressed: () =>
-                              setState(() => _obscurePassword = !_obscurePassword),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ),
                       validator: (v) =>
                           (v == null || v.isEmpty) ? 'Champ requis' : null,
                       onFieldSubmitted: (_) => _submit(),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.s),
                     Obx(() {
                       final err = _auth.error.value;
                       if (err == null) return const SizedBox.shrink();
                       return Padding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 8),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.s),
                         child: Text(
                           err,
-                          style: const TextStyle(color: Colors.red, fontSize: 13),
+                          style: AppTextStyles.caption.copyWith(color: AppColors.error),
                           textAlign: TextAlign.center,
                         ),
                       );
                     }),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.m),
                     Obx(() => SizedBox(
                           height: 50,
                           child: ElevatedButton(
                             onPressed: _auth.isLoading.value ? null : _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6C5CE7),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 0,
-                            ),
                             child: _auth.isLoading.value
                                 ? const SizedBox(
                                     height: 22,
@@ -144,17 +127,10 @@ class _LoginViewState extends State<LoginView> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text(
-                                    'Se connecter',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                : const Text('Se connecter'),
                           ),
                         )),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.l),
                   ],
                 ),
               ),

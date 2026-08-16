@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import '../controllers/teacher_home_controller.dart';
 import '../core/session/app_session.dart';
 import '../features/auth/controllers/auth_controller.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/theme/app_dimens.dart';
 import 'teacher_profile_view.dart';
 
 class TeacherHomeView extends StatelessWidget {
@@ -14,17 +17,17 @@ class TeacherHomeView extends StatelessWidget {
     final controller = Get.put(TeacherHomeController());
 
     return Scaffold(
-      // Fond du corps de la page en gris très clair conforme à l'image
-      backgroundColor: const Color(0xFFF8F9FA),
+      // Fond du corps de la page conforme au thème central
+      backgroundColor: AppColors.background,
 
       // LE HAUT DE LA PAGE : Fond blanc avec le trait de séparation horizontal
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         elevation: 0,
         toolbarHeight: 85, // Donne de l'espace pour respirer comme sur l'UI
         automaticallyImplyLeading: false,
         title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -32,12 +35,13 @@ class TeacherHomeView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Bonjour,',
-                      style: TextStyle(fontSize: 16, color: Colors.black54, fontWeight: FontWeight.normal)),
+                  Text('Bonjour,',
+                      style: AppTextStyles.bodyLarge
+                          .copyWith(color: AppColors.textSecondary)),
                   const SizedBox(height: 2),
                   Obx(() => Text(
                         controller.teacherName.value,
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+                        style: AppTextStyles.h2,
                       )),
                 ],
               ),
@@ -46,7 +50,8 @@ class TeacherHomeView extends StatelessWidget {
                   const SizedBox(width: 15),
                   PopupMenuButton<String>(
                     offset: const Offset(0, 40),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.m)),
                     onSelected: (value) {
                       if (value == 'logout') {
                         Get.find<AuthController>().logout();
@@ -59,7 +64,8 @@ class TeacherHomeView extends StatelessWidget {
                             value: 'profil',
                             child: Row(
                               children: [
-                                Icon(Icons.person, size: 18, color: Colors.blue),
+                                Icon(Icons.person,
+                                    size: AppIconSize.s, color: AppColors.info),
                                 SizedBox(width: 8),
                                 Text('Mon Profil'),
                               ],
@@ -69,7 +75,9 @@ class TeacherHomeView extends StatelessWidget {
                             value: 'logout',
                             child: Row(
                               children: [
-                                Icon(Icons.logout, size: 18, color: Colors.red),
+                                Icon(Icons.logout,
+                                    size: AppIconSize.s,
+                                    color: AppColors.error),
                                 SizedBox(width: 8),
                                 Text('Déconnexion'),
                               ],
@@ -78,7 +86,7 @@ class TeacherHomeView extends StatelessWidget {
                         ],
                     child: CircleAvatar(
                       radius: 18,
-                      backgroundColor: const Color(0xFF6C5CE7),
+                      backgroundColor: AppColors.primary,
                       child: Text(
                         _initials(AppSession.instance.teacherName),
                         style: const TextStyle(
@@ -98,7 +106,7 @@ class TeacherHomeView extends StatelessWidget {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
-            color: Colors.grey.shade300,
+            color: AppColors.divider,
             height: 1,
           ),
         ),
@@ -111,7 +119,7 @@ class TeacherHomeView extends StatelessWidget {
           if (controller.isLoading.value && controller.seances.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6C5CE7)),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             );
           }
@@ -124,21 +132,18 @@ class TeacherHomeView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 50, color: Colors.redAccent),
+                    const Icon(Icons.error_outline,
+                        size: AppIconSize.l, color: AppColors.error),
                     const SizedBox(height: 15),
                     Text(
                       controller.error.value,
-                      style: const TextStyle(fontSize: 15, color: Colors.black87),
+                      style: AppTextStyles.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 15),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6C5CE7),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
                       onPressed: () => controller.fetchDashboardData(),
-                      child: const Text('Réessayer', style: TextStyle(color: Colors.white)),
+                      child: const Text('Réessayer'),
                     ),
                   ],
                 ),
@@ -147,11 +152,12 @@ class TeacherHomeView extends StatelessWidget {
           }
 
           return RefreshIndicator(
-            color: const Color(0xFF6C5CE7),
+            color: AppColors.primary,
             onRefresh: () => controller.fetchDashboardData(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.m, vertical: AppSpacing.m),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -165,26 +171,28 @@ class TeacherHomeView extends StatelessWidget {
                       _buildSmallStatCard(
                         '${controller.seances.length}',
                         "Cours Aujourd'hui",
-                        Colors.blue,
+                        AppColors.info,
                       ),
                       const SizedBox(width: 15),
                       _buildSmallStatCard(
                         '${controller.absencesCount.value}',
                         'Absences',
-                        Colors.red,
+                        AppColors.error,
                       ),
                     ],
                   ),
                   const SizedBox(height: 25),
 
-                  const Text('Statistique', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black)),
+                  Text('Statistique', style: AppTextStyles.titleMedium),
                   const SizedBox(height: 15),
 
                   // GRID DYNAMIQUE POUR LES STATISTIQUES DES CLASSES
                   _buildStatsGrid(controller),
                   const SizedBox(height: 25),
 
-                  const Text('AGENDA DU JOUR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
+                  Text('AGENDA DU JOUR',
+                      style: AppTextStyles.label
+                          .copyWith(color: AppColors.textPrimary)),
                   const SizedBox(height: 15),
 
                   // AGENDA DYNAMIQUE DU JOUR
@@ -206,24 +214,27 @@ class TeacherHomeView extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFF6C5CE7),
-          borderRadius: BorderRadius.circular(15),
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(AppRadius.l),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF6C5CE7).withOpacity(0.3),
+              color: AppColors.primary.withOpacity(0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             )
           ],
         ),
-        child: const Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Prochain cours', style: TextStyle(color: Colors.white70, fontSize: 13)),
-            SizedBox(height: 6),
-            Text('Aucun cours restant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-            SizedBox(height: 6),
-            Text("Bonne fin de journée !", style: TextStyle(color: Colors.white, fontSize: 14)),
+            const Text('Prochain cours',
+                style: TextStyle(color: Colors.white70, fontSize: 13)),
+            const SizedBox(height: 6),
+            Text('Aucun cours restant',
+                style: AppTextStyles.h2.copyWith(color: Colors.white)),
+            const SizedBox(height: 6),
+            const Text("Bonne fin de journée !",
+                style: TextStyle(color: Colors.white, fontSize: 14)),
           ],
         ),
       );
@@ -242,11 +253,11 @@ class TeacherHomeView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF6C5CE7),
-        borderRadius: BorderRadius.circular(15),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6C5CE7).withOpacity(0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -255,11 +266,14 @@ class TeacherHomeView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Prochain cours dans', style: TextStyle(color: Colors.white70, fontSize: 13)),
+          const Text('Prochain cours dans',
+              style: TextStyle(color: Colors.white70, fontSize: 13)),
           const SizedBox(height: 6),
-          Text(timeString, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(timeString,
+              style: AppTextStyles.h1.copyWith(color: Colors.white)),
           const SizedBox(height: 6),
-          Text('$matiere$label', style: const TextStyle(color: Colors.white, fontSize: 14)),
+          Text('$matiere$label',
+              style: const TextStyle(color: Colors.white, fontSize: 14)),
         ],
       ),
     );
@@ -273,14 +287,14 @@ class TeacherHomeView extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(30),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey.shade200),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.l),
+          border: Border.all(color: AppColors.divider),
         ),
         child: Center(
           child: Text(
             moyenneData['message'] ?? 'Aucune statistique de note disponible aujourd\'hui.',
-            style: const TextStyle(color: Colors.black54, fontSize: 13),
+            style: AppTextStyles.bodySecondary,
             textAlign: TextAlign.center,
           ),
         ),
@@ -292,28 +306,28 @@ class TeacherHomeView extends StatelessWidget {
         'titre': 'Taux de réussite',
         'note': moyenneData['tauxReussite'] ?? '0%',
         'sousTitre': '',
-        'color': Colors.green,
+        'color': AppColors.success,
         'icon': Icons.check_circle_outline,
       },
       {
         'titre': 'Meilleure note',
         'note': moyenneData['meilleureNote'] ?? '0',
         'sousTitre': 'sur 20',
-        'color': Colors.blue,
+        'color': AppColors.info,
         'icon': Icons.star_border,
       },
       {
         'titre': 'Plus faible note',
         'note': moyenneData['plusFaibleNote'] ?? '0',
         'sousTitre': 'sur 20',
-        'color': Colors.red,
+        'color': AppColors.error,
         'icon': Icons.trending_down,
       },
       {
         'titre': 'Notes ≥ 10',
         'note': moyenneData['notesSuperieuresOuEgalesA10']?.toString() ?? '0',
         'sousTitre': 'étudiants',
-        'color': Colors.purple,
+        'color': AppColors.secondary,
         'icon': Icons.pie_chart_outline,
       },
     ];
@@ -345,9 +359,9 @@ class TeacherHomeView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.shade200),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.l),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,7 +373,8 @@ class TeacherHomeView extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.w500),
+                  style: AppTextStyles.bodyMedium
+                      .copyWith(fontWeight: FontWeight.w500),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -369,15 +384,41 @@ class TeacherHomeView extends StatelessWidget {
           ),
           Text(
             value,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
+            style: AppTextStyles.h2.copyWith(color: color),
           ),
           if (subtitle.isNotEmpty)
             Text(
               subtitle,
-              style: const TextStyle(fontSize: 11, color: Colors.black54),
+              style: AppTextStyles.caption,
             )
           else
             const SizedBox(height: 11), // Pour garder le même alignement même sans sous-titre
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmAction({
+    required String title,
+    required String message,
+    required VoidCallback onConfirm,
+  }) {
+    return Get.dialog(
+      AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              onConfirm();
+            },
+            child: const Text('Confirmer'),
+          ),
         ],
       ),
     );
@@ -390,31 +431,31 @@ class TeacherHomeView extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(30),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey.shade200),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.l),
+          border: Border.all(color: AppColors.divider),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
             'Aucun cours planifié pour aujourd\'hui.',
-            style: TextStyle(color: Colors.black54, fontSize: 13),
+            style: AppTextStyles.bodySecondary,
           ),
         ),
       );
     }
 
     final List<Color> agendaColors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
+      AppColors.info,
+      AppColors.success,
+      AppColors.warning,
+      AppColors.secondary,
     ];
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.shade200),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.l),
+        border: Border.all(color: AppColors.divider),
       ),
       child: ListView.separated(
         shrinkWrap: true,
@@ -458,17 +499,32 @@ class TeacherHomeView extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey.shade200),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.l),
+          border: Border.all(color: AppColors.divider),
         ),
         child: Column(
           children: [
-            Text(value, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: color)),
+            Text(value, style: AppTextStyles.h2.copyWith(color: color)),
             const SizedBox(height: 4),
-            Text(title, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text(title, style: AppTextStyles.caption),
           ],
         ),
+      ),
+    );
+  }
+
+  // --- PILLULE DE STATUT (extrait pour éviter la duplication x3) ---
+  Widget _buildStatusPill(String text, {required Color color}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(AppRadius.m),
+      ),
+      child: Text(
+        text,
+        style: AppTextStyles.label.copyWith(color: color),
       ),
     );
   }
@@ -490,8 +546,8 @@ class TeacherHomeView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(t1, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                  Text(t2, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text(t1, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+                  Text(t2, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
                 ],
               ),
               const SizedBox(width: 30),
@@ -499,8 +555,8 @@ class TeacherHomeView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text(sub, style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                    Text(subject, style: AppTextStyles.titleMedium),
+                    Text(sub, style: AppTextStyles.bodySecondary),
                   ],
                 ),
               ),
@@ -511,97 +567,38 @@ class TeacherHomeView extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade100,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          'En cours',
-                          style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      _buildStatusPill('En cours', color: AppColors.success),
                       const SizedBox(width: 8),
                       ElevatedButton(
-                        onPressed: () => controller.terminerSeance(index),
+                        onPressed: () => _confirmAction(
+                          title: 'Terminer la séance',
+                          message: 'Voulez-vous vraiment terminer cette séance ?',
+                          onConfirm: () => controller.terminerSeance(index),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade400,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          backgroundColor: AppColors.error,
                         ),
-                        child: const Text(
-                          'Arrêter',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                        ),
+                        child: const Text('Arrêter'),
                       ),
                     ],
                   )
                 else if (statut == 'Terminé')
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'Terminé',
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  )
+                  _buildStatusPill('Terminé', color: AppColors.success)
                 else if (statut == 'Non effectuée')
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'Non effectuée',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  )
+                  _buildStatusPill('Non effectuée', color: AppColors.error)
                 else
                   const SizedBox.shrink()
               else // seance == null (pas encore démarrée)
                 if (statut == 'Non effectuée')
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'Non effectuée',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  )
+                  _buildStatusPill('Non effectuée', color: AppColors.error)
                 else if (affectationId != null)
                   ElevatedButton(
-                    onPressed: () => controller.demarrerSeance(index),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6C5CE7),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    onPressed: () => _confirmAction(
+                      title: 'Démarrer la séance',
+                      message: 'Voulez-vous vraiment démarrer cette séance ?',
+                      onConfirm: () => controller.demarrerSeance(index),
                     ),
-                    child: const Text(
-                      'Démarrer',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                    ),
+                    child: const Text('Démarrer'),
                   )
                 else
                   const SizedBox.shrink(),

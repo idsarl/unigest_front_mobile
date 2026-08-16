@@ -1,18 +1,25 @@
 import 'package:flutter/foundation.dart';
 
+/// Application-level constants
 class AppConstants {
+  /// Application name
   static const String appName = 'unigest_app';
 
   static String get baseUrl {
     if (kIsWeb) {
       return 'http://localhost:5400';
     } else if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'https://api.unigest.com/api';
+      return 'https://192.168.100.79/api';
+      // return 'https://api.unigest.com/api';
       // return 'http://192.168.1.29:5400';
     } else {
       return 'http://localhost:5400';
     }
   }
+  /// URL du backend Spring en ligne, utilisée par le module enseignant
+  /// (notes, appels, emploi du temps, messagerie/websocket).
+  // static const String baseUrl = 'https://api.lyuni-gest.com';
+
 
   static const String tokenKey = 'auth_token';
   static const String userKey = 'user_data';
