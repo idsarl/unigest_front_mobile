@@ -9,8 +9,8 @@ class AppConstants {
     if (kIsWeb) {
       return 'http://localhost:5400';
     } else if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'https://192.168.100.79/api';
-      // return 'https://api.unigest.com/api';
+      // return 'https://192.168.100.79/api';
+      return 'https://api.lyuni-gest.com/api';
       // return 'http://192.168.1.29:5400';
     } else {
       return 'http://localhost:5400';

@@ -25,8 +25,8 @@ dependencies:
   url_launcher: ^6.3.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  connectivity_plus: ^6.0.5
   sqflite: ^2.3.3
+  flutter_secure_storage: ^9.2.2
 
 dev_dependencies:
   flutter_test:

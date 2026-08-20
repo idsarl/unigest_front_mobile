@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import '../core/constants/app_constants.dart';
+import '../core/config/server_config_service.dart';
 import '../core/session/app_session.dart';
 import '../core/storage/hive_service.dart';
 import '../core/utils/error_handler.dart';
@@ -14,14 +13,25 @@ class ApiService {
   ApiService._();
   static final ApiService instance = ApiService._();
 
-  final String baseUrl = AppConstants.baseUrl;
+  String get _baseUrl {
+    final url = ServerConfigService.instance.serverUrl;
+    if (url == null || url.isEmpty) {
+      throw StateError(
+          'Aucun serveur configuré. Veuillez d\'abord configurer l\'URL du serveur.');
+    }
+    return url;
+  }
   final AppSession _session = AppSession.instance;
   final HiveService _hive = HiveService.instance;
-  final Connectivity _connectivity = Connectivity();
 
   Future<bool> get isConnected async {
-    final results = await _connectivity.checkConnectivity();
-    return !results.contains(ConnectivityResult.none);
+    try {
+      final result = await InternetAddress.lookup('8.8.8.8')
+          .timeout(const Duration(seconds: 3));
+      return result.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 
   Map<String, String> _headers({bool jsonBody = true}) {
@@ -38,8 +48,11 @@ class ApiService {
 
   Uri _uri(String endpoint, [Map<String, String>? query]) {
     final path = endpoint.startsWith('/') ? endpoint : '/$endpoint';
-    return Uri.parse('$baseUrl$path').replace(queryParameters: query);
+    return Uri.parse('$_baseUrl$path').replace(queryParameters: query);
   }
+
+  /// Vide le cache Hive et les requêtes en attente lors d'un changement de serveur.
+  Future<void> resetForServerChange() => _hive.clearQueuedRequests();
 
   String _cacheKey(String endpoint, [Map<String, String>? query]) {
     final queryStr =

@@ -19,11 +19,11 @@ class AppConfig {
 
   static String get _devApiHost {
     if (kIsWeb) return 'localhost';
-
+           
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 'https://192.168.100.79/api';
-        // return 'https://api.unigest.com/api';
+        // return 'http://192.168.100.79/api';
+        return 'https://api.lyuni-gest.com/api';
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:
       case TargetPlatform.linux:

@@ -1,9 +1,18 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
+import '../config/server_config_service.dart';
 import '../utils/error_handler.dart';
 
 class ApiService {
+  static String get _baseUrl {
+    final url = ServerConfigService.instance.serverUrl;
+    if (url == null || url.isEmpty) {
+      throw StateError('Aucun serveur configuré.');
+    }
+    return url;
+  }
+
   // Stockage du token JWT
   static String? _token;
 
@@ -42,7 +51,7 @@ class ApiService {
   // Méthode GET avec timeout et gestion d'erreurs
   static Future<http.Response> get(String endpoint) async {
     try {
-      final url = Uri.parse('${AppConfig.baseUrl}$endpoint');
+      final url = Uri.parse('$_baseUrl$endpoint');
       final response = await http
           .get(
         url,
@@ -65,7 +74,7 @@ class ApiService {
   static Future<http.Response> post(String endpoint,
       {Map<String, dynamic>? body}) async {
     try {
-      final url = Uri.parse('${AppConfig.baseUrl}$endpoint');
+      final url = Uri.parse('$_baseUrl$endpoint');
       final response = await http
           .post(
         url,
@@ -94,7 +103,7 @@ class ApiService {
     try {
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('${AppConfig.baseUrl}$endpoint'),
+        Uri.parse('$_baseUrl$endpoint'),
       );
       request.headers.addAll({
         'Accept': 'application/json',
@@ -117,7 +126,7 @@ class ApiService {
   static Future<http.Response> put(String endpoint,
       {Map<String, dynamic>? body}) async {
     try {
-      final url = Uri.parse('${AppConfig.baseUrl}$endpoint');
+      final url = Uri.parse('$_baseUrl$endpoint');
       final response = await http
           .put(
         url,
@@ -140,7 +149,7 @@ class ApiService {
   // Méthode DELETE avec timeout et gestion d'erreurs
   static Future<http.Response> delete(String endpoint) async {
     try {
-      final url = Uri.parse('${AppConfig.baseUrl}$endpoint');
+      final url = Uri.parse('$_baseUrl$endpoint');
       final response = await http
           .delete(
         url,

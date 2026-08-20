@@ -1,8 +1,9 @@
 import 'package:get/get.dart';
-import '../../../core/constants/app_constants.dart';
+import '../../../core/config/server_config_service.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../models/user.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/api_service.dart';
 import '../../../core/session/app_session.dart';
 
 class AuthController extends GetxController {
@@ -115,12 +116,27 @@ class AuthController extends GetxController {
     Get.offAllNamed('/auth');
   }
 
+  /// Déconnecte l'utilisateur, réinitialise le client HTTP et redirige vers
+  /// l'écran de configuration serveur pour permettre de changer d'organisation.
+  Future<void> changeServer() async {
+    await authService.logout();
+    await ApiService.instance.resetForServerChange();
+    userName.value = '';
+    userPrenom.value = '';
+    userRole.value = '';
+    userId.value = 0;
+    isAuthenticated.value = false;
+    await ServerConfigService.instance.clearServerUrl();
+    Get.offAllNamed('/server-config');
+  }
+
   String _formatError(Object e) {
     final msg = e.toString();
     if (msg.contains('SocketException') ||
         msg.contains('Failed host lookup') ||
         msg.contains('Connection refused')) {
-      return 'Impossible de joindre le serveur (${AppConstants.baseUrl}).';
+      final url = ServerConfigService.instance.serverUrl ?? 'serveur non configuré';
+      return 'Impossible de joindre le serveur ($url).';
     }
     if (e is UnauthorizedException || e is ForbiddenException) {
       return 'Email ou mot de passe incorrect';

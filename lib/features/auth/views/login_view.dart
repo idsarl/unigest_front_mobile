@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../../../core/config/server_config_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -28,6 +29,20 @@ class _LoginViewState extends State<LoginView> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!ServerConfigService.instance.isConfiguredRx.value) {
+      Get.snackbar(
+        'Serveur non configuré',
+        'Veuillez d\'abord saisir l\'adresse du serveur de votre établissement.',
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.all(AppSpacing.m),
+      );
+      await Future.delayed(const Duration(seconds: 1));
+      Get.offAllNamed('/server-config');
+      return;
+    }
+
     await _auth.login(_emailController.text, _passwordController.text);
   }
 
@@ -130,6 +145,33 @@ class _LoginViewState extends State<LoginView> {
                                 : const Text('Se connecter'),
                           ),
                         )),
+                                    const SizedBox(height: AppSpacing.l),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        await ServerConfigService.instance.clearServerUrl();
+                        Get.offAllNamed('/server-config');
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.m,
+                          horizontal: AppSpacing.l,
+                        ),
+                        side: const BorderSide(color: AppColors.textHint),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.m),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.dns_outlined,
+                        size: AppIconSize.m,
+                        color: AppColors.textHint,
+                      ),
+                      label: Text(
+                        'Configurer le serveur de mon établissement',
+                        style: AppTextStyles.bodySecondary
+                            .copyWith(color: AppColors.textHint),
+                      ),
+                    ),
                     const SizedBox(height: AppSpacing.l),
                   ],
                 ),

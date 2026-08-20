@@ -1,0 +1,47 @@
+====================================================
+  UniGest — Exemples d'URL serveur (tests locaux)
+====================================================
+
+Copiez l'URL qui correspond à votre environnement et collez-la
+dans l'écran "Configuration du serveur" au premier lancement de l'app.
+
+----------------------------------------------------
+DÉVELOPPEMENT LOCAL
+----------------------------------------------------
+
+  Android émulateur  →  http://10.0.2.2:5400/api
+  iOS simulateur     →  http://localhost:5400/api
+  Appareil physique  →  http://<IP_DE_VOTRE_MAC>:5400/api
+
+  Pour connaître l'IP de votre Mac sur le réseau local :
+    macOS : ifconfig | grep "inet " | grep -v 127
+    Exemple de résultat : 192.168.1.42
+    → URL à saisir : http://192.168.1.42:5400/api
+
+----------------------------------------------------
+SERVEUR DE STAGING / RECETTE
+----------------------------------------------------
+
+  https://staging.mon-etablissement.com/api
+
+----------------------------------------------------
+PRODUCTION
+----------------------------------------------------
+
+  https://mon-etablissement.com/api
+
+----------------------------------------------------
+NOTES
+----------------------------------------------------
+
+  - Toujours inclure /api à la fin si le backend Spring
+    expose ses endpoints sous ce préfixe.
+  - Ne pas mettre de slash final (http://...5400/api, PAS /api/).
+  - Le bouton "Valider et continuer" vérifie la connectivité
+    avant de sauvegarder. Le serveur doit être démarré.
+  - Pour changer de serveur depuis l'app : écran de connexion
+    → bouton "Changer de serveur" en bas de page.
+  - L'URL est stockée dans le trousseau sécurisé de l'OS
+    (flutter_secure_storage). Elle persiste entre les relances.
+
+====================================================

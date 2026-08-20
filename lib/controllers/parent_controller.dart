@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
-import '../core/constants/app_constants.dart';
+import '../core/config/server_config_service.dart';
 import '../core/session/app_session.dart';
 import '../core/utils/presence_utils.dart';
 import '../services/teacher_repository.dart';
@@ -107,7 +107,7 @@ class ParentController extends GetxController {
 
     _stompClient = StompClient(
       config: StompConfig.sockJS(
-        url: '${AppConstants.baseUrl}/ws',
+        url: '${ServerConfigService.instance.serverUrl ?? ''}/ws',
         stompConnectHeaders: {
           'Authorization': 'Bearer $token',
         },
