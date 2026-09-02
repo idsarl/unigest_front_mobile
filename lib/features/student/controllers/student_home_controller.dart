@@ -12,7 +12,6 @@ import '../../../core/services/emploi_service.dart';
 import '../../../core/services/absences_service.dart';
 import '../../../core/services/notifications_service.dart';
 import '../../../core/services/bulletin_service.dart';
-import '../../../services/storage_service.dart';
 
 class StudentHomeController extends BaseController {
   // Observables
@@ -272,7 +271,6 @@ class StudentHomeController extends BaseController {
 
   Future<void> logout() async {
     try {
-      await StorageService.logout();
       final authController = Get.find<AuthController>();
       await authController.logout();
     } catch (e) {

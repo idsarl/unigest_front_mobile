@@ -3,7 +3,6 @@ import '../../../core/state_management/getx_helpers.dart';
 import '../../../core/services/parent_service.dart';
 import '../../../models/parent_model.dart';
 import '../../../models/child_model.dart';
-import '../../../services/storage_service.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class ParentProfileController extends BaseController {
@@ -36,11 +35,9 @@ class ParentProfileController extends BaseController {
 
   Future<void> logout() async {
     try {
-      await StorageService.logout();
-      Get.offAllNamed('/auth');
+      await Get.find<AuthController>().logout();
     } catch (e) {
       setError(e.toString());
     }
   }
 }
-

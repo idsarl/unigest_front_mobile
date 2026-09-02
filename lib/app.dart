@@ -12,17 +12,25 @@ import 'features/student/controllers/student_home_controller.dart';
 import 'features/auth/views/login_view.dart';
 import 'core/theme/app_theme.dart';
 import 'views/MainLayout.dart';
+import 'services/api_service.dart';
+import 'services/connectivity_service.dart';
+import 'core/widgets/offline_banner.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<ConnectivityService>()) {
+      Get.put(
+        ConnectivityService(api: ApiService.instance),
+        permanent: true,
+      );
+    }
     return GetMaterialApp(
       title: 'UniGest',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -32,7 +40,12 @@ class MyApp extends StatelessWidget {
         Locale('fr', 'FR'),
       ],
       locale: const Locale('fr', 'FR'),
-
+      builder: (context, child) => Column(
+        children: [
+          const OfflineBanner(),
+          Expanded(child: child ?? const SizedBox.shrink()),
+        ],
+      ),
       home: const AuthWrapper(),
       getPages: [
         GetPage(

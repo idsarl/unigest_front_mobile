@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async' as async;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
@@ -13,26 +14,10 @@ class ApiService {
   ApiService._();
   static final ApiService instance = ApiService._();
 
-  String get _baseUrl {
-    final url = ServerConfigService.instance.serverUrl;
-    if (url == null || url.isEmpty) {
-      throw StateError(
-          'Aucun serveur configuré. Veuillez d\'abord configurer l\'URL du serveur.');
-    }
-    return url;
-  }
   final AppSession _session = AppSession.instance;
   final HiveService _hive = HiveService.instance;
 
-  Future<bool> get isConnected async {
-    try {
-      final result = await InternetAddress.lookup('8.8.8.8')
-          .timeout(const Duration(seconds: 3));
-      return result.isNotEmpty;
-    } catch (_) {
-      return false;
-    }
-  }
+  static const Duration _requestTimeout = Duration(seconds: 30);
 
   Map<String, String> _headers({bool jsonBody = true}) {
     final headers = <String, String>{
@@ -47,8 +32,35 @@ class ApiService {
   }
 
   Uri _uri(String endpoint, [Map<String, String>? query]) {
-    final path = endpoint.startsWith('/') ? endpoint : '/$endpoint';
-    return Uri.parse('$_baseUrl$path').replace(queryParameters: query);
+    return ServerConfigService.instance.resolveApiUri(endpoint, query);
+  }
+
+  bool _isNetworkFailure(Object error) =>
+      error is SocketException ||
+      error is async.TimeoutException ||
+      error is http.ClientException;
+
+  Future<Map<String, dynamic>> _queueMutation(
+    String method,
+    String endpoint, {
+    dynamic body,
+    Map<String, String>? query,
+  }) async {
+    final queuedAt = DateTime.now().toUtc().toIso8601String();
+    await _hive.addQueuedRequest({
+      'method': method,
+      'endpoint': endpoint,
+      'body': body,
+      'query': query,
+      'queuedAt': queuedAt,
+    });
+    return {
+      'success': false,
+      'queued': true,
+      'queuedAt': queuedAt,
+      'message':
+          'Modification enregistrée hors ligne, en attente de synchronisation.',
+    };
   }
 
   /// Vide le cache Hive et les requêtes en attente lors d'un changement de serveur.
@@ -64,21 +76,10 @@ class ApiService {
       {Map<String, String>? query, bool useCache = true}) async {
     final cacheKey = _cacheKey(endpoint, query);
 
-    // Vérifie la connexion
-    final hasConnection = await isConnected;
-
-    if (!hasConnection) {
-      // Hors ligne : essaye de récupérer depuis le cache
-      final cachedData = _hive.getCache(cacheKey);
-      if (cachedData != null) {
-        return cachedData;
-      }
-      throw Exception('Pas de connexion et pas de données en cache');
-    }
-
     try {
-      final response =
-          await http.get(_uri(endpoint, query), headers: _headers());
+      final response = await http
+          .get(_uri(endpoint, query), headers: _headers())
+          .timeout(_requestTimeout);
       final data = _handleResponse(response);
       // Sauvegarde dans le cache (TTL de 1 heure par défaut)
       if (useCache) {
@@ -86,7 +87,7 @@ class ApiService {
       }
       return data;
     } catch (e) {
-      // Si erreur réseau, essaye le cache
+      if (!_isNetworkFailure(e)) rethrow;
       final cachedData = _hive.getCache(cacheKey);
       if (cachedData != null) {
         return cachedData;
@@ -101,37 +102,18 @@ class ApiService {
     Map<String, String>? query,
     bool queueIfOffline = true,
   }) async {
-    final hasConnection = await isConnected;
-
-    if (!hasConnection && queueIfOffline) {
-      // Ajoute à la file d'attente
-      await _hive.addQueuedRequest({
-        'method': 'POST',
-        'endpoint': endpoint,
-        'body': body,
-        'query': query,
-      });
-      // Retourne une réponse simulée pour que l'UI continue
-      return {'success': true, 'queued': true};
-    }
-
     try {
-      final response = await http.post(
-        _uri(endpoint, query),
-        headers: _headers(),
-        body: body == null ? null : json.encode(body),
-      );
+      final response = await http
+          .post(
+            _uri(endpoint, query),
+            headers: _headers(),
+            body: body == null ? null : json.encode(body),
+          )
+          .timeout(_requestTimeout);
       return _handleResponse(response);
     } catch (e) {
-      // Si erreur réseau, ajoute à la file d'attente
-      if (queueIfOffline) {
-        await _hive.addQueuedRequest({
-          'method': 'POST',
-          'endpoint': endpoint,
-          'body': body,
-          'query': query,
-        });
-        return {'success': true, 'queued': true};
+      if (queueIfOffline && _isNetworkFailure(e)) {
+        return _queueMutation('POST', endpoint, body: body, query: query);
       }
       rethrow;
     }
@@ -143,34 +125,18 @@ class ApiService {
     Map<String, String>? query,
     bool queueIfOffline = true,
   }) async {
-    final hasConnection = await isConnected;
-
-    if (!hasConnection && queueIfOffline) {
-      await _hive.addQueuedRequest({
-        'method': 'PUT',
-        'endpoint': endpoint,
-        'body': body,
-        'query': query,
-      });
-      return {'success': true, 'queued': true};
-    }
-
     try {
-      final response = await http.put(
-        _uri(endpoint, query),
-        headers: _headers(),
-        body: body == null ? null : json.encode(body),
-      );
+      final response = await http
+          .put(
+            _uri(endpoint, query),
+            headers: _headers(),
+            body: body == null ? null : json.encode(body),
+          )
+          .timeout(_requestTimeout);
       return _handleResponse(response);
     } catch (e) {
-      if (queueIfOffline) {
-        await _hive.addQueuedRequest({
-          'method': 'PUT',
-          'endpoint': endpoint,
-          'body': body,
-          'query': query,
-        });
-        return {'success': true, 'queued': true};
+      if (queueIfOffline && _isNetworkFailure(e)) {
+        return _queueMutation('PUT', endpoint, body: body, query: query);
       }
       rethrow;
     }
@@ -182,34 +148,18 @@ class ApiService {
     Map<String, String>? query,
     bool queueIfOffline = true,
   }) async {
-    final hasConnection = await isConnected;
-
-    if (!hasConnection && queueIfOffline) {
-      await _hive.addQueuedRequest({
-        'method': 'PATCH',
-        'endpoint': endpoint,
-        'body': body,
-        'query': query,
-      });
-      return {'success': true, 'queued': true};
-    }
-
     try {
-      final response = await http.patch(
-        _uri(endpoint, query),
-        headers: _headers(),
-        body: body == null ? null : json.encode(body),
-      );
+      final response = await http
+          .patch(
+            _uri(endpoint, query),
+            headers: _headers(),
+            body: body == null ? null : json.encode(body),
+          )
+          .timeout(_requestTimeout);
       return _handleResponse(response);
     } catch (e) {
-      if (queueIfOffline) {
-        await _hive.addQueuedRequest({
-          'method': 'PATCH',
-          'endpoint': endpoint,
-          'body': body,
-          'query': query,
-        });
-        return {'success': true, 'queued': true};
+      if (queueIfOffline && _isNetworkFailure(e)) {
+        return _queueMutation('PATCH', endpoint, body: body, query: query);
       }
       rethrow;
     }
@@ -217,40 +167,23 @@ class ApiService {
 
   Future<dynamic> delete(String endpoint,
       {Map<String, String>? query, bool queueIfOffline = true}) async {
-    final hasConnection = await isConnected;
-
-    if (!hasConnection && queueIfOffline) {
-      await _hive.addQueuedRequest({
-        'method': 'DELETE',
-        'endpoint': endpoint,
-        'query': query,
-      });
-      return {'success': true, 'queued': true};
-    }
-
     try {
-      final response =
-          await http.delete(_uri(endpoint, query), headers: _headers());
+      final response = await http
+          .delete(_uri(endpoint, query), headers: _headers())
+          .timeout(_requestTimeout);
       return _handleResponse(response);
     } catch (e) {
-      if (queueIfOffline) {
-        await _hive.addQueuedRequest({
-          'method': 'DELETE',
-          'endpoint': endpoint,
-          'query': query,
-        });
-        return {'success': true, 'queued': true};
+      if (queueIfOffline && _isNetworkFailure(e)) {
+        return _queueMutation('DELETE', endpoint, query: query);
       }
       rethrow;
     }
   }
 
   /// Synchronise les requêtes en attente
-  Future<void> syncQueuedRequests() async {
-    final hasConnection = await isConnected;
-    if (!hasConnection) return;
-
+  Future<int> syncQueuedRequests() async {
     final requests = _hive.getQueuedRequests();
+    var syncedCount = 0;
     for (final req in requests) {
       try {
         final method = req['method'] as String;
@@ -268,20 +201,33 @@ class ApiService {
             await put(endpoint,
                 body: body, query: queryParams, queueIfOffline: false);
             break;
+          case 'PATCH':
+            await patch(endpoint,
+                body: body, query: queryParams, queueIfOffline: false);
+            break;
           case 'DELETE':
             await delete(endpoint, query: queryParams, queueIfOffline: false);
             break;
         }
         // Supprime la requête de la file une fois traitée
         await _hive.removeQueuedRequest(req['id'] as String);
+        syncedCount++;
       } catch (e) {
-        // 401/403 = jamais autorisé pour cet utilisateur : supprimer définitivement
-        if (e is UnauthorizedException || e is ForbiddenException) {
+        // Une requête définitivement invalide ne doit pas bloquer la file.
+        if (e is UnauthorizedException ||
+            e is ForbiddenException ||
+            (e is AppException &&
+                e.statusCode != null &&
+                e.statusCode! >= 400 &&
+                e.statusCode! < 500 &&
+                e.statusCode != 408 &&
+                e.statusCode != 429)) {
           await _hive.removeQueuedRequest(req['id'] as String);
         }
-        // autre erreur réseau : garder pour la prochaine tentative
+        if (_isNetworkFailure(e)) break;
       }
     }
+    return syncedCount;
   }
 
   /// Vide la file des requêtes en attente (à appeler à la connexion/déconnexion)
@@ -357,10 +303,12 @@ class ApiService {
 
   Future<void> downloadFile(String url, String savePath) async {
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: _headers(jsonBody: false),
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: _headers(jsonBody: false),
+          )
+          .timeout(_requestTimeout);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final file = File(savePath);

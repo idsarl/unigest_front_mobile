@@ -2,28 +2,19 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../config/server_config_service.dart';
+import '../session/app_session.dart';
 import '../utils/error_handler.dart';
 
 class ApiService {
-  static String get _baseUrl {
-    final url = ServerConfigService.instance.serverUrl;
-    if (url == null || url.isEmpty) {
-      throw StateError('Aucun serveur configuré.');
-    }
-    return url;
-  }
-
   // Stockage du token JWT
-  static String? _token;
-
-  static String? get token => _token;
+  static String? get token => AppSession.instance.token;
 
   static void setToken(String? newToken) {
-    _token = newToken;
+    AppSession.instance.token = newToken;
   }
 
   static void clearToken() {
-    _token = null;
+    AppSession.instance.token = null;
   }
 
   // Headers par défaut avec authentification
@@ -33,8 +24,8 @@ class ApiService {
       'Accept': 'application/json',
     };
 
-    if (_token != null) {
-      defaultHeaders['Authorization'] = 'Bearer $_token';
+    if (token != null && token!.isNotEmpty) {
+      defaultHeaders['Authorization'] = 'Bearer $token';
     }
 
     return defaultHeaders;
@@ -51,7 +42,7 @@ class ApiService {
   // Méthode GET avec timeout et gestion d'erreurs
   static Future<http.Response> get(String endpoint) async {
     try {
-      final url = Uri.parse('$_baseUrl$endpoint');
+      final url = ServerConfigService.instance.resolveApiUri(endpoint);
       final response = await http
           .get(
         url,
@@ -74,7 +65,7 @@ class ApiService {
   static Future<http.Response> post(String endpoint,
       {Map<String, dynamic>? body}) async {
     try {
-      final url = Uri.parse('$_baseUrl$endpoint');
+      final url = ServerConfigService.instance.resolveApiUri(endpoint);
       final response = await http
           .post(
         url,
@@ -103,11 +94,12 @@ class ApiService {
     try {
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('$_baseUrl$endpoint'),
+        ServerConfigService.instance.resolveApiUri(endpoint),
       );
       request.headers.addAll({
         'Accept': 'application/json',
-        if (_token != null) 'Authorization': 'Bearer $_token',
+        if (token != null && token!.isNotEmpty)
+          'Authorization': 'Bearer $token',
       });
       request.fields.addAll(fields);
 
@@ -126,7 +118,7 @@ class ApiService {
   static Future<http.Response> put(String endpoint,
       {Map<String, dynamic>? body}) async {
     try {
-      final url = Uri.parse('$_baseUrl$endpoint');
+      final url = ServerConfigService.instance.resolveApiUri(endpoint);
       final response = await http
           .put(
         url,
@@ -149,7 +141,7 @@ class ApiService {
   // Méthode DELETE avec timeout et gestion d'erreurs
   static Future<http.Response> delete(String endpoint) async {
     try {
-      final url = Uri.parse('$_baseUrl$endpoint');
+      final url = ServerConfigService.instance.resolveApiUri(endpoint);
       final response = await http
           .delete(
         url,
@@ -173,7 +165,8 @@ class ApiService {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return response;
     } else if (response.statusCode == 401) {
-      throw ErrorHandler.createUnauthorizedException(body: decodeBody(response));
+      throw ErrorHandler.createUnauthorizedException(
+          body: decodeBody(response));
     } else if (response.statusCode == 403) {
       throw ErrorHandler.createForbiddenException(body: decodeBody(response));
     } else if (response.statusCode == 404) {

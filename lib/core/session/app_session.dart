@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Session utilisateur connecté (JWT + profil enseignant).
 class AppSession {
@@ -11,6 +12,10 @@ class AppSession {
   static const String _keyTeacherName = 'teacher_name';
   static const String _keyTeacherEmail = 'teacher_email';
   static const String _keyRole = 'user_role';
+
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
 
   String? token;
   int teacherId = 0;
@@ -45,8 +50,10 @@ class AppSession {
   Future<void> persist() async {
     final prefs = await SharedPreferences.getInstance();
     if (token != null) {
-      await prefs.setString(_keyToken, token!);
+      await _secureStorage.write(key: _keyToken, value: token!);
     }
+    // Supprime l'ancienne copie non chiffrée après migration.
+    await prefs.remove(_keyToken);
     await prefs.setInt(_keyTeacherId, teacherId);
     await prefs.setString(_keyTeacherName, teacherName);
     await prefs.setString(_keyTeacherEmail, teacherEmail);
@@ -55,7 +62,16 @@ class AppSession {
 
   Future<bool> restore() async {
     final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString(_keyToken);
+    token = await _secureStorage.read(key: _keyToken);
+    // Migration transparente des versions qui stockaient le JWT en clair.
+    final legacyToken = prefs.getString(_keyToken);
+    if ((token == null || token!.isEmpty) &&
+        legacyToken != null &&
+        legacyToken.isNotEmpty) {
+      token = legacyToken;
+      await _secureStorage.write(key: _keyToken, value: legacyToken);
+    }
+    await prefs.remove(_keyToken);
     teacherId = prefs.getInt(_keyTeacherId) ?? 0;
     teacherName = prefs.getString(_keyTeacherName) ?? '';
     teacherEmail = prefs.getString(_keyTeacherEmail) ?? '';
@@ -65,6 +81,7 @@ class AppSession {
 
   Future<void> clearStorage() async {
     final prefs = await SharedPreferences.getInstance();
+    await _secureStorage.delete(key: _keyToken);
     await prefs.remove(_keyToken);
     await prefs.remove(_keyTeacherId);
     await prefs.remove(_keyTeacherName);

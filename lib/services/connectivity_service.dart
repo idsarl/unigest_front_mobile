@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 import 'package:get/get.dart';
-import '../core/db/database_helper.dart';
+import 'package:http/http.dart' as http;
+import '../core/config/server_config_service.dart';
+import '../core/session/app_session.dart';
 import 'api_service.dart';
 
 class ConnectivityService extends GetxService {
@@ -17,7 +17,9 @@ class ConnectivityService extends GetxService {
   void onInit() {
     super.onInit();
     _checkInitial();
-    _timer = Timer.periodic(const Duration(seconds: 10), (_) => _poll());
+    if (!Get.testMode) {
+      _timer = Timer.periodic(const Duration(seconds: 30), (_) => _poll());
+    }
   }
 
   @override
@@ -30,61 +32,44 @@ class ConnectivityService extends GetxService {
     isOnline.value = await _hasInternet();
   }
 
+  Future<void> checkNow() => _poll();
+
   Future<void> _poll() async {
     final online = await _hasInternet();
     final wasOffline = !isOnline.value;
     isOnline.value = online;
-    if (online && wasOffline) {
-      _syncPendingActions();
+    if (online && wasOffline && AppSession.instance.isAuthenticated) {
+      await _syncPendingActions();
     }
   }
 
   Future<bool> _hasInternet() async {
+    if (!ServerConfigService.instance.hasServerConfigured()) return false;
     try {
-      final result = await InternetAddress.lookup('8.8.8.8')
-          .timeout(const Duration(seconds: 3));
-      return result.isNotEmpty;
+      // On sonde le serveur réellement utilisé plutôt qu'un DNS public.
+      // Tout statut HTTP confirme que le transport jusqu'à l'API fonctionne.
+      await http
+          .get(ServerConfigService.instance.resolveApiUri('/auth/me'))
+          .timeout(const Duration(seconds: 5));
+      return true;
     } catch (_) {
       return false;
     }
   }
 
   Future<void> _syncPendingActions() async {
-    final pending = await DatabaseHelper.getPendingActions();
-    if (pending.isEmpty) return;
-
-    int synced = 0;
-    for (final action in pending) {
-      try {
-        final method = action['method'] as String;
-        final endpoint = action['endpoint'] as String;
-        final payload = action['payload'] as String?;
-        final body = payload != null && payload.isNotEmpty
-            ? jsonDecode(payload) as Map<String, dynamic>
-            : null;
-
-        switch (method) {
-          case 'POST':
-            await _api.post(endpoint, body: body);
-          case 'PATCH':
-            await _api.patch(endpoint, body: body);
-          case 'PUT':
-            await _api.put(endpoint, body: body);
-        }
-        await DatabaseHelper.markActionSynced(action['id'] as int);
-        synced++;
-      } catch (_) {
-        // keep in queue for next sync attempt
+    try {
+      final count = await _api.syncQueuedRequests();
+      if (count > 0) {
+        Get.snackbar(
+          'Synchronisation',
+          '$count modification(s) hors ligne synchronisée(s).',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 3),
+        );
       }
-    }
-
-    if (synced > 0) {
-      Get.snackbar(
-        'Synchronisation',
-        '$synced action(s) synchronisée(s)',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 3),
-      );
+    } catch (_) {
+      // La file Hive est conservée pour la prochaine reconnexion.
     }
   }
 }

@@ -29,7 +29,7 @@ class _LoginViewState extends State<LoginView> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
+   
     if (!ServerConfigService.instance.isConfiguredRx.value) {
       Get.snackbar(
         'Serveur non configuré',
@@ -144,8 +144,9 @@ class _LoginViewState extends State<LoginView> {
                                   )
                                 : const Text('Se connecter'),
                           ),
-                        )),
-                                    const SizedBox(height: AppSpacing.l),
+                        )), 
+                        const SizedBox(height: AppSpacing.l),
+                    
                     OutlinedButton.icon(
                       onPressed: () async {
                         await ServerConfigService.instance.clearServerUrl();

@@ -20,9 +20,9 @@ class _ParentMainViewState extends State<ParentMainView> {
 
   @override
   Widget build(BuildContext context) {
-    final homeController = Get.put(ParentHomeController());
-    final notificationsController = Get.put(ParentNotificationsController());
-    final profileController = Get.put(ParentProfileController());
+    Get.put(ParentHomeController());
+    Get.put(ParentNotificationsController());
+    Get.put(ParentProfileController());
 
     return Scaffold(
       body: Obx(() {

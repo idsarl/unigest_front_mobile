@@ -1,4 +1,3 @@
-import '../core/services/api_service.dart' as core_api;
 import '../core/session/app_session.dart';
 import '../models/user.dart';
 import 'api_service.dart';
@@ -10,8 +9,7 @@ class AuthService {
 
   Future<User> login(String login, String password) async {
     final raw = await _api.post('/api/auth/login',
-        body: {'login': login, 'password': password},
-        queueIfOffline: false);
+        body: {'login': login, 'password': password}, queueIfOffline: false);
 
     if (raw is! Map) {
       throw Exception('Réponse du serveur invalide');
@@ -21,7 +19,8 @@ class AuthService {
     // Le token peut s'appeler token, accessToken ou jwt selon le backend
     final token = data['token']?.toString() ??
         data['accessToken']?.toString() ??
-        data['jwt']?.toString() ?? '';
+        data['jwt']?.toString() ??
+        '';
     if (token.isEmpty) {
       throw Exception('Token absent de la réponse du serveur');
     }
@@ -51,7 +50,6 @@ class AuthService {
       await _loadCurrentUser();
     } catch (_) {}
 
-    core_api.ApiService.setToken(token);
     await _session.persist();
 
     // Vider les requêtes d'une session précédente pour éviter les 403
@@ -61,14 +59,13 @@ class AuthService {
   }
 
   Future<User> register(String email, String password, String name) async {
-    throw UnsupportedError('Inscription non exposée par l\'API mobile actuelle');
+    throw UnsupportedError(
+        'Inscription non exposée par l\'API mobile actuelle');
   }
 
   Future<bool> restoreSession() async {
     final restored = await _session.restore();
     if (!restored) return false;
-
-    core_api.ApiService.setToken(_session.token);
 
     try {
       await _loadCurrentUser();
@@ -101,7 +98,6 @@ class AuthService {
 
   Future<void> logout() async {
     await _api.clearQueuedRequests();
-    core_api.ApiService.clearToken();
     await _session.clearStorage();
   }
 }

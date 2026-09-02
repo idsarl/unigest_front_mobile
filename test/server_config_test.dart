@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:unigest_app/core/config/server_config_service.dart';
+import 'package:unigest_app/core/session/app_session.dart';
 import 'package:unigest_app/features/server_config/controllers/server_config_controller.dart';
 import 'package:unigest_app/features/server_config/views/server_config_view.dart';
 
 void main() {
   setUp(() {
     Get.reset();
+    Get.testMode = true;
     SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
     // Réinitialise l'état du service entre chaque test
     ServerConfigService.instance.setUrlForTesting(null);
   });
@@ -38,6 +42,45 @@ void main() {
       ServerConfigService.instance.setUrlForTesting(null);
       expect(ServerConfigService.instance.isConfiguredRx.value, isFalse);
     });
+
+    test('resolveApiUri avoids a duplicated api prefix', () {
+      ServerConfigService.instance
+          .setUrlForTesting('https://server.example.com/api');
+
+      expect(
+        ServerConfigService.instance.resolveApiUri('/api/auth/me').toString(),
+        'https://server.example.com/api/auth/me',
+      );
+      expect(
+        ServerConfigService.instance.resolveApiUri('/notes').toString(),
+        'https://server.example.com/api/notes',
+      );
+    });
+
+    test('resolveApiUri preserves a server sub-path', () {
+      ServerConfigService.instance
+          .setUrlForTesting('https://server.example.com/school');
+      expect(
+        ServerConfigService.instance.resolveApiUri('/api/auth/me').toString(),
+        'https://server.example.com/school/api/auth/me',
+      );
+    });
+  });
+
+  group('AppSession secure storage', () {
+    test('migrates a legacy plaintext token to secure storage', () async {
+      SharedPreferences.setMockInitialValues({'auth_token': 'legacy-jwt'});
+      FlutterSecureStorage.setMockInitialValues({});
+
+      expect(await AppSession.instance.restore(), isTrue);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('auth_token'), isNull);
+      expect(
+        await const FlutterSecureStorage().read(key: 'auth_token'),
+        'legacy-jwt',
+      );
+      await AppSession.instance.clearStorage();
+    });
   });
 
   group('ServerConfigController — validation URL', () {
@@ -56,12 +99,13 @@ void main() {
       expect(controller.isLoading.value, isFalse);
     });
 
-    test('URL without scheme sets error', () async {
+    test('URL without scheme is normalized to HTTPS', () async {
       controller.urlFieldController.text = 'server.example.com/api';
       await controller.validateAndSave();
 
-      expect(controller.errorMessage.value, isNotNull);
-      expect(controller.errorMessage.value, contains('invalide'));
+      expect(controller.errorMessage.value, isNull);
+      expect(ServerConfigService.instance.serverUrl,
+          'https://server.example.com/api');
       expect(controller.isLoading.value, isFalse);
     });
 
@@ -119,7 +163,7 @@ void main() {
       expect(ctrl.errorMessage.value, contains('requise'));
     });
 
-    testWidgets('affiche une erreur pour URL sans schéma', (tester) async {
+    testWidgets('accepte une URL sans schéma et ajoute HTTPS', (tester) async {
       final ctrl = Get.put(ServerConfigController());
       await tester.pumpWidget(
         const GetMaterialApp(home: ServerConfigView()),
@@ -130,8 +174,9 @@ void main() {
       await ctrl.validateAndSave();
       await tester.pump();
 
-      expect(ctrl.errorMessage.value, isNotNull);
-      expect(ctrl.errorMessage.value, contains('invalide'));
+      expect(ctrl.errorMessage.value, isNull);
+      expect(ServerConfigService.instance.serverUrl,
+          'https://server.example.com/api');
     });
   });
 }

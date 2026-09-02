@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 /// Service de stockage local avec Hive pour le support hors ligne.
@@ -74,7 +73,7 @@ class HiveService {
   Future<void> addQueuedRequest(Map<String, dynamic> request) async {
     final box = Hive.box(_boxQueuedRequests);
     // Génère un ID unique pour la requête
-    final requestId = DateTime.now().millisecondsSinceEpoch.toString();
+    final requestId = '${DateTime.now().microsecondsSinceEpoch}-${box.length}';
     await box.put(requestId, request);
   }
 

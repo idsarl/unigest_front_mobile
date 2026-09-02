@@ -1,12 +1,17 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:unigest_app/app.dart';
 import 'package:unigest_app/core/config/server_config_service.dart';
 
 void main() {
   setUp(() {
+    Get.reset();
+    Get.testMode = true;
     SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
   });
 
   testWidgets('Premier lancement : affiche l\'écran de configuration serveur',

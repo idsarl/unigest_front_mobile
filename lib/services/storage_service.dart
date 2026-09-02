@@ -1,6 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class StorageService {
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
   static const String _userNameKey = 'user_name';
@@ -9,12 +13,20 @@ class StorageService {
 
   static Future<void> saveAuthToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
+    await _secureStorage.write(key: _tokenKey, value: token);
+    await prefs.remove(_tokenKey);
   }
 
   static Future<String?> getAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
+    final secureToken = await _secureStorage.read(key: _tokenKey);
+    final legacyToken = prefs.getString(_tokenKey);
+    if (secureToken == null && legacyToken != null) {
+      await _secureStorage.write(key: _tokenKey, value: legacyToken);
+      await prefs.remove(_tokenKey);
+      return legacyToken;
+    }
+    return secureToken;
   }
 
   static Future<void> saveUserInfo({
@@ -49,11 +61,13 @@ class StorageService {
 
   static Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
+    await _secureStorage.delete(key: _tokenKey);
     await prefs.clear();
   }
 
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
+    await _secureStorage.delete(key: _tokenKey);
     await prefs.remove(_tokenKey);
     await prefs.remove(_userIdKey);
     await prefs.remove(_userNameKey);
